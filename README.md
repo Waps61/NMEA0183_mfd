@@ -75,7 +75,7 @@ The file `custom_partitons.csv` file wil maked use of the full memory potential.
 
 ## Example
 ### the mainscreen
-![screenshot of the mainscreen](/screenshots/IMG_4331.jpg)
+![screenshot of the mainscreen](/screenshots/IMG_4342.jpg)
 
 ### the brightness screen
 ![screenshot of the brightness screen](/screenshots/IMG_4332.jpg)
