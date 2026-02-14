@@ -71,6 +71,7 @@ void mfd_config_panel_create(lv_obj_t *parent)
     lv_dropdown_set_selected(baudvalue, 1);
     lv_dropdown_set_symbol(baudvalue, LV_SYMBOL_DOWN);
     lv_obj_set_style_text_font(baudvalue, &ui_font_lv_awsome_26, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+    lv_dropdown_bind_value(baudvalue, &mfd_baudrate);
 
     lv_obj_t *wifilabel = lv_label_create(parent);
     lv_obj_set_pos(wifilabel, 100, 103);
@@ -119,6 +120,7 @@ void mfd_config_panel_create(lv_obj_t *parent)
     lv_obj_set_size(logvalue, 150, 70);
     lv_textarea_set_accepted_chars(logvalue, "1234567890.");
     lv_textarea_set_max_length(logvalue, 6);
+    
 
     lv_obj_add_flag(logvalue, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_add_state(logvalue, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_CHECKED));
@@ -150,5 +152,5 @@ void mfd_config_panel_create(lv_obj_t *parent)
     lv_label_set_text(btnlbl, "Save");
     lv_obj_set_style_text_align(btnlbl, LV_TEXT_ALIGN_CENTER, 0);
 
-    lv_obj_add_event_cb(parent, mfd_panel_event_cb, LV_EVENT_ALL, NULL);
+    //lv_obj_add_event_cb(parent, mfd_panel_event_cb, LV_EVENT_ALL, NULL);
 }

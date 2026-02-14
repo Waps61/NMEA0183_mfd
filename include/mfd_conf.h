@@ -38,10 +38,14 @@ static lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *
 static lv_obj_t *SOGbox2, *COGbox2, *CTSbox2, *AWSbox2 = NULL;
 
 //static Preferences mfdsettings;
-static int mfd_baudrate; // default to 38400
-static bool mfd_wifi;    // default to 0 = off
-//static String mfd_ssid[25];
-//static String mfd_pwd[25];
-static long mfd_log;
+static lv_subject_t mfd_baudrate; // default to 38400
+static lv_subject_t mfd_wifi;     // default to 0 = off
+static lv_subject_t mfd_ssid;
+static lv_subject_t mfd_pwd;
+static lv_subject_t mfd_log;
 
+static char mfd_ssid_curval[26];
+static char mfd_ssid_oldval[26];
+static char mfd_pwd_curval[26];
+static char mfd_pwd_oldval[26];
 #endif // MFD_CONF_H
