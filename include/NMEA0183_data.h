@@ -1,3 +1,6 @@
+/**
+ * @file NMEA0183_data.h
+ */
 #ifndef NMEA0183_DATA_H
 #define NMEA0183_DATA_H
 
@@ -106,24 +109,25 @@ Example:
 $HCXDR,A,171,D,PITCH,A,-37,D,ROLL,G,367,,MAGX,G,2420,,MAGY,G,-8984,,MAGZ*41
 */
 
-#define FIELD_BUFFER 15
-#define NR_OF_NMEA_TAGS 21 // make sure this equal to nr of NMEA_TAG
+#define FIELD_BUFFER 15 // length of the buffer for NMEA field values as a string
 
-// Helper variables for calculation on secondar data
-static float boat_sog = 0.0;
-static int boat_hdg = 0;
-static int boat_awa = 0;
-static int boat_cts = 0;
-static int boat_cog = 0;
-static float boat_dpt = 0.0;
-static float boat_vmg = 0.0;
-static float boat_log = 0.0;  // Will be set to real value when EEPROM is read
-static float boat_trp = 0.0;
+// Helper variables for calculation on secondary data
+static float boat_sog; //= 0.0;
+static int boat_hdg; //= 0;
+static int boat_awa;//= 0;
+static int boat_cts; //= 0;
+static int boat_cog; //= 0;
+static float boat_dpt; // = 0.0;
+static float boat_vmg; // = 0.0;
+
+static float boat_trp; // = 0.0;
 static bool trip_started = false; // to ensure trip starts at 0
 static char lat_new[FIELD_BUFFER] = {0};
 static char lon_new[FIELD_BUFFER] = {0};
 static char lat_old[FIELD_BUFFER] = {0};
 static char lon_old[FIELD_BUFFER] = {0};
+
+extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
 
 #define NR_OF_NMEA_TAGS 21 // make sure this equal to nr of NMEA_TAG
 // Used as a reference to the required NMEA tag
@@ -164,5 +168,9 @@ static char NMEA_DATA_STORE[NR_OF_NMEA_TAGS][NMEA_BUFFER_SIZE + 1] = {0};
 static bool data_store_inited = false;
 extern void init_data_store();
 extern void set_data_store(enum sequence_id tag, const char data[15]);
+
+extern void set_boat_log(float value);
+extern float increase_boat_log(float value);
+extern float get_boat_log();
 
 #endif // NMEA0183_DATA_H

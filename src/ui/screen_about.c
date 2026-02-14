@@ -1,6 +1,6 @@
 /**
- * @file screen_about_gen.c
- * @brief Template source file for LVGL objects
+ * @file screen_about.c
+ * 
  */
 
 /*********************

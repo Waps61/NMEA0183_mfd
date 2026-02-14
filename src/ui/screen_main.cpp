@@ -1,6 +1,6 @@
 /**
  * @file screen_main_gen.c
- * @brief Template source file for LVGL objects
+ * 
  */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
@@ -70,23 +70,30 @@ lv_chart_series_t *ser_sog,*ser_dpt;
  *   GLOBAL FUNCTIONS
  **********************/
 // implement function declared in  NMEA0183.h
+
+void set_boat_log(float value)
+ {
+  boat_log = value;
+}
+float get_boat_log()
+{
+  return boat_log;
+}
+float  increase_boat_log(float value)
+{
+  boat_log += value;
+  return boat_log;
+}
+
 void init_data_store()
 {
 
-  lv_log("--->>Initialization data:\n");
-  lv_log("baudrate: %d\n", ship_config.baudrate);
-  lv_log("wifi is %d\n", ship_config.wifi_on);
-  lv_log("SSID :%s\n", ship_config.SSID);
-  lv_log("pwd :%s\n", ship_config.pwd);
-  lv_log("log: %.1f\n", ship_config.ship_log);
-
-  boat_log = ship_config.ship_log; // Dummy totla mileage
-
-  for (int i = 0; i < NR_OF_NMEA_TAGS; i++)
-  {
-    strcpy(NMEA_DATA_STORE[i], "---");
-    // lv_log("NMEA_DATA_STORE[ %d] = %s\n", i, NMEA_DATA_STORE[i]);
-  }
+    
+    for (int i = 0; i < NR_OF_NMEA_TAGS; i++)
+    {
+      strcpy(NMEA_DATA_STORE[i], "---");
+      // lv_log("NMEA_DATA_STORE[ %d] = %s\n", i, NMEA_DATA_STORE[i]);
+    }
   data_store_inited = true;
 }
 
@@ -118,59 +125,17 @@ void test_screen_data_updates()
 {
   current_millis = millis();
   NMEA_runSoftGenerator();
+  
 
-  /**
-   * Remove inline comment if toy want to used fake test data instead of data from
-   * the NMEA_runSoftGenerator()
-   */
-  // if (millis() % 3600)
-  // {
-  // sprintf(tile_data_buffer, "%d", mileage);
-  // lv_label_set_text(tile_hash[TRP], tile_data_buffer);
-  // mileage = (mileage++) % 1001;
-  // // }
-
-  //  if (millis() - previous_millis > UPDATE_DELAY)
-  // {
-  //   previous_millis = current_millis;
-  //   boat_cts = (int)(rand() % 10) + 270;
-  //   sprintf(tile_data_buffer, "%d", boat_cts);
-  //   lv_label_set_text(CTSvalue, tile_data_buffer);
-  //   lv_label_set_text(CTSvalue2, tile_data_buffer);
-  //   boat_hdg = (int)(rand() % 10) + 265;
-  //   sprintf(tile_data_buffer, "%d", boat_hdg);
-  //   lv_label_set_text(HDGvalue, tile_data_buffer);
-  //   boat_cog = (int)(rand() % 5) + 270;
-  //   sprintf(tile_data_buffer, "%d", boat_cog);
-  //   lv_label_set_text(COGvalue, tile_data_buffer);
-  //   lv_label_set_text(COGvalue2, tile_data_buffer);
-  //   boat_sog = (float)(rand() % 20) / 10 + 6;
-  //   sprintf(tile_data_buffer, "%.1f", boat_sog);
-  //   lv_label_set_text(SOGvalue, tile_data_buffer);
-  //   lv_label_set_text(SOGvalue2, tile_data_buffer);
-
-  //   sprintf(tile_data_buffer, "%.1f", (float)(rand() % 25) / 10 + 5);
-  //   lv_label_set_text(DPTvalue, tile_data_buffer);
-  //   sprintf(tile_data_buffer, "%d", (int)(rand() % 4) + 13);
-  //   lv_label_set_text(AWSvalue, tile_data_buffer);
-  //   lv_label_set_text(TWSvalue, tile_data_buffer);
-  //   lv_label_set_text(AWSvalue2, tile_data_buffer);
-  //   boat_awa = (int)(rand() % 5) + 30;
-  //   sprintf(tile_data_buffer, "%d", boat_awa);
-  //   lv_label_set_text(AWAvalue, tile_data_buffer);
+  
 
   //   sprintf(tile_data_buffer, "%.1f", (float)(boat_sog * cos(boat_awa * PI / 180)));
   //   lv_label_set_text(VMGvalue, tile_data_buffer);
 
-  //   sprintf(tile_data_buffer, "%d", (int)(rand() % 5) + 40);
-  //   lv_label_set_text(TWAvalue, tile_data_buffer);
-  //   sprintf(tile_data_buffer, "%d", mileage++);
-  //   lv_label_set_text(TRPvalue, tile_data_buffer);
-  //   sprintf(tile_data_buffer, "%.1f", (float)(rand() % 25) / 10 + 5);
-
+  //   
   //   sprintf(tile_data_buffer, "%d", boat_cog - boat_cts);
   //   lv_label_set_text(CMGvalue, tile_data_buffer);
-  // }
+  // 
 }
 
 /**

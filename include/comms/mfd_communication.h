@@ -1,3 +1,6 @@
+/**
+ * @file mfd_communication.h
+ */
 #ifndef MFD_COMMUNICATION_H
 #define MFD_COMMUNICATION_H
 

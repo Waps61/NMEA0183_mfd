@@ -1,3 +1,6 @@
+/**
+ * @file mfd_config_panel.h
+ */ 
 #ifndef MFD_CONFIG_PANEL_H
 #define MFD_CONFIG_PANEL_H
 

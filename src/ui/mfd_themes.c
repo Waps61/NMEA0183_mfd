@@ -1,7 +1,12 @@
 /**
  * @file mfd_themes.c
  */
-
+/*
+  Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
+  Contact:  waps61 ,gmail.com
+  Themes and Style implementation. It is used to initilialize the thems and style in use and and funuctions
+  for swithing Thems and Syles
+*/
 /*********************
  *      INCLUDES
  *********************/

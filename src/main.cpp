@@ -128,7 +128,15 @@
 // lv_style_t style_base;
 lv_obj_t *main_view = NULL;
 lv_theme_t *mfd_theme_day;
+// static Preferences mfdsettings;
+lv_subject_t mfd_baudrate; // default to 38400
+lv_subject_t mfd_wifi;     // default to 0 = off
+lv_subject_t mfd_ssid;
+lv_subject_t mfd_pwd;
+lv_subject_t mfd_log;
 
+mfd_pers_t ship_config;
+float boat_log=0.01;
 /**
  * Set the backlight of the JC1060P470 display with integrated ESP32-P4-C6
  */
@@ -142,8 +150,9 @@ void set_backlight(int value)
 
 void setup()
 {
+  //Read persistent dat from NVR (non volatile ram)
   ship_config = mfd_read_persistent_data();
-
+  nvr_millis = millis();
   lv_init();
   Serial.begin(115200);
 
@@ -160,38 +169,31 @@ void setup()
       false, /* Dark theme?  False = light theme. */
       &ui_font_lv_conthrax_16);
 
-  // Read the mfdconfig settting from EEPROM
-  // by opening the app in w-r mode
-  // TO DO: fix compiling error: unkown type 'class'
-  // mfdsettings.begin("nmea-mfd", false);
-  // mfd_baudrate = mfdsettings.getInt("baudrate", 38400);
-  // mfd_wifi = mfdsettings.getBool("wifi", false);
-  // mfd_ssid = mfdsettings.getString("SSID", "your_ssid");
-  // mfd_pwd = mfdsettings.getString("PWD", "your_pwd");
-  // mfd_log = mfdsettings.getLong("log", 0);
-
   lv_log("+++++ Setup done\n");
   ui_screens_init("yazz_mfd");
 
-  lv_disp_load_scr(screen_main);
-  ("--->>EEPROM read with:\n");
-  lv_log("baudrate: %d\n", ship_config.baudrate);
-  lv_log("wifi is %d\n", ship_config.wifi_on);
-  lv_log("SSID :%s\n", ship_config.SSID);
-  lv_log("pwd :%s\n", ship_config.pwd);
-  lv_log("log: %.1f\n", ship_config.ship_log);
-  boat_log = ship_config.ship_log;
-  lv_subject_init_int(&mfd_baudrate, ship_config.baudrate);
-  lv_subject_init_int(&mfd_wifi, ship_config.wifi_on);
+  //set subject data for config data from NVR
   char tmpbuf[26];
-  ship_config.SSID.toCharArray(tmpbuf, 25, 0);
-  lv_subject_init_string(&mfd_ssid, mfd_ssid_curval, mfd_ssid_oldval, 24, tmpbuf);
-  ship_config.pwd.toCharArray(tmpbuf, 25, 0);
-  lv_subject_init_string(&mfd_ssid, mfd_pwd_curval, mfd_pwd_oldval, 24, tmpbuf);
-  lv_subject_init_float(&mfd_log, ship_config.ship_log);
+  lv_subject_init_int(&mfd_baudrate, mfd_ship_config_get_baudrate());
+  lv_subject_init_int(&mfd_wifi, mfd_ship_config_get_wifi());
+  (mfd_ship_config_get_ssid()).toCharArray(tmpbuf, 25, 0);
+  lv_subject_init_string(&mfd_ssid, mfd_ssid_curval,mfd_ssid_oldval,25, tmpbuf);
+  (mfd_ship_config_get_pwd()).toCharArray(tmpbuf, 25, 0);
+  lv_subject_init_string(&mfd_pwd, mfd_pwd_curval, mfd_pwd_oldval,25, tmpbuf);
+  lv_subject_init_float(&mfd_log, mfd_ship_config_get_log());
 
-  // char *rslt;
-  // for testing purposes only
+  lv_disp_load_scr(screen_main);
+  lv_log("--->>EEPROM read with:\n");
+  lv_log("baudrate: %d\n", mfd_ship_config_get_baudrate());
+  lv_log("wifi is %d\n", mfd_ship_config_get_wifi());
+  lv_log("SSID :%s\n", mfd_ship_config_get_ssid()); 
+  lv_log("pwd :%s\n", mfd_ship_config_get_pwd());
+  lv_log("log: %.1f\n", mfd_ship_config_get_log());
+
+  set_boat_log(lv_subject_get_float(&mfd_log)); // set boat_log to value from NVR
+  lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
+
+  //for testing purposes only
   // mfd_pers_t testconfig;
   // testconfig.baudrate = 4800;
   // testconfig.wifi_on = 0;
@@ -204,8 +206,8 @@ void setup()
   // mfd_update_persistent_key(MFD_SSID,&testconfig);
   // testconfig.baudrate = 38400;
   // mfd_update_persistent_key(MFD_BAUDRATE, &testconfig);
-  // erase_flash();
-  // lv_log("result %s",rslt);
+
+  //erase_flash();
 #endif // TEST
 #ifdef TEST
   testlab_init();
@@ -222,6 +224,16 @@ void loop()
 #endif
 
   mfd_update_tile_data();
+
+  if( (millis()- nvr_millis)>NVR_UPDATE_INTERVAL) //every 5 minutes the ships_log is store to NVR
+  {
+    nvr_millis = millis();
+    //synchronize the subject and the persistent ship log objects
+    lv_subject_set_float(&mfd_log, get_boat_log());
+    ship_config.ship_log = get_boat_log();
+    // write last vale of ship log to NVR
+    mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
+  }
 
 // if (mfd_style_changed)
 // {

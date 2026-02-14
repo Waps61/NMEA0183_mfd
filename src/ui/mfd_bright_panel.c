@@ -1,10 +1,13 @@
+/**
+ * @file mfd_bright_panel.c
+ */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
   Contact:  waps61 @gmail.com
   Brightness screen implementation. The brightness screen controls the 4 themes setting for
   Daylight, Sunlight, Dawn and NIght setting for the display. Typical color schemes are used.
   It is also used to control the backlight ilumination between 5 and 100%
-*/ 
+*/
 #include<lvgl.h>
 
 #include <ui/mfd_bright_panel.h>

@@ -1,3 +1,6 @@
+/**
+ * @file mfd_communication.cpp
+ */
 #include <Arduino.h>
 /*
   Project:  Yazz_NMEAtor_ESP32.cpp, Copyright 2020, Roy Wassili

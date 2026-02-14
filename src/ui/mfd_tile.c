@@ -1,5 +1,5 @@
 /**
- * @file mfd_themes.c
+ * @file mfd_tile.c
  */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
@@ -9,6 +9,7 @@
   The unit, like KTS or nm, are displayed omn the rigth just above the center
   An additiona tile_data object is centered on the tile to display the actual reading from the
   NMEA0183 inputs
+  It also provides space for a mini-tile which can be used for secondary data not available on a tile
 */
 /*********************
  *      INCLUDES

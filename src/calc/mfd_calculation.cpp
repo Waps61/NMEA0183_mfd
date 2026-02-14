@@ -1,3 +1,6 @@
+/**
+ * @file mfd_calculation.cpp
+ */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
   Contact:  waps61 ,gmail.com
@@ -199,7 +202,7 @@ void processNMEAData(const char *buff)
 
   double tmpVal = 0.0;
   double tmpVar = 0.0;
-  double distance = 0.0;
+  float distance = 0.0;
   char tmp[15];
 
   char *ptr;
@@ -295,16 +298,20 @@ void processNMEAData(const char *buff)
           if (!trip_started)
           {
             trip_started = true;
+            lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_log));
+            set_boat_log(lv_subject_get_float(&mfd_log));
+            lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(),lv_subject_get_float(&mfd_log));
             strcpy(lat_old, lat_new);
             strcpy(lon_old, lon_new);
           }
           distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
           boat_trp += distance;
-          boat_log += distance;
-          
+          increase_boat_log(distance);
+          //lv_log(" boat_log = %.1f\n", get_boat_log());
+
           sprintf(tmp, "%.1f", boat_trp);
           set_data_store(TRP, tmp);
-          sprintf(tmp, "%.1f", boat_log);
+          sprintf(tmp, "%.1f", get_boat_log());
           set_data_store(LOG, tmp);
         }
         if (field == 7)

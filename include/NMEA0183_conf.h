@@ -1,3 +1,6 @@
+/**
+ * @file NMEA0183_conf.h
+ */
 #ifndef NMEA0183_CONF_H
 #define NMEA0183_CONF_H
 

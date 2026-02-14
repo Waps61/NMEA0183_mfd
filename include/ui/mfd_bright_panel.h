@@ -1,3 +1,6 @@
+/**
+ * @file mfd_bright_panel.h
+ */ 
 #ifndef MFD_BRIGHT_PANEL_H
 #define MFD_BRIGHT_PANEL_H
 

@@ -1,5 +1,5 @@
 /**
- * @file mfd_data_box.h
+ * @file mfd_tile_data.h
  */
 
 #ifndef MFD_TILE_DATA_H

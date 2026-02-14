@@ -1,5 +1,5 @@
 /**
- * @file mfd_themes.c
+ * @file mfd_tile_gauge.c
  */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili

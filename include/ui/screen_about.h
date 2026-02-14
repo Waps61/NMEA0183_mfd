@@ -1,5 +1,5 @@
 /**
- * @file screen_about_gen.h
+ * @file screen_about.h
  */
 
 #ifndef SCREEN_ABOUT_H
