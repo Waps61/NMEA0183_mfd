@@ -140,6 +140,26 @@ lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *
     }
   return tile;
 }
+/**
+ * Add an empty space in the size of tile to the panel
+ */
+void mfd_panel_add_spacer(lv_obj_t *panel)
+{
+  mfd_panel_t *pdata = (mfd_panel_t *)lv_obj_get_user_data(panel);
+  lv_obj_t *spacer = mfd_tile_create(panel);
+  lv_obj_set_style_x(spacer, pdata->draw_pos_x, 0);
+  lv_obj_set_style_y(spacer, pdata->draw_pos_y, 0);
+  if (pdata->tile_count < pdata->max_nr_of_tiles)
+  {
+    pdata->tile_count++;
+    pdata->draw_pos_x += TILE_WIDTH + pdata->tile_spacing_x;
+    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - TILE_WIDTH))
+    {
+      pdata->draw_pos_x = 10;
+      pdata->draw_pos_y += TILE_HEIGHT + pdata->tile_spacing_y;
+    }
+  }
+  }
 
 lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
 {

@@ -52,6 +52,14 @@ static lv_obj_t *mfd_wind_panel = NULL;       // a static panel to display wind 
 static lv_obj_t *mfd_course_panel = NULL;     // a static panel to display course data
 static lv_obj_t *mfd_brightness_panel = NULL; // a static panel for brigtness settings
 static lv_obj_t *mfd_config_panel = NULL;     // a static panel for the config setting
+static lv_obj_t *mfd_panel_array[] = {0};
+static int  TRIP_PNL = 0;
+static int WIND_PNL = 1;
+static int COURSE_PNL = 2;
+static int BRIGHT_PNL = 3;
+static int CONFIG_PNL = 4;
+static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL};
+
 static char tile_data_buffer[15];
 
 unsigned long previous_millis = 0;
@@ -71,15 +79,15 @@ lv_chart_series_t *ser_sog,*ser_dpt;
  **********************/
 // implement function declared in  NMEA0183.h
 
-void set_boat_log(float value)
+ void set_boat_log(float value)
  {
   boat_log = value;
 }
-float get_boat_log()
+ float get_boat_log()
 {
   return boat_log;
 }
-float  increase_boat_log(float value)
+ float  increase_boat_log(float value)
 {
   boat_log += value;
   return boat_log;
@@ -106,19 +114,28 @@ void set_data_store(enum sequence_id tag, const char data[15])
     if (data[i] != '0' || j > 0)
       fmt_data[j++] = data[i];
   }
-  if(tag==SOG)
+  switch( tag)
   {
+
+  case SOG:
     boat_sog = atof(fmt_data);
-    //lv_log("boat_sog = %f\n", boat_sog);
-  }
-  if(tag==DPT)
-  {
-    boat_dpt = atof(fmt_data)*-1.0;
-    //lv_log("boat_dpt = %f\n", boat_dpt);
-  }
-  sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
-  // strcpy(NMEA_DATA_STORE[tag], fmt_data);
-  //lv_log("NMEA_data_store[%d] = %s org = %s not fmt =%s\n", tag, NMEA_DATA_STORE[tag], data, fmt_data);
+    sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
+    break;
+  case DPT:
+    boat_dpt = atof(fmt_data) * -1.0;
+    sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
+    break;
+  case LOG:
+    sprintf(NMEA_DATA_STORE[tag], "%2.5s", fmt_data);
+    break;
+  default:
+  if(strlen(fmt_data)<3)
+    sprintf(NMEA_DATA_STORE[tag], "0%2.4s", fmt_data);
+    else
+      sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
+    break;
+    
+}
 }
 
 void test_screen_data_updates()
@@ -282,13 +299,18 @@ lv_obj_t *screen_main_create(void)
 
   // Create the panels TRIP, WIND, COURSE, BRIGHTNESS and SETTINGS
   lv_obj_t *mfd_trip_panel = mfd_panel_create(screen_active, "TRIP");
+  mfd_panel_array[TRIP_PNL] = mfd_trip_panel;
   lv_obj_t *mfd_wind_panel = mfd_panel_create(screen_active, "WIND");
+  mfd_panel_array[WIND_PNL] = mfd_wind_panel;
   mfd_hide_panel(mfd_wind_panel);
   lv_obj_t *mfd_course_panel = mfd_panel_create(screen_active, "COURSE");
+  mfd_panel_array[COURSE_PNL] = mfd_course_panel;
   mfd_hide_panel(mfd_course_panel);
   lv_obj_t *mfd_bright_panel = mfd_panel_create(screen_active, "BRIGHTNESS");
+  mfd_panel_array[BRIGHT_PNL] = mfd_bright_panel;
   mfd_hide_panel(mfd_bright_panel);
   lv_obj_t *mfd_settings_panel = mfd_panel_create(screen_active, " SETTING");
+  mfd_panel_array[CONFIG_PNL] = mfd_settings_panel;
   mfd_hide_panel(mfd_settings_panel);
 
   // Add the buttons and their link to their panel to the menubar
@@ -375,12 +397,16 @@ lv_obj_t *screen_main_create(void)
 
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
+ 
+  mfd_panel_add_spacer(mfd_wind_panel);
 
   AWSbox2 = mfd_panel_add_tile(mfd_wind_panel, "AWS", "KTS", AWSbox2);
   tile_hash[AWS2] = mfd_tile_add_tile_data(AWSbox2, tile_hash[AWS2]);
 
   TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
   tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
+
+  mfd_panel_add_spacer(mfd_wind_panel);
 
   // Add the tiles and their tile_data objects to thwe course panel
   CTSbox2 = mfd_panel_add_tile(mfd_course_panel, "CTS", "o", CTSbox2);

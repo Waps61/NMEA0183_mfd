@@ -26,16 +26,16 @@
    The pre-compiler concatenates string literals by using "" in between
 */
 
-unsigned long tmr1 = 0;
+//unsigned long tmr1 = 0;
 
 // SoftwareSerial nmeaSerialOut; // // signal need to be inverted for RS-232
 
 // ----- software timer
-unsigned long Timer2 = 1000000; // 500000L;                         // 500mS loop ... used when sending data to to Processing
-unsigned long Stop2 = 0;
+// unsigned long Timer2 = 1000000; // 500000L;                         // 500mS loop ... used when sending data to to Processing
+// unsigned long Stop2 = 0;
 
-bool on = true;
-byte pin = 22;
+// bool on = true;
+// byte pin = 22;
 
 bool updateDisplay = false;
 

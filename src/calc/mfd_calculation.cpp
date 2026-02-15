@@ -38,7 +38,7 @@ String NmeaStream[SIZE_NMEA_STREAM] = {
     "$PSTOB,13.0,v",
     "$IIVWR,179,L,02.3,N,,,,",
     "$TZBWC,095318.000,5251.3171,N,00541.7331,E,250.0,M,0.05,N,,S*7F",
-    "$IIVHW,,,161,M,04.57,N,,",
+    "$IIVHW,,,213,M,04.57,N,,",
     "$GPRMC,095318.000,A,5251.6721,N,00540.9582,E,5.3,203.35,120420,,,D*6D",
     "$IIVWR,168,L,13.3,N,,,,",
     "$IIMTW,12.2,C",
@@ -48,7 +48,7 @@ String NmeaStream[SIZE_NMEA_STREAM] = {
     "$GPGLL,5251.3191,N,00541.8137,E,151314.000,A,D*5B",
     "$PSTOB,13.1,v",
     "$IIVWR,175,R,12.7,N,,,,",
-    "$IIVHW,,,158,M,05.57,N,,"};
+    "$IIVHW,,,210,M,05.57,N,,"};
 
 #endif
 // Variable used to pass nmea tag values like SOG etc. back and forth between objects, max 15 char's long
@@ -298,9 +298,10 @@ void processNMEAData(const char *buff)
           if (!trip_started)
           {
             trip_started = true;
-            lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_log));
-            set_boat_log(lv_subject_get_float(&mfd_log));
-            lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(),lv_subject_get_float(&mfd_log));
+            lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_subject_log));
+            //set_boat_log(lv_subject_get_float(&mfd_subject_log));
+            lv_subject_set_float(&mfd_subject_log, get_boat_log());
+            lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(), lv_subject_get_float(&mfd_subject_log));
             strcpy(lat_old, lat_new);
             strcpy(lon_old, lon_new);
           }
@@ -311,7 +312,7 @@ void processNMEAData(const char *buff)
 
           sprintf(tmp, "%.1f", boat_trp);
           set_data_store(TRP, tmp);
-          sprintf(tmp, "%.1f", get_boat_log());
+          sprintf(tmp, "%f", get_boat_log());
           set_data_store(LOG, tmp);
         }
         if (field == 7)
@@ -325,6 +326,7 @@ void processNMEAData(const char *buff)
         if (field == 8)
         {
           sprintf(tmp, "%.3s", cvalue);
+          boat_cog = atoi(cvalue);
           set_data_store(COG, tmp);
         }
       }
@@ -381,7 +383,10 @@ void processNMEAData(const char *buff)
         if (field == 6)
         {
           sprintf(tmp, "%.3s", cvalue);
+          boat_cts = atoi(cvalue);
           set_data_store(CTS, tmp);
+          sprintf(tmp, "%d", boat_cts - boat_cog);
+          set_data_store(CMG,tmp);
         }
       }
       // Prepare for HDG values, converting from magnetic to true values

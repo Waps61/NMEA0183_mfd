@@ -3,18 +3,22 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.2
+  VERSION:  0.3
   Date:     v0.1 31-01-2026
   Last
-  Update:   v0.2 14-02-2026
+  Update:   v0.3 15-02-2026
+            fixed bugs, cleaned code, spacer added for panels when not all tiles are used
+            CMG implemented
+            TO DO: Implement Sun-, Dawn and Night modes 
+  Previous
+  updates:
+            v0.2 14-02-2026
             Except from communication with hardwared NMEA0183 the program is functional.
             For testing and demo purposes it sends virtual NMEA0183 messages and these
             are processed correctly.
             Persistent storage implemented and working
             Sun-, Dawn and Night modes not functional
-  Previous
-  updates:
-            31-01-2026 V0.1
+            v0.1 31-01-2026
             1st working version of the UI without NMEA0183 data input, but with a working demo
 
   Achieved: 31-01-2026 Succesful FAT  with Runnable version on ESP32 with JC1060P470 HMI
@@ -129,11 +133,11 @@
 lv_obj_t *main_view = NULL;
 lv_theme_t *mfd_theme_day;
 // static Preferences mfdsettings;
-lv_subject_t mfd_baudrate; // default to 38400
-lv_subject_t mfd_wifi;     // default to 0 = off
-lv_subject_t mfd_ssid;
-lv_subject_t mfd_pwd;
-lv_subject_t mfd_log;
+ lv_subject_t mfd_subject_baudrate; // default to 38400
+lv_subject_t mfd_subject_wifi;     // default to 0 = off
+lv_subject_t mfd_subject_ssid;
+lv_subject_t mfd_subject_pwd;
+lv_subject_t mfd_subject_log;
 
 mfd_pers_t ship_config;
 float boat_log=0.01;
@@ -174,13 +178,18 @@ void setup()
 
   //set subject data for config data from NVR
   char tmpbuf[26];
-  lv_subject_init_int(&mfd_baudrate, mfd_ship_config_get_baudrate());
-  lv_subject_init_int(&mfd_wifi, mfd_ship_config_get_wifi());
+  lv_subject_init_int(&mfd_subject_baudrate, mfd_ship_config_get_baudrate());
+  lv_log("mfd_subject_baudrate = %d\n", lv_subject_get_int(&mfd_subject_baudrate));
+  lv_subject_init_int(&mfd_subject_wifi, mfd_ship_config_get_wifi());
+  lv_log("mfd_subject_wifi_on = %d\n", lv_subject_get_int(&mfd_subject_wifi));
   (mfd_ship_config_get_ssid()).toCharArray(tmpbuf, 25, 0);
-  lv_subject_init_string(&mfd_ssid, mfd_ssid_curval,mfd_ssid_oldval,25, tmpbuf);
+  lv_subject_init_string(&mfd_subject_ssid, mfd_ssid_curval,mfd_ssid_oldval,25, tmpbuf);
+  lv_log("mfd_subject_ssid = %s\n", lv_subject_get_string(&mfd_subject_ssid));
   (mfd_ship_config_get_pwd()).toCharArray(tmpbuf, 25, 0);
-  lv_subject_init_string(&mfd_pwd, mfd_pwd_curval, mfd_pwd_oldval,25, tmpbuf);
-  lv_subject_init_float(&mfd_log, mfd_ship_config_get_log());
+  lv_subject_init_string(&mfd_subject_pwd, mfd_pwd_curval, mfd_pwd_oldval,25, tmpbuf);
+  lv_log("mfd_subject_pwd = %s\n", lv_subject_get_string(&mfd_subject_pwd));
+  lv_subject_init_float(&mfd_subject_log, mfd_ship_config_get_log());
+  lv_log("mfd_subject_log = %.1f\n", lv_subject_get_float(&mfd_subject_log));
 
   lv_disp_load_scr(screen_main);
   lv_log("--->>EEPROM read with:\n");
@@ -190,7 +199,7 @@ void setup()
   lv_log("pwd :%s\n", mfd_ship_config_get_pwd());
   lv_log("log: %.1f\n", mfd_ship_config_get_log());
 
-  set_boat_log(lv_subject_get_float(&mfd_log)); // set boat_log to value from NVR
+  set_boat_log(lv_subject_get_float(&mfd_subject_log)); // set boat_log to value from NVR
   lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
 
   //for testing purposes only
@@ -229,8 +238,8 @@ void loop()
   {
     nvr_millis = millis();
     //synchronize the subject and the persistent ship log objects
-    lv_subject_set_float(&mfd_log, get_boat_log());
-    ship_config.ship_log = get_boat_log();
+    lv_subject_set_float(&mfd_subject_log, get_boat_log());
+    mfd_ship_config_set_log( get_boat_log());
     // write last vale of ship log to NVR
     mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
   }

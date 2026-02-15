@@ -127,7 +127,6 @@ static char lon_new[FIELD_BUFFER] = {0};
 static char lat_old[FIELD_BUFFER] = {0};
 static char lon_old[FIELD_BUFFER] = {0};
 
-extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
 
 #define NR_OF_NMEA_TAGS 21 // make sure this equal to nr of NMEA_TAG
 // Used as a reference to the required NMEA tag
@@ -169,8 +168,5 @@ static bool data_store_inited = false;
 extern void init_data_store();
 extern void set_data_store(enum sequence_id tag, const char data[15]);
 
-extern void set_boat_log(float value);
-extern float increase_boat_log(float value);
-extern float get_boat_log();
 
 #endif // NMEA0183_DATA_H

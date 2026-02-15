@@ -1,6 +1,6 @@
 /**
  * @file mfd_config_panel.h
- */ 
+ */
 #ifndef MFD_CONFIG_PANEL_H
 #define MFD_CONFIG_PANEL_H
 
@@ -9,13 +9,12 @@
 #include <font/mfd_fonts.h>
 #include <persist/mfd_persistent.h>
 
-
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    static const char *baud_options = "4800\n38400";
     /*Create an AZERTY keyboard map*/
     static const char *kb_map[] = {"1", "2", "3", LV_SYMBOL_BACKSPACE, "\n",
                                    "4", "5", "6", " ", "\n",
