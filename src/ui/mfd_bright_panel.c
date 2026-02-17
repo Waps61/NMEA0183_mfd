@@ -181,12 +181,38 @@ static void buttonbar_event_cb(lv_event_t *e)
   }
 }
 
-void mfd_brightness_panel_create(lv_obj_t *parent)
+lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
 {
   
+  lv_obj_t *panel = lv_obj_create(parent);
+  lv_obj_set_name_static(panel, title);
+  lv_log("creating panel %s\n", lv_obj_get_name(panel));
+  mfd_set_style_sun(panel);
+  lv_obj_set_width(panel, 865);
+  lv_obj_set_height(panel, lv_pct(98));
+  lv_obj_set_x(panel, 150);
+  lv_obj_set_y(panel, 0);
+  mfd_panel_t *paneldata;
+  paneldata = (mfd_panel_t *)malloc(sizeof(mfd_panel_t));
+  paneldata->draw_pos_x = TILE_START_POS_X;
+  paneldata->draw_pos_y = TILE_START_POS_Y;
+  paneldata->max_nr_of_tiles = MAX_NR_OF_TILES;
+  paneldata->tile_count = 0;
+  paneldata->tile_spacing_x = TILE_SPACING_X;
+  paneldata->tile_spacing_y = TILE_SPACING_Y;
+  lv_obj_set_user_data(panel, paneldata);
+
+  if (title != NULL)
+  {
+    lv_obj_t *label = lv_label_create(panel);
+    lv_obj_set_style_align(label, LV_ALIGN_TOP_MID, 0);
+    lv_label_set_text(label, title);
+    lv_obj_set_align(label, LV_ALIGN_TOP_MID);
+  }
+
   init_style_btnbase();
-  lv_subject_init_int(&brightness_subject, ACTUAL_BRIGHTNESS);
-  lv_obj_t *btnm = lv_buttonmatrix_create(parent);
+  lv_subject_init_int(&brightness_subject, (int32_t)ACTUAL_BRIGHTNESS);
+  lv_obj_t *btnm = lv_buttonmatrix_create(panel);
   lv_obj_add_style(btnm, &style_btnbase, 0);
   // lv_obj_set_size(btnm, 600, 200);
   lv_obj_add_event_cb(btnm, buttonbar_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
@@ -197,7 +223,7 @@ void mfd_brightness_panel_create(lv_obj_t *parent)
   // lv_buttonmatrix_set_one_check(btnm, true);
   lv_obj_center(btnm);
 
-  lv_obj_t *slider = lv_slider_create(parent);
+  lv_obj_t *slider = lv_slider_create(panel);
   lv_obj_add_event_cb(slider, brightness_slider_event_cb, LV_EVENT_RELEASED | LV_INDEV_STATE_RELEASED, NULL); /* Assign an event callback */
   lv_slider_set_range(slider, 5, 100);
   lv_bar_set_start_value(slider, 10, LV_ANIM_OFF);
@@ -206,9 +232,10 @@ void mfd_brightness_panel_create(lv_obj_t *parent)
   lv_obj_add_style(slider, &mfd_style,0);
 
   // Create a label below the slider
-  lv_obj_t *label = lv_label_create(parent);
+  lv_obj_t *label = lv_label_create(panel);
   lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -90);
   lv_obj_add_style(label, &mfd_style_day, LV_STATE_DEFAULT);
   lv_label_bind_text(label, &brightness_subject, "%d %%");
   // update_data_values = false;
+  return panel;
 }

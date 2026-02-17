@@ -57,7 +57,7 @@ lv_obj_t *mfd_mini_tile_add_data(lv_obj_t *tile)
   static bool inited = false;
   
   lv_obj_t *tile_data = lv_label_create(tile);
-  lv_obj_set_name_static(tile_data, "mfd_mini_tile_data");
+  lv_obj_set_name(tile_data, "mfd_mini_tile_data");
   if (tile_data != NULL)
   {
     lv_log(" mfd_mini_tile created %s\n", lv_obj_get_name(tile_data));

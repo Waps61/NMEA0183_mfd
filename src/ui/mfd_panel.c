@@ -21,31 +21,12 @@
 /*********************
  *      DEFINES
  *********************/
-#define TILE_START_POS_X 10
-#define TILE_START_POS_Y 20
-#define MAX_NR_OF_TILES 6
-#define TILE_SPACING_X 10
-#define TILE_SPACING_Y 10
+
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
-  lv_style_t style_main;
-  lv_style_t style_scrollbar;
-} lv_panel_styles_t;
 
-struct _mfd_panel_t
-{
-  int max_nr_of_tiles;
-  int tile_spacing_x;
-  int tile_spacing_y;
-  int draw_pos_x;
-  int draw_pos_y;
-  int tile_count;
-};
-typedef struct _mfd_panel_t mfd_panel_t;
 
 /***********************
  *  STATIC VARIABLES
@@ -58,22 +39,8 @@ typedef struct _mfd_panel_t mfd_panel_t;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-int max_row = 2;
-int max_col = 3;
-int max_tiles = 6;
-int tile_index = 0;
 
-void mfd_hide_panel(lv_obj_t *panel)
-{
-  if (!lv_obj_has_flag(panel, LV_OBJ_FLAG_HIDDEN))
-    lv_obj_add_flag(panel, LV_OBJ_FLAG_HIDDEN);
-}
 
-void mfd_show_panel(lv_obj_t *panel)
-{
-  if (lv_obj_has_flag(panel, LV_OBJ_FLAG_HIDDEN))
-    lv_obj_remove_flag(panel, LV_OBJ_FLAG_HIDDEN);
-}
 
 static void mfd_panel_style_observer_cb(lv_observer_t *observer, lv_subject_t *subject)
 {
@@ -161,7 +128,7 @@ void mfd_panel_add_spacer(lv_obj_t *panel)
   }
   }
 
-lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
+lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title) 
 {
   static bool inited = false;
   static lv_panel_styles_t styles;
@@ -179,7 +146,7 @@ lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
   }
 
   lv_obj_t *panel = lv_obj_create(parent);
-  lv_obj_set_name_static(panel, title);
+  lv_obj_set_name(panel, title);
   
   mfd_set_style_sun(panel);
   lv_obj_set_width(panel, 865);

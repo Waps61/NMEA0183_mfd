@@ -8,6 +8,7 @@
 #include <ui/mfd_themes.h>
 #include <font/mfd_fonts.h>
 #include <persist/mfd_persistent.h>
+#include <ui/mfd_panel_gen.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -27,7 +28,7 @@ extern "C"
                                                      LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, (lv_buttonmatrix_ctrl_t)(LV_BUTTONMATRIX_CTRL_HIDDEN | LV_BUTTONMATRIX_CTRL_WIDTH_6),
                                                      LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_6};
 
-    void mfd_config_panel_create(lv_obj_t *parent);
+    lv_obj_t* mfd_config_panel_create(lv_obj_t *parent, const char* title);
 
 #ifdef __cplusplus
 } /*extern "C"*/

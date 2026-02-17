@@ -147,7 +147,7 @@ lv_obj_t *mfd_tile_create(lv_obj_t *parent)
   }
 
   lv_obj_t *tile = lv_obj_create(parent);
-  lv_obj_set_name_static(tile, "mfd_tile");
+  lv_obj_set_name(tile, "mfd_tile");
   mfd_set_tile_style(tile);
   lv_obj_set_width(tile, TILE_WIDTH);
   lv_obj_set_height(tile, TILE_HEIGHT);

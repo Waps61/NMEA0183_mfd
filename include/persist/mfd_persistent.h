@@ -1,14 +1,15 @@
 /**
  * @file mfd_persistent.h
- */ 
+ */
 #ifndef MFD_PERSISTENT_H
 #define MFD_PERSISTENT_H
 #include <Arduino.h>
 #include <Preferences.h>
 
-#define NVR_UPDATE_INTERVAL 300000 // in milli seconds this converts to 5 minutes
-
-static long nvr_millis;  // stores the previous millis alues for NVR_UPDATE function
+// in milli seconds this converts to 10 minutes that the ships lof
+// is written to persitent storage
+#define NVR_UPDATE_INTERVAL 600000
+static long nvr_millis; // stores the previous millis alues for NVR_UPDATE function
 
 static Preferences mfd_preferences;
 enum mfd_pers_key

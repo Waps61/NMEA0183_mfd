@@ -9,6 +9,7 @@
 //#include <SD.h>
 #include <NMEA0183_data.h>
 #include <calc/mfd_calculation.h>
+#include <mfd_conf.h>
 
 //*** Since the signal from the RS422-TTL converter is inverted
 //*** a digital input is used as a software serial port because
@@ -16,10 +17,10 @@
 // #include <SoftwareSerial.h>
 #define SAMPLERATE 115200
 
-#define LISTENER_RATE 38400 // Baudrate for the listner
+// #define LISTENER_RATE 38400 // Baudrate for the listner, but now set through mfd_subject_baudrate
 #define LISTENER_RX 18      // Serial1 Rx port
 #define LISTENER_TX 19      // Serial1 TX port
-#define TALKER_RATE 38400   // Baudrate for the talker
+//#define TALKER_RATE 38400   // Baudrate for the talker
 #define TALKER_RX 22
 #define TALKER_TX 23 // SoftSerial port 2
 

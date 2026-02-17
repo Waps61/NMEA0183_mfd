@@ -30,17 +30,10 @@
 
 // SoftwareSerial nmeaSerialOut; // // signal need to be inverted for RS-232
 
-// ----- software timer
-// unsigned long Timer2 = 1000000; // 500000L;                         // 500mS loop ... used when sending data to to Processing
-// unsigned long Stop2 = 0;
 
-// bool on = true;
-// byte pin = 22;
 
-bool updateDisplay = false;
 
-// bool newData = false;
-// unsigned long tmr1 = 0;
+
 
 /*
  * Setting for Serial interrupt
@@ -214,12 +207,13 @@ void NMEA_startListening()
 
 
 /*
- * Initializes UART 2 for incomming NMEA0183 data from the boat network
+ * Initializes UART 1 for incomming NMEA0183 data from the boat network
  */
 bool initializeListener()
 {
   bool status = true;
-  Serial1.begin(LISTENER_RATE, SERIAL_8N1, LISTENER_RX, LISTENER_TX, true);
+  int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
+  Serial1.begin(baudrate, SERIAL_8N1, LISTENER_RX, LISTENER_TX, true);
   clearNMEAInputBuffer();
 #ifdef DEBUG
   debugWrite("Listener initialized...");
@@ -228,12 +222,14 @@ bool initializeListener()
 }
 
 /*
- * Initializes UART 2 for incomming NMEA0183 data from the boat network
+ * Initializes UART  for incomming NMEA0183 data from the boat network
+ for now UART2 run at the same speed as UART1
  */
 bool initializeTalker()
 {
   bool status = true;
-  Serial2.begin(LISTENER_RATE, SERIAL_8N1, TALKER_RX, TALKER_TX, true);
+  int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
+  Serial2.begin(baudrate, SERIAL_8N1, TALKER_RX, TALKER_TX, true);
   clearNMEAInputBuffer();
 #ifdef DEBUG
   debugWrite("Listener initialized...");
@@ -241,80 +237,12 @@ bool initializeTalker()
   return status;
 }
 
-// /*
-//   Decode the incomming character and test if it is valid NMEA data.
-//   If true than put it the NMEA buffer and call NMEAParser object
-//   to process incomming and complete MNEA sentence
-// */
-// void decodeNMEAInput(char cIn)
-// {
-//   switch (cIn)
-//   {
-//   case '~':
-//     // reserved by NMEA
-//   case '!':
-//     // for AIS info
-//   case '$':
-//     // for general NMEA info
-//     nmeaStatus = RECEIVING;
-//     nmeaIndex = 0;
-//     break;
-//   case '*':
-//     if (nmeaStatus == RECEIVING)
-//     {
-//       nmeaStatus = CHECKSUMMING;
-//     }
-//     break;
-//   case '\n':
-//   case '\r':
-//     // in old v1.5 version, NMEA Data may not be checksummed!
-//     if (nmeaStatus == RECEIVING || nmeaStatus == CHECKSUMMING)
-//     {
-//       nmeaDataReady = true;
-//       nmeaStatus = TERMINATING;
-//     }
-//     else
-//       nmeaStatus = INVALID;
-//     break;
-//   }
-//   switch (nmeaStatus)
-//   {
-//   case INVALID:
-//     // do nothing
-//     nmeaIndex = 0;
-//     nmeaDataReady = false;
-//     break;
-//   case RECEIVING:
-//   case CHECKSUMMING:
-//     NMEA_DATA_STORE[nmeaIndex] = cIn;
-//     nmeaIndex++;
-//     break;
-//   case TERMINATING:
-//     nmeaStatus = INVALID;
-//     if (nmeaDataReady)
-//     {
-//       nmeaDataReady = false;
-//       // Clear the remaining buffer content with '\0'
-//       for (int y = nmeaIndex + 1; y < NMEA_BUFFER_SIZE + 1; y++)
-//       {
-//         NMEA_DATA_STORE[y] = '\0';
-//       }
-// #ifdef DEBUG
-//       debugWrite(NMEA_DATA_STORE);
-// #endif
-//       NmeaParser.parseNMEASentence(NMEA_DATA_STORE);
-//       // clear the NMEA_DATA_STORE with 0
-//       memset(NMEA_DATA_STORE, 0, NMEA_BUFFER_SIZE + 1);
-//       nmeaIndex = 0;
-//     }
-//     break;
-//   }
-// }
+
 
 // /*
 //  * Start listeneing for incomming NNMEA sentences
 //  */
-// void NMEA_tartListening()
+// void NMEA_startListening()
 // {
 // #ifdef DEBUG
 //   debugWrite("Listening....");

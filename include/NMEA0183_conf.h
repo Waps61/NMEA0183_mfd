@@ -111,12 +111,12 @@ void touchscreen_setup()
   screenWidth = gfx->width();
   screenHeight = gfx->height();
 
-  lv_style_init(&green);
-  lv_style_set_bg_color(&green, lv_palette_main(LV_PALETTE_LIME));
-  lv_style_init(&yellow);
-  lv_style_set_bg_color(&yellow, lv_palette_main(LV_PALETTE_AMBER));
-  lv_style_init(&red);
-  lv_style_set_bg_color(&red, lv_palette_main(LV_PALETTE_PURPLE));
+  // lv_style_init(&green);
+  // lv_style_set_bg_color(&green, lv_palette_main(LV_PALETTE_LIME));
+  // lv_style_init(&yellow);
+  // lv_style_set_bg_color(&yellow, lv_palette_main(LV_PALETTE_AMBER));
+  // lv_style_init(&red);
+  // lv_style_set_bg_color(&red, lv_palette_main(LV_PALETTE_PURPLE));
 
 #ifdef DIRECT_RENDER_MODE
   bufSize = screenWidth * screenHeight;

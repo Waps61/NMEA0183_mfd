@@ -5,6 +5,10 @@
 #define MFD_CONF_H
 #include <lvgl.h> // v9.3.0
 
+//Version
+#define VERSION_MAJOR "0"
+#define VERSION_MINOR "4"
+#define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
 #define MFD_SCREEN_HEIGHT 600
@@ -55,8 +59,10 @@ extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is re
  static char mfd_pwd_curval[26];
  static char mfd_pwd_oldval[26];
 
+
  extern void set_boat_log(float value);
  extern float increase_boat_log(float value);
  extern float get_boat_log();
 
+ 
 #endif // MFD_CONF_H

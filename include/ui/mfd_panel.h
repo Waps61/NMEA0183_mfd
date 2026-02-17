@@ -15,6 +15,7 @@ extern "C"
    *********************/
 
 #include <lvgl.h>
+#include <ui/mfd_panel_gen.h>
 
   /*********************
    *      DEFINES
@@ -27,8 +28,6 @@ extern "C"
   /**********************
    * GLOBAL PROTOTYPES
    **********************/
-  void mfd_hide_panel(lv_obj_t *panel);
-  void mfd_show_panel(lv_obj_t *panel);
   lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *tag_unit, lv_obj_t *data_tile);
   lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title);
   void mfd_panel_add_spacer(lv_obj_t *panel);

@@ -1,6 +1,6 @@
 /**
  * @file screen_main_gen.c
- * 
+ *
  */
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
@@ -52,8 +52,8 @@ static lv_obj_t *mfd_wind_panel = NULL;       // a static panel to display wind 
 static lv_obj_t *mfd_course_panel = NULL;     // a static panel to display course data
 static lv_obj_t *mfd_brightness_panel = NULL; // a static panel for brigtness settings
 static lv_obj_t *mfd_config_panel = NULL;     // a static panel for the config setting
-static lv_obj_t *mfd_panel_array[] = {0};
-static int  TRIP_PNL = 0;
+static lv_obj_t *mfd_panel_array[5] = {0};
+static int TRIP_PNL = 0;
 static int WIND_PNL = 1;
 static int COURSE_PNL = 2;
 static int BRIGHT_PNL = 3;
@@ -71,37 +71,38 @@ size_t free_bytes;
  *  STATIC PROTOTYPES
  **********************/
 lv_obj_t *tile_hash[NR_OF_NMEA_TAGS] = {0};
-lv_obj_t *sogplot,*dptplot;
-lv_chart_series_t *ser_sog,*ser_dpt;
+lv_obj_t *sogplot, *dptplot;
+lv_chart_series_t *ser_sog, *ser_dpt;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 // implement function declared in  NMEA0183.h
 
- void set_boat_log(float value)
- {
+void set_boat_log(float value)
+{
   boat_log = value;
+  lv_subject_set_float(&mfd_subject_log, value);
 }
- float get_boat_log()
+float get_boat_log()
 {
   return boat_log;
 }
- float  increase_boat_log(float value)
+float increase_boat_log(float value)
 {
   boat_log += value;
+  lv_subject_set_float(&mfd_subject_log, boat_log);
   return boat_log;
 }
 
 void init_data_store()
 {
 
-    
-    for (int i = 0; i < NR_OF_NMEA_TAGS; i++)
-    {
-      strcpy(NMEA_DATA_STORE[i], "---");
-      // lv_log("NMEA_DATA_STORE[ %d] = %s\n", i, NMEA_DATA_STORE[i]);
-    }
+  for (int i = 0; i < NR_OF_NMEA_TAGS; i++)
+  {
+    strcpy(NMEA_DATA_STORE[i], "---");
+    // lv_log("NMEA_DATA_STORE[ %d] = %s\n", i, NMEA_DATA_STORE[i]);
+  }
   data_store_inited = true;
 }
 
@@ -114,7 +115,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
     if (data[i] != '0' || j > 0)
       fmt_data[j++] = data[i];
   }
-  switch( tag)
+  switch (tag)
   {
 
   case SOG:
@@ -129,30 +130,18 @@ void set_data_store(enum sequence_id tag, const char data[15])
     sprintf(NMEA_DATA_STORE[tag], "%2.5s", fmt_data);
     break;
   default:
-  if(strlen(fmt_data)<3)
-    sprintf(NMEA_DATA_STORE[tag], "0%2.4s", fmt_data);
+    if (strlen(fmt_data) < 3)
+      sprintf(NMEA_DATA_STORE[tag], "0%2.4s", fmt_data);
     else
       sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
-    
-}
+  }
 }
 
 void test_screen_data_updates()
 {
   current_millis = millis();
   NMEA_runSoftGenerator();
-  
-
-  
-
-  //   sprintf(tile_data_buffer, "%.1f", (float)(boat_sog * cos(boat_awa * PI / 180)));
-  //   lv_label_set_text(VMGvalue, tile_data_buffer);
-
-  //   
-  //   sprintf(tile_data_buffer, "%d", boat_cog - boat_cts);
-  //   lv_label_set_text(CMGvalue, tile_data_buffer);
-  // 
 }
 
 /**
@@ -190,12 +179,12 @@ void mfd_update_tile_data()
       case AWS:
         lv_label_set_text(tile_hash[AWS2], NMEA_DATA_STORE[i]);
         break;
-        case DPT:
-          lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt);
-          break;
-        default:
-          break;
-        }
+      case DPT:
+        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt);
+        break;
+      default:
+        break;
+      }
     }
   }
 }
@@ -210,39 +199,25 @@ void mfd_update_tile_data()
  */
 void menu_btn_event_cb(lv_event_t *event)
 {
-  lv_obj_t *panel_btn = NULL;
-  panel_btn = (lv_obj_t *)lv_event_get_user_data(event);
-  const char *panel_name = lv_obj_get_name(panel_btn);
-  lv_log("panel to show is %s\n", panel_name);
+  // lv_obj_t *panel_btn = NULL;
+  lv_event_code_t code = lv_event_get_code(event);
+  lv_obj_t *btn = lv_event_get_target_obj(event);
+  if (code == LV_EVENT_CLICKED)
+  {
+    int *ipnl = (int *)lv_event_get_user_data(event);
+    lv_log("index from button pressed = %d\n", *ipnl);
+    for (int i = TRIP_PNL; i <= CONFIG_PNL; i++)
+    {
+      if (i == *ipnl)
+      {
+        lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
+        mfd_show_panel(mfd_panel_array[i]);
+      }
+      else
+        mfd_hide_panel(mfd_panel_array[i]);
+    }
+  }
 
-  // lv_log(" panels equal is: %d\n", strcmp(panel_name, "TRIP"));
-  // if (strcmp(panel_name, "TRIP") == 0)
-  // {
-  //   lv_log("hidding panel: %s\n)", panel_name);
-  //   if (lv_obj_has_flag(panel_btn, LV_OBJ_FLAG_HIDDEN))
-  //     mfd_show_panel(panel_btn);
-  //   lv_log("hidding panel: WIND\n");
-  //   mfd_hide_panel(mfd_wind_panel);
-  //   lv_log("hidding panel: COURSE\n");
-  //   mfd_hide_panel(mfd_course_panel);
-  //   lv_log("hidding panel: BRIGHTNESS\n");
-  //   mfd_hide_panel(mfd_brightness_panel);
-  //   lv_log("hidding panel: SETTING\n");
-  //   mfd_hide_panel(mfd_config_panel);
-  // }
-  // else if (strcmp(panel_name, "WIND") == 0)
-  // {
-  //   if (lv_obj_has_flag(panel_btn, LV_OBJ_FLAG_HIDDEN))
-  //     mfd_show_panel(panel_btn);
-  //   mfd_hide_panel(mfd_trip_panel);
-  //   mfd_hide_panel(mfd_course_panel);
-  //   mfd_hide_panel(mfd_brightness_panel);
-  //   mfd_hide_panel(mfd_config_panel);
-  // }
-  if (lv_obj_has_flag(panel_btn, LV_OBJ_FLAG_HIDDEN))
-    mfd_show_panel(panel_btn);
-  else if (strcmp(panel_name, "TRIP") != 0)
-    mfd_hide_panel(panel_btn);
 }
 
 /**
@@ -277,19 +252,8 @@ lv_obj_t *screen_main_create(void)
   // Add a menubar
   lv_obj_t *menu_bar = lv_obj_create(screen_active);
   lv_obj_remove_style_all(menu_bar);
-  lv_obj_set_flex_flow(menu_bar, LV_FLEX_FLOW_COLUMN);
-  lv_obj_set_style_bg_color(menu_bar, lv_color_hex(DAWN_BACKGROUND), 0);
-  lv_obj_set_style_bg_opa(menu_bar, LV_OPA_50, 0);
-  lv_obj_set_style_text_color(menu_bar, lv_color_hex(DAY_TEXT_ON_BACKGROUND), 0);
-  //lv_obj_set_style_text_opa(menu_bar, LV_OPA_70, 0);
-  lv_obj_set_style_text_font(menu_bar, &ui_font_lv_conthrax_16, 0);
-  lv_obj_set_style_border_color(menu_bar, lv_color_hex(DAWN_TEXT_ON_PRIMARY), 0);
-  lv_obj_set_style_border_width(menu_bar, 1, 0);
-  lv_obj_set_style_text_font(menu_bar, &ui_font_lv_conthrax_16, 0);
-  lv_obj_set_style_text_align(menu_bar, LV_TEXT_ALIGN_CENTER, 0);
-  lv_obj_set_style_shadow_color(menu_bar, lv_color_hex(DAWN_SURFACE), 0);
-  lv_obj_set_style_shadow_width(menu_bar, 5, 0);
-
+   lv_obj_set_flex_flow(menu_bar, LV_FLEX_FLOW_COLUMN);
+  mfd_set_menu_bar_style(menu_bar);
   lv_obj_set_x(menu_bar, 0);
   lv_obj_set_y(menu_bar, 0);
   lv_obj_set_width(menu_bar, 145);
@@ -300,36 +264,47 @@ lv_obj_t *screen_main_create(void)
   // Create the panels TRIP, WIND, COURSE, BRIGHTNESS and SETTINGS
   lv_obj_t *mfd_trip_panel = mfd_panel_create(screen_active, "TRIP");
   mfd_panel_array[TRIP_PNL] = mfd_trip_panel;
+  mfd_show_panel(mfd_trip_panel);
   lv_obj_t *mfd_wind_panel = mfd_panel_create(screen_active, "WIND");
   mfd_panel_array[WIND_PNL] = mfd_wind_panel;
   mfd_hide_panel(mfd_wind_panel);
+
   lv_obj_t *mfd_course_panel = mfd_panel_create(screen_active, "COURSE");
   mfd_panel_array[COURSE_PNL] = mfd_course_panel;
   mfd_hide_panel(mfd_course_panel);
-  lv_obj_t *mfd_bright_panel = mfd_panel_create(screen_active, "BRIGHTNESS");
+
+  lv_obj_t *mfd_bright_panel = mfd_brightness_panel_create(screen_active, "BRIGHT");
+  // mfd_brightness_panel_create(mfd_bright_panel);
   mfd_panel_array[BRIGHT_PNL] = mfd_bright_panel;
   mfd_hide_panel(mfd_bright_panel);
-  lv_obj_t *mfd_settings_panel = mfd_panel_create(screen_active, " SETTING");
+
+  lv_obj_t *mfd_settings_panel = mfd_config_panel_create(screen_active, " SETTING");
   mfd_panel_array[CONFIG_PNL] = mfd_settings_panel;
+  // mfd_config_panel_create(mfd_settings_panel);
   mfd_hide_panel(mfd_settings_panel);
 
   // Add the buttons and their link to their panel to the menubar
   // The void *userdata reference  is the reference to the panel to show
   lv_obj_t *trip_btn = mfd_button_create(menu_bar, "TRIP");
   // lv_obj_add_flag(trip_btn, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_add_event_cb(trip_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_trip_panel);
+  // lv_obj_add_event_cb(trip_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_trip_panel);
+  lv_obj_add_event_cb(trip_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[TRIP_PNL]);
 
   lv_obj_t *wind_btn = mfd_button_create(menu_bar, "WIND");
-  lv_obj_add_event_cb(wind_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_wind_panel);
+  // lv_obj_add_event_cb(wind_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_wind_panel);
+  lv_obj_add_event_cb(wind_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[WIND_PNL]);
 
   lv_obj_t *course_btn = mfd_button_create(menu_bar, "COURSE");
-  lv_obj_add_event_cb(course_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_course_panel);
+  // lv_obj_add_event_cb(course_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_course_panel);
+  lv_obj_add_event_cb(course_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[COURSE_PNL]);
 
   lv_obj_t *bright_btn = mfd_button_create(menu_bar, "BRIGHT");
-  lv_obj_add_event_cb(bright_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_bright_panel);
+  // lv_obj_add_event_cb(bright_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_bright_panel);
+  lv_obj_add_event_cb(bright_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[BRIGHT_PNL]);
 
   lv_obj_t *setting_btn = mfd_button_create(menu_bar, "SETTING");
-  lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_settings_panel);
+  // lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_settings_panel);
+  lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
   lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
   // lv_obj_add_flag(wind_btn, LV_OBJ_FLAG_CHECKABLE);
@@ -397,7 +372,7 @@ lv_obj_t *screen_main_create(void)
 
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
- 
+
   mfd_panel_add_spacer(mfd_wind_panel);
 
   AWSbox2 = mfd_panel_add_tile(mfd_wind_panel, "AWS", "KTS", AWSbox2);
@@ -426,9 +401,6 @@ lv_obj_t *screen_main_create(void)
 
   CMGbox = mfd_panel_add_tile(mfd_course_panel, "CMG", "0", CMGbox);
   tile_hash[CMG] = mfd_tile_add_tile_data(CMGbox, tile_hash[CMG]);
-
-  mfd_brightness_panel_create(mfd_bright_panel);
-  mfd_config_panel_create(mfd_settings_panel);
 
   LV_TRACE_OBJ_CREATE("finished");
 
