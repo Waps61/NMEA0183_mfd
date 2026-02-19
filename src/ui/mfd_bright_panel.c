@@ -40,7 +40,7 @@ void init_style_btnbase()
   //lv_style_set_text_color(&style_btnbase, lv_color_white());
   lv_style_set_width(&style_btnbase, 750);
   lv_style_set_height(&style_btnbase, 200);
-  mfd_style_changed = false;
+  mfd_style_changed = UNCHANGED_STYLE;
 }
 
 static void brightness_slider_event_cb(lv_event_t *e)
@@ -70,7 +70,7 @@ static void buttonbar_event_cb(lv_event_t *e)
   lv_obj_t *obj = lv_event_get_target_obj(e);
   lv_draw_task_t *draw_task = lv_event_get_draw_task(e);
   lv_draw_dsc_base_t *base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-
+  
   /*When the button matrix draws the buttons...*/
   if (base_dsc->part == LV_PART_ITEMS)
   {
@@ -96,8 +96,8 @@ static void buttonbar_event_cb(lv_event_t *e)
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(DAY_SURFACE); // lv_palette_darken(LV_PALETTE_GREY, 1);
-          //mfd_update_style(obj, &mfd_style_day);
-          lv_style_copy(&mfd_style,&mfd_style_day);
+          mfd_set_style_changed( DAY_STYLE);
+          //lv_style_copy(&mfd_style, &mfd_style_day);
         }else
           fill_draw_dsc->color = lv_color_hex(DAY_BACKGROUND); // lv_palette_main(LV_PALETTE_GREY);
       }
@@ -117,8 +117,9 @@ static void buttonbar_event_cb(lv_event_t *e)
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(SUN_SURFACE);
-    
-        }else
+          mfd_set_style_changed( SUN_STYLE);
+          //lv_style_copy(&mfd_style, &mfd_style_sun);
+            }else
           fill_draw_dsc->color = lv_color_hex(SUN_BACKGROUND);
       }
 
@@ -127,7 +128,7 @@ static void buttonbar_event_cb(lv_event_t *e)
         label_draw_dsc->color = lv_color_hex(SUN_TEXT_ON_BACKGROUND);
       }
 
-      lv_style_copy(&mfd_style,&mfd_style_sun);
+      
     }
 
     else if (base_dsc->id1 == 2)
@@ -139,6 +140,9 @@ static void buttonbar_event_cb(lv_event_t *e)
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(DAWN_SURFACE);
+          mfd_set_style_changed(DAWN_STYLE);
+      
+          //lv_style_copy(&mfd_style, &mfd_style_dawn);
         }else
           fill_draw_dsc->color = lv_color_hex(DAWN_BACKGROUND);
       }
@@ -148,7 +152,7 @@ static void buttonbar_event_cb(lv_event_t *e)
       {
         label_draw_dsc->color = lv_color_hex(DAWN_TEXT_ON_BACKGROUND);
       }
-      lv_style_copy(&mfd_style,&mfd_style_dawn);
+      
     }
     /*Change the draw descriptor of the 3rd button*/
     else if (base_dsc->id1 == 3)
@@ -160,9 +164,10 @@ static void buttonbar_event_cb(lv_event_t *e)
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(NIGHT_SURFACE);
-          //mfd_update_style(obj, &mfd_style_night);
-          mfd_style_changed = true;
-          lv_style_copy(&mfd_style, &mfd_style_night);
+          //mfd_update_style(lv_screen_active(), &mfd_style_night);
+          mfd_set_style_changed( NIGHT_STYLE);
+          
+          //lv_style_copy(&mfd_style, &mfd_style_night);
         }else
           fill_draw_dsc->color = lv_color_hex(NIGHT_BACKGROUND);
       }
@@ -179,6 +184,8 @@ static void buttonbar_event_cb(lv_event_t *e)
     }
     
   }
+  //mfd_update_style(obj, &mfd_style_night);
+  // lv_style_reset(&curr_style);
 }
 
 lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)

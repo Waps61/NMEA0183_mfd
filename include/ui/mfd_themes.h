@@ -2,6 +2,7 @@
  * @file mfd_themes.h
  */
 
+
 #ifndef MFD_THEMES_H
 #define MFD_THEMES_H
 
@@ -22,6 +23,8 @@ extern "C"
 /*
  * Day theme colours
  */
+#define UNCHANGED_STYLE 0
+#define DAY_STYLE 1
 #define DAY_PRIMARY 0x37474F   // #37474F
 #define DAY_SECONDARY 0x263238 // #263238
 #define DAY_BACKGROUND 0xc7c7c7 // #c7c7c7
@@ -32,6 +35,7 @@ extern "C"
 /*
  * Night theme colours
  */
+#define NIGHT_STYLE 2
 #define NIGHT_PRIMARY 0x252525 // #252525
 #define NIGHT_SECONDARY 0x5e5e5e // #5e5e5e
 #define NIGHT_BACKGROUND 0x000000 // #000000
@@ -42,6 +46,7 @@ extern "C"
 /*
  * Sun theme colours
  */
+#define SUN_STYLE 3
 #define SUN_PRIMARY 0x0033ff // #0033ff
 #define SUN_SECONDARY 0x0029cc // #0029cc
 #define SUN_BACKGROUND 0xf3f4f6 // #f3f4f6
@@ -52,12 +57,13 @@ extern "C"
 /*
  * Dawn theme colours
  */
+#define DAWN_STYLE 4
 #define DAWN_PRIMARY 0x311B92   // #311B92
 #define DAWN_SECONDARY 0x4527A0 // #4527A0
 #define DAWN_BACKGROUND 0x1A237E  // #1A237E
 #define DAWN_SURFACE 0x303F9F     // #303F9F
-#define DAWN_TEXT_ON_PRIMARY 0x7E57C2  // #7E57C2
-#define DAWN_TEXT_ON_BACKGROUND 0x7986CB // #7986CB
+#define DAWN_TEXT_ON_PRIMARY 0xc6abf4    // #c6abf4
+#define DAWN_TEXT_ON_BACKGROUND 0x795a6fa // #df07f3
 
   /**********************
    *      TYPEDEFS
@@ -85,18 +91,20 @@ extern "C"
   static   lv_style_t mfd_style_day, mfd_style_night, mfd_style_sun, mfd_style_dawn, mfd_style;
   static lv_style_t mfd_style_tile, mfd_style_menubar, mfd_style_btn, mfd_style_btn_pressed;
   static bool mfd_styles_inited;
-  static bool mfd_style_changed;
+  static int mfd_style_changed;
 
   /**********************
    * GLOBAL PROTOTYPES
    *********************/
 
-  static void switch_theme_event_cb(lv_event_t *e);
-
+  
   void mfd_init_styles();
   void mfd_update_style( lv_obj_t *parent, lv_style_t *newstyle);
+  int mfd_get_style_changed();
+  void mfd_set_style_changed(int styleID);
+  void mfd_recolor(lv_obj_t *parent);
 
-  
+  lv_obj_t *mfd_set_style(lv_obj_t *obj);
   lv_obj_t *mfd_set_style_day(lv_obj_t *obj);
   lv_obj_t *mfd_set_style_night(lv_obj_t *obj);
   lv_obj_t *mfd_set_style_sun(lv_obj_t *obj);

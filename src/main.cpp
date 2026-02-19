@@ -116,6 +116,17 @@
 #include <font/mfd_fonts.h>
 #include <NMEA0183_conf.h>
 
+/**
+ * If you want to test sepcific undocumented LVGL functionality
+ * then use this playground.
+ * It excludes all of your main program, unless you include them within the
+ * testboundary here
+ */
+//#define TEST // Exclude if not used for testing purposes
+#ifdef TEST
+#include "test/testlab.h"
+
+#endif // TEST
 #ifndef TEST
 #include <ui/ui_screens.h>
 #include <ui/screen_main.h>
@@ -129,10 +140,6 @@
 
 #endif // TEST
 
-#ifdef TEST
-#include "test/testlab.h"
-
-#endif // TEST
 // lv_style_t style_base;
 lv_obj_t *main_view = NULL;
 lv_theme_t *mfd_theme_day;
@@ -143,8 +150,10 @@ lv_subject_t mfd_subject_ssid;
 lv_subject_t mfd_subject_pwd;
 lv_subject_t mfd_subject_log;
 
+#ifndef TEST
 mfd_pers_t ship_config;
 float boat_log = 0.01;
+#endif // TEST
 /**
  * Set the backlight of the JC1060P470 display with integrated ESP32-P4-C6
  */
@@ -158,9 +167,11 @@ void set_backlight(int value)
 
 void setup()
 {
+#ifndef TEST
   // Read persistent dat from NVR (non volatile ram)
   ship_config = mfd_read_persistent_data();
   nvr_millis = millis();
+#endif // TEST
   lv_init();
   Serial.begin(115200);
 
@@ -172,8 +183,8 @@ void setup()
 #ifndef TEST
   mfd_theme_day = lv_theme_default_init(
       disp,                      /* Use DPI, size, etc. from this display */
-      lv_color_hex(DAY_PRIMARY), /* Primary and secondary palette */
-      lv_color_hex(DAY_SECONDARY),
+      lv_color_hex(SUN_PRIMARY), /* Primary and secondary palette */
+      lv_color_hex(SUN_SECONDARY),
       false, /* Dark theme?  False = light theme. */
       &ui_font_lv_conthrax_16);
 
@@ -247,11 +258,6 @@ void loop()
     // write last vale of ship log to NVR
     mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
   }
-
-// if (mfd_style_changed)
-// {
-//   mfd_style_changed = false;
-//   lv_obj_report_style_change(&mfd_style_night);
-// }
 #endif // TEST
+  mfd_recolor(screen_main);
 }
