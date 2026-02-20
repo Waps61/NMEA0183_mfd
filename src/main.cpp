@@ -3,10 +3,12 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.4
+  VERSION:  0.5
   Date:     v0.1 31-01-2026
   Last
-  Update:
+  Update:   fixed bugs, cleaned code, implemented version info on settings screen, 
+            fixed toggle state for menubar, added spacer for panels when not all tiles are used
+            implemented Sun-, Dawn and Night modes
   Previous  v0.4 17-02-2026
             Fixed toggle state. Cleaned dead code
             Version info implemented on Setting screen
@@ -183,8 +185,8 @@ void setup()
 #ifndef TEST
   mfd_theme_day = lv_theme_default_init(
       disp,                      /* Use DPI, size, etc. from this display */
-      lv_color_hex(SUN_PRIMARY), /* Primary and secondary palette */
-      lv_color_hex(SUN_SECONDARY),
+      lv_color_hex(DAY_PRIMARY), /* Primary and secondary palette */
+      lv_palette_lighten(LV_PALETTE_GREY,1),
       false, /* Dark theme?  False = light theme. */
       &ui_font_lv_conthrax_16);
 

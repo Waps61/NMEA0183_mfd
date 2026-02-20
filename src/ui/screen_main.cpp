@@ -329,6 +329,7 @@ lv_obj_t *screen_main_create(void)
   lv_chart_set_axis_range(sogplot, LV_CHART_AXIS_PRIMARY_Y, 0, 10);
   lv_obj_set_style_bg_color(sogplot, lv_color_hex(DAY_BACKGROUND), LV_PART_MAIN);
   lv_chart_set_div_line_count(sogplot, 5, 6);
+  lv_obj_set_style_line_color(sogplot, lv_color_hex(SUN_LINE_COLOR), 0);
   ser_sog = lv_chart_add_series(sogplot, lv_color_hex(NIGHT_TEXT_ON_BACKGROUND), LV_CHART_AXIS_PRIMARY_Y);
   lv_chart_set_all_value(sogplot, ser_sog, 0);
   lv_obj_t *lbl_sog = lv_label_create(SOGminitile);
@@ -346,7 +347,8 @@ lv_obj_t *screen_main_create(void)
   lv_chart_set_axis_range(dptplot, LV_CHART_AXIS_PRIMARY_Y, -10, 0);
   lv_obj_set_style_bg_color(dptplot, lv_color_hex(DAY_BACKGROUND), LV_PART_MAIN);
   lv_chart_set_div_line_count(dptplot, 5, 6);
-  ser_dpt = lv_chart_add_series(dptplot, lv_color_hex(DAWN_SURFACE), LV_CHART_AXIS_PRIMARY_Y);
+  lv_obj_set_style_line_color(dptplot, lv_color_hex(SUN_LINE_COLOR), 0);
+  ser_dpt = lv_chart_add_series(dptplot, lv_color_hex(NIGHT_TEXT_ON_BACKGROUND), LV_CHART_AXIS_PRIMARY_Y);
   lv_chart_set_all_value(dptplot, ser_dpt, 0);
   lv_obj_t *lbl_dpt = lv_label_create(DPTminitile);
   lv_label_set_text(lbl_dpt, "0");

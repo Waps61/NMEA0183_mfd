@@ -30,7 +30,8 @@ extern "C"
 #define DAY_BACKGROUND 0xc7c7c7 // #c7c7c7
 #define DAY_SURFACE 0x3d3d3d // #3d3d3d
 #define DAY_TEXT_ON_PRIMARY 0xffffff // #ffffff
-#define DAY_TEXT_ON_BACKGROUND 0x1f2937// #1f2937
+#define DAY_TEXT_ON_BACKGROUND 0x000000// #000000
+#define DAY_LINE_COLOR 0x575757// #575757
 
 /*
  * Night theme colours
@@ -42,17 +43,19 @@ extern "C"
 #define NIGHT_SURFACE 0x374151 // #374151
 #define NIGHT_TEXT_ON_PRIMARY 0xc83232 // #c83232
 #define NIGHT_TEXT_ON_BACKGROUND 0xc83232 // #c83232
+#define NIGHT_LINE_COLOR 0x373737           // #373737
 
 /*
  * Sun theme colours
  */
 #define SUN_STYLE 3
-#define SUN_PRIMARY 0x0033ff // #0033ff
-#define SUN_SECONDARY 0x0029cc // #0029cc
-#define SUN_BACKGROUND 0xf3f4f6 // #f3f4f6
-#define SUN_SURFACE 0xe3e3e3 // #e3e3e3
+#define SUN_PRIMARY 0xffea00   // #ffea00
+#define SUN_SECONDARY 0x00061e // #000723
+#define SUN_BACKGROUND 0xffffff // #ffffff
+#define SUN_SURFACE 0xb7b7b7    // #b7b7b7
 #define SUN_TEXT_ON_PRIMARY 0xffffff // #ffffff
 #define SUN_TEXT_ON_BACKGROUND 0x000000 // #000000
+#define SUN_LINE_COLOR 0xa4a4a4         // #a4a4a4
 
 /*
  * Dawn theme colours
@@ -63,7 +66,8 @@ extern "C"
 #define DAWN_BACKGROUND 0x1A237E  // #1A237E
 #define DAWN_SURFACE 0x303F9F     // #303F9F
 #define DAWN_TEXT_ON_PRIMARY 0xc6abf4    // #c6abf4
-#define DAWN_TEXT_ON_BACKGROUND 0x795a6fa // #df07f3
+#define DAWN_TEXT_ON_BACKGROUND 0xea01ff // #ea01ff
+#define DAWN_LINE_COLOR 0x553ca0         // #553ca0
 
   /**********************
    *      TYPEDEFS

@@ -168,6 +168,7 @@ lv_obj_t* mfd_config_panel_create(lv_obj_t *parent, const char * title )
     lv_obj_set_name(wifivalue, "mfd_wifi_value");
     lv_obj_set_pos(wifivalue, 300, 94);
     lv_obj_set_size(wifivalue, 50, 34);
+    lv_obj_set_style_border_width(wifivalue, 1, 0);
     if(ship_config.wifi_on)
       lv_obj_set_state(wifivalue, LV_STATE_CHECKED,true);
       else
@@ -231,6 +232,7 @@ lv_obj_t* mfd_config_panel_create(lv_obj_t *parent, const char * title )
       lv_obj_set_style_bg_color(savebtn, lv_color_hex(0xff2bc33b), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
       lv_obj_set_style_shadow_width(savebtn, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
       lv_obj_set_style_shadow_offset_y(savebtn, 5, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+      lv_obj_set_style_border_width(savebtn, 1, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
 
       lv_obj_t *btnlbl = lv_label_create(savebtn);
       // lv_obj_set_pos(btnlbl, 0, 0);
@@ -245,6 +247,7 @@ lv_obj_t* mfd_config_panel_create(lv_obj_t *parent, const char * title )
       lv_obj_t *version = lv_label_create(panel);
       lv_obj_set_style_text_font(version, &ui_font_lv_conthrax_16, 0);
       lv_obj_set_style_align(version, LV_ALIGN_BOTTOM_LEFT, 0);
+      lv_obj_set_style_opa(version,LV_OPA_40, 0);
       lv_obj_set_style_text_color(version, lv_color_hex(DAY_BACKGROUND), 0);
       lv_label_set_text(version, MFD_VERSION);
 

@@ -31,6 +31,7 @@ void init_style_btnbase()
   //lv_style_set_border_color(&style_btnbase, lv_palette_darken(LV_PALETTE_BLUE_GREY, 0));
   lv_style_set_bg_color(&style_btnbase, lv_color_lighten(lv_color_hex(DAWN_SURFACE),LV_OPA_30));
   lv_style_set_border_width(&style_btnbase, 2);
+  lv_style_set_border_color(&style_btnbase, lv_color_hex(DAY_LINE_COLOR));
   lv_style_set_radius(&style_btnbase, 10);
   lv_style_set_shadow_width(&style_btnbase, 10);
   lv_style_set_shadow_offset_y(&style_btnbase, 5);
@@ -236,7 +237,18 @@ lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   lv_bar_set_start_value(slider, 10, LV_ANIM_OFF);
   lv_slider_bind_value(slider, &brightness_subject);
   lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -60);
+  lv_obj_set_style_border_width(slider, 1, 0);
   lv_obj_add_style(slider, &mfd_style,0);
+
+  lv_obj_t* dimdown = lv_label_create(panel);
+  lv_label_set_text(dimdown, "-");
+  lv_obj_set_style_text_font(dimdown, &ui_font_lv_conthrax_24, 0);
+  lv_obj_align(dimdown, LV_ALIGN_BOTTOM_LEFT, 225, -60);
+
+  lv_obj_t* dimup = lv_label_create(panel);
+  lv_label_set_text(dimup, "+");
+  lv_obj_set_style_text_font(dimup, &ui_font_lv_conthrax_24, 0);
+  lv_obj_align(dimup, LV_ALIGN_BOTTOM_RIGHT, -225, -60);
 
   // Create a label below the slider
   lv_obj_t *label = lv_label_create(panel);
