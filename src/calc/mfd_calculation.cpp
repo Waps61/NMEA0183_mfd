@@ -298,7 +298,7 @@ void processNMEAData(const char *buff)
           if (!trip_started)
           {
             trip_started = true;
-            lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_subject_log));
+            //lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_subject_log));
             //set_boat_log(lv_subject_get_float(&mfd_subject_log));
             lv_subject_set_float(&mfd_subject_log, get_boat_log());
             lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(), lv_subject_get_float(&mfd_subject_log));

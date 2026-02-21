@@ -217,7 +217,19 @@ void menu_btn_event_cb(lv_event_t *event)
         mfd_hide_panel(mfd_panel_array[i]);
     }
   }
+  /**
+   * Without below code an Assertion is causing a crash after a couple of panelswitches due to low memory.
+   * Loggin the memory monitor did not reveal a leakage of memory .
+   * It seems that the memory allocated for the user data is not sufficient or not properly managed. 
+   * By adding the below code the assertion does not seem to happen anymore. It is not clear why this is the case, 
+   * but it might be related to the way the event system handles user data and memory management.
+   */
+  mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
+  lv_mem_monitor(mem_monitor);
+  // lv_log("Memory monitor after btn press: total size: %d, free size: %d, used size: %d\n", 
+  //mem_monitor->total_size, mem_monitor->free_size, mem_monitor->total_size - mem_monitor->free_size);
 
+  lv_free(mem_monitor);
 }
 
 /**

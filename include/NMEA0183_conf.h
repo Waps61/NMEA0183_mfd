@@ -94,7 +94,7 @@ void touchscreen_setup()
 #endif
   bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
   iType = bbct.sensorType();
-  lv_log("+++++ iType=%d \n", iType);
+  //lv_log("+++++ iType=%d \n", iType);
   w = gfx->width();
   h = gfx->height();
   n = min(w, h);

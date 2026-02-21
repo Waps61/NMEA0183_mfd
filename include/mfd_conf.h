@@ -37,6 +37,7 @@ static bool brightness_changed;
 static int brightness_value;
 static bool update_data_values;
 static lv_obj_t *screen_active = NULL;
+static lv_mem_monitor_t *mem_monitor=NULL;
 
 /*Create a Tabview box object*/
 static lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *TWSbox,

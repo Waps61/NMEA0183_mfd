@@ -238,6 +238,10 @@ void setup()
 #ifdef TEST
   testlab_init();
 #endif // TEST
+mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
+lv_mem_monitor(mem_monitor);
+lv_log("Memory monitor after init: total size: %d, free size: %d, used size: %d\n", mem_monitor->total_size, mem_monitor->free_size, mem_monitor->total_size - mem_monitor->free_size);
+lv_free(mem_monitor);
 }
 
 void loop()
@@ -261,5 +265,6 @@ void loop()
     mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
   }
 #endif // TEST
+ 
   mfd_recolor(screen_main);
-}
+  }
