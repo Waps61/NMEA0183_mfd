@@ -19,7 +19,7 @@
 //*** characters $ or ! and the checksum character *, the checksum
 //*** AND last but not least the <CR><LF> chacters.
 //*** we define one more for the terminating '\0' character for char buffers
-#define NMEA_BUFFER_SIZE 82 // According NEA0183 specs the max char is 82
+#define NMEA_BUFFER_SIZE 164 // According NEA0183 specs the max char is 82
 #define NMEA_TERMINATOR "\r\n"
 
 //*** The maximum number of fields in an NMEA string

@@ -17,8 +17,8 @@
 // *** Conditional Debug & Test Info to Serial Monitor
 // *** by commenting out the line(s) below the debugger and or test statements will
 // *** be ommitted from the code
-// #define DEBUG 1
-//#define TEST 1
+ #define DEBUG 1
+// #define TEST 1
 
 /*
    If there is some special treatment needed for some NMEA sentences then
@@ -26,14 +26,9 @@
    The pre-compiler concatenates string literals by using "" in between
 */
 
-//unsigned long tmr1 = 0;
+// unsigned long tmr1 = 0;
 
 // SoftwareSerial nmeaSerialOut; // // signal need to be inverted for RS-232
-
-
-
-
-
 
 /*
  * Setting for Serial interrupt
@@ -51,25 +46,22 @@ void listenerReady()
 debugWrite() <--provides basic debug info from other tasks
 takes a String as input parameter
 */
-void debugWrite(String debugMsg)
+void debugWrite(const char *debugMsg)
 {
 #ifdef DEBUG
-  if (debugMsg.length() > 1)
-    Serial.println(debugMsg);
-  else
-    Serial.print(debugMsg);
+  if (strlen(debugMsg) > 1)
+    lv_log("%s\n", debugMsg);
+  
 #endif
 }
 
+
 /*
-   Class definitions go here
-*/
-/*
-Cleasr the inputbuffer by reading until empty, since Serial.flush does not this anymore
+Clear the inputbuffer by reading until empty, since Serial.flush does not this anymore
 */
 void clearNMEAInputBuffer()
 {
-
+  int i = 0;
   while (Serial1.available() > 0)
   {
     Serial1.read();
@@ -84,126 +76,92 @@ int NMEA_startTalking(const char *nmea_buff)
   return i;
 }
 
-/** reads the softseroal port pin 10 and ckeks for valid nmea data starting with
+/** 
+ * reads the serial port  and ckeks for valid nmea data starting with
  * character '$' only (~ and ! can be skipped as start charcter)
+ * This is a state based process, where the state is determined by the nmeaStatus variable
+ * Initial state is INVALID
+ * When a start character is found, the state changes to RECEIVING and the nmeaBuffer is filled 
+ * with the incoming characters until a '*' character is found, then the state changes to CHECKSUMMING 
+ * and the checksum characters are read until a newline character is found, then the state changes to 
+ * TERMINATING and the nmeaDataReady flag is set to true, and the nmeaBuffer is processed by the 
+ * processNMEAData function, and then the state changes back to INVALID
  */
 void NMEA_startListening()
 {
-  static bool recvInProgress = false;
-  static byte ndx = 0;
-  char startMarker = '$'; // we can skip ~ and ! starters since we don't process them here
-  // char aisMarker = '!';
-  // char rsvMarker = '~';
-  char endMarker = '\n';
-  char rc;
-  newData = false;
-  while (Serial1.available() > 0 && newData == false)
+  char cIn = '\0';
+  while (Serial1.available() > 0 && nmeaStatus != TERMINATING)
   {
-    rc = Serial1.read();
-    if (recvInProgress == true)
+    cIn = Serial1.read();
+    switch (cIn)
     {
-      if (rc != endMarker)
+    case '~':
+      // reserved by NMEA
+    case '!':
+      // for AIS info
+    case '$':
+      // for general NMEA info
+      nmeaStatus = RECEIVING;
+      nmeaIndex = 0;
+      break;
+    case '*':
+      if (nmeaStatus == RECEIVING)
       {
-        receivedChars[ndx] = rc;
-        ndx++;
-        if (ndx >= NMEA_BUFFER_SIZE)
-        {
-          ndx = NMEA_BUFFER_SIZE - 1;
-        }
+        nmeaStatus = CHECKSUMMING;
+      }
+      break;
+    case '\n':
+    case '\r':
+      // in old v1.5 version, NMEA Data may not be checksummed!
+      if (nmeaStatus == RECEIVING || nmeaStatus == CHECKSUMMING)
+      {
+        nmeaDataReady = true;
+        nmeaStatus = TERMINATING;
       }
       else
-      {
-        receivedChars[ndx] = '\0'; // terminate the string
+        nmeaStatus = INVALID;
 
-        recvInProgress = false;
-        ndx = 0;
-        newData = true;
-      }
+      break;
     }
-    else if (rc == startMarker)
+    switch (nmeaStatus)
     {
-      receivedChars[ndx] = rc;
-      ndx++;
-      recvInProgress = true;
+    case INVALID:
+      // do nothing
+      nmeaIndex = 0;
+      nmeaDataReady = false;
+      break;
+    case RECEIVING:
+    case CHECKSUMMING:
+      nmeaBuffer[nmeaIndex] = cIn;
+      nmeaIndex++;
+      break;
+    case TERMINATING:
+
+      nmeaStatus = INVALID;
+      if (nmeaDataReady)
+      {
+        nmeaDataReady = false;
+
+        // Clear the remaining buffer content with '\0'
+        for (int y = nmeaIndex + 1; y < NMEA_BUFFER_SIZE + 1; y++)
+        {
+          nmeaBuffer[y] = '\0';
+        }
+#ifdef DEBUG
+        debugWrite(nmeaBuffer);
+#endif
+
+            processNMEAData(nmeaBuffer);
+
+        // clear the NMEAbuffer with 0
+        memset(nmeaBuffer, 0, NMEA_BUFFER_SIZE + 1);
+        nmeaIndex = 0;
+      }
+
+      break;
     }
   }
-  NMEA_startTalking(receivedChars);
 }
-
-// Need to look into my older process neme data routine as a replacement for the one above
-/*Decode the incomming character and test if it is valid NMEA data.If true than put it the NMEA buffer and call NMEAParser object
-        to process incomming and complete MNEA sentence
-            * /
-//     void decodeNMEAInput(char cIn)
-// {
-//   switch (cIn)
-//   {
-//   case '~':
-//     // reserved by NMEA
-//   case '!':
-//     // for AIS info
-//   case '$':
-//     // for general NMEA info
-//     nmeaStatus = RECEIVING;
-//     nmeaIndex = 0;
-//     break;
-//   case '*':
-//     if (nmeaStatus == RECEIVING)
-//     {
-//       nmeaStatus = CHECKSUMMING;
-//     }
-//     break;
-//   case '\n':
-//   case '\r':
-//     // in old v1.5 version, NMEA Data may not be checksummed!
-//     if (nmeaStatus == RECEIVING || nmeaStatus == CHECKSUMMING)
-//     {
-//       nmeaDataReady = true;
-//       nmeaStatus = TERMINATING;
-//     }
-//     else
-//       nmeaStatus = INVALID;
-
-//     break;
-//   }
-//   switch (nmeaStatus)
-//   {
-//   case INVALID:
-//     // do nothing
-//     nmeaIndex = 0;
-//     nmeaDataReady = false;
-//     break;
-//   case RECEIVING:
-//   case CHECKSUMMING:
-//     nmeaBuffer[nmeaIndex] = cIn;
-//     nmeaIndex++;
-//     break;
-//   case TERMINATING:
-
-//     nmeaStatus = INVALID;
-//     if (nmeaDataReady)
-//     {
-//       nmeaDataReady = false;
-
-//       // Clear the remaining buffer content with '\0'
-//       for (int y = nmeaIndex + 1; y < NMEA_BUFFER_SIZE + 1; y++)
-//       {
-//         nmeaBuffer[y] = '\0';
-//       }
-// #ifdef DEBUG
-//       debugWrite(nmeaBuffer);
-// #endif
-//       NmeaParser.parseNMEASentence(nmeaBuffer);
-
-//       // clear the NMEAbuffer with 0
-//       memset(nmeaBuffer, 0, NMEA_BUFFER_SIZE + 1);
-//       nmeaIndex = 0;
-//     }
-
-//     break;
-//   }
-// }
-
 
 
 /*
@@ -214,7 +172,17 @@ bool initializeListener()
   bool status = true;
   int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
   Serial1.begin(baudrate, SERIAL_8N1, LISTENER_RX, LISTENER_TX, true);
-  clearNMEAInputBuffer();
+  // clearNMEAInputBuffer();
+  //  nmeaBuffer = (char *)malloc((NMEA_BUFFER_SIZE + 1) *sizeof(char));
+  memset(nmeaBuffer, 32, NMEA_BUFFER_SIZE - 1);
+  nmeaBuffer[NMEA_BUFFER_SIZE] = '\0';
+
+  lv_log("nmeaBuffer initialized with %s\n", nmeaBuffer);
+
+  // for(int i = 0; i < NMEA_BUFFER_SIZE + 1; i++)
+  // {
+  //   nmeaBuffer[i] = '\0';
+  // }
 #ifdef DEBUG
   debugWrite("Listener initialized...");
 #endif
@@ -229,30 +197,14 @@ bool initializeTalker()
 {
   bool status = true;
   int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
-  Serial2.begin(baudrate, SERIAL_8N1, TALKER_RX, TALKER_TX, true);
+  // Serial2.begin(baudrate, SERIAL_8N1, TALKER_RX, TALKER_TX, true);
   clearNMEAInputBuffer();
+  lv_log("Listener initialized..\n");
 #ifdef DEBUG
   debugWrite("Listener initialized...");
 #endif
   return status;
 }
-
-
-
-// /*
-//  * Start listeneing for incomming NNMEA sentences
-//  */
-// void NMEA_startListening()
-// {
-// #ifdef DEBUG
-//   debugWrite("Listening....");
-// #endif
-
-//   while (Serial1.available() > 0 && nmeaStatus != TERMINATING)
-//   {
-//     decodeNMEAInput(Serial1.read());
-//   }
-// }
 
 
 

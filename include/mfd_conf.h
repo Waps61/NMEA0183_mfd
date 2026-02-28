@@ -7,7 +7,7 @@
 
 //Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "5"
+#define VERSION_MINOR "6"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -29,7 +29,7 @@
 #define DEFAULT_BRIGHTNESS 25 // 25% brightness as default
 #define ACTUAL_BRIGHTNESS DEFAULT_BRIGHTNESS
 
-#define DEMO // When active data is simulated for the display outcomment if not used
+//#define DEMO // When active data is simulated for the display outcomment if not used
 // #define TEST
 
 static lv_subject_t brightness_subject;

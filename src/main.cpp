@@ -3,13 +3,20 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.5
+  VERSION:  0.6 28-02-2026
   Date:     v0.1 31-01-2026
-  Last
-  Update:   fixed bugs, cleaned code, implemented version info on settings screen, 
+  Last :    v0.6 28-02-2026
+            Implemented 2-way communication so that incomming NMEA data can be relayed
+            I re-used my state based function from the Yazz_NMEAtor_ESP32 project to read the 
+            NMEA data from the serial port, and added a function to process the data when it is ready.
+  Update:   fixed bugs, cleaned code, implemented version info on settings screen,
             fixed toggle state for menubar, added spacer for panels when not all tiles are used
             implemented Sun-, Dawn and Night modes
-  Previous  v0.4 17-02-2026
+  Previous  V0.5  22-02-2026
+            fixed bugs, cleaned code, implemented version info on settings screen,
+            fixed toggle state for menubar, added spacer for panels when not all tiles are used
+            implemented Sun-, Dawn and Night modes
+            v0.4 17-02-2026
             Fixed toggle state. Cleaned dead code
             Version info implemented on Setting screen
             TO DO: Implement Sun-, Dawn and Night modes
@@ -137,6 +144,7 @@
 #include <ui/mfd_bright_panel.h>
 #include <persist/mfd_persistent.h>
 #include <NMEA0183_data.h>
+#include <comms/mfd_communication.h>
 
 #include <persist/flash_erase.h>
 
@@ -238,10 +246,13 @@ void setup()
 #ifdef TEST
   testlab_init();
 #endif // TEST
-mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
-lv_mem_monitor(mem_monitor);
-lv_log("Memory monitor after init: total size: %d, free size: %d, used size: %d\n", mem_monitor->total_size, mem_monitor->free_size, mem_monitor->total_size - mem_monitor->free_size);
-lv_free(mem_monitor);
+#ifndef DEMO
+  mfd_setup_communication();
+#endif // DEMO
+  mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
+  lv_mem_monitor(mem_monitor);
+  lv_log("Memory monitor after init: total size: %d, free size: %d, used size: %d\n", mem_monitor->total_size, mem_monitor->free_size, mem_monitor->total_size - mem_monitor->free_size);
+  lv_free(mem_monitor);
 }
 
 void loop()
@@ -252,6 +263,10 @@ void loop()
 #ifdef DEMO
   test_screen_data_updates();
 #endif
+#ifndef DEMO
+  NMEA_startListening();
+  
+#endif // DEMO
 
   mfd_update_tile_data();
 

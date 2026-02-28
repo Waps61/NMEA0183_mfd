@@ -148,7 +148,7 @@ float calculate_distance(const char *lat1_str, const char *lon1_str,
   float c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
   float distance = R * c * KTN;
-  //lv_log(" distance between %s,%s anf %s,%s = %f\n", lat1_str, lon1_str, lat2_str, lon2_str, distance);
+  // lv_log(" distance between %s,%s anf %s,%s = %f\n", lat1_str, lon1_str, lat2_str, lon2_str, distance);
 
   return distance;
 }
@@ -179,11 +179,9 @@ void NMEA_runSoftGenerator()
   if (millis() - softTimerNow > 25)
   {
     softTimerNow = millis();
-    
 
-      // lv_log("sending msg %d data=%s\n", softIndex, NmeaStream[softIndex].c_str());
-      processNMEAData(NmeaStream[softIndex++].c_str());
-    
+    // lv_log("sending msg %d data=%s\n", softIndex, NmeaStream[softIndex].c_str());
+    processNMEAData(NmeaStream[softIndex++].c_str());
 
     softIndex %= SIZE_NMEA_STREAM;
   }
@@ -196,276 +194,284 @@ void NMEA_runSoftGenerator()
 void processNMEAData(const char *buff)
 {
 
-  // lv_log("received string: %s length= %d\n", buff, strlen(buff));
-
-  int field = 0; // the field number in the NMEA string,
-
-  double tmpVal = 0.0;
-  double tmpVar = 0.0;
-  float distance = 0.0;
-  char tmp[15];
-
-  char *ptr;
-
-  char *nmea_str;    // used to proces the tokens (seperated by ',' )
-  char bfr[83];      // a copy of the referenced nmead buffer to prevent pointe problems
-  strcpy(bfr, buff); // make the copy!
-
-  field = 0;                   // ignore sentence tag, the first field as the tag
-  nmea_str = strstr(bfr, ","); // find the tokens in the NMEA string
-  // lv_log("nmea buff = %s\n", nmea_str);
-  char *token = strtok(nmea_str, ","); // the token is actually holding the value of the fields
-  // lv_log("token = %s\n", token);
-  // Adjust field for empty fields
-  while (nmea_str[field] == ',')
-    field++;
-  // Get all the field from the NMEAstring seperated by ','
-  while (token != NULL)
+  //lv_log("received string: %s length= %d\n", buff, strlen(buff));
+  if (strlen(buff) > 0)
   {
-    cvalue[0] = 0;
-    // lv_log("received string: %s ci =%d  li=%d\n", buff, ci, li);
-    if ((ptr = strstr(buff, "MWV")) != NULL ||
-        (ptr = strstr(buff, "RMC")) != NULL ||
-        (ptr = strstr(buff, "CTS")) != NULL ||
-        (ptr = strstr(buff, "TOB")) != NULL ||
-        (ptr = strstr(buff, "VWR")) != NULL ||
-        (ptr = strstr(buff, "BAT")) != NULL ||
-        (ptr = strstr(buff, "HDG")) != NULL ||
-        (ptr = strstr(buff, "MTW")) != NULL ||
-        (ptr = strstr(buff, "DPT")) != NULL ||
-        (ptr = strstr(buff, "BWC")) != NULL ||
-        (ptr = strstr(buff, "VHW")) != NULL)
+    int field = 0; // the field number in the NMEA string,
+
+    double tmpVal = 0.0;
+    double tmpVar = 0.0;
+    float distance = 0.0;
+    char tmp[15];
+
+    char *ptr;
+
+    char *nmea_str; // used to proces the tokens (seperated by ',' )
+    char bfr[83]={0};   // a copy of the referenced nmead buffer to prevent pointe problems
+    //lv_log("going to copy buff to bfr\n");
+    strcpy(bfr, buff); // make the copy!
+    //lv_log("buff = %s\n",buff);
+    field = 0;                   // ignore sentence tag, the first field as the tag
+    nmea_str = strstr(bfr, ","); // find the tokens in the NMEA string
+    if (nmea_str != NULL)
     {
-      // prepare for further manupulation and to prevent pointer problems
-      // make a copy of the token
-      strcpy(cvalue, token);
-      //lv_log("value = %s\n", cvalue);
-      //  Set to next field
-      // field++;
+      //lv_log("nmea buff = %s\n", nmea_str);
+      char *token = strtok(nmea_str, ","); // the token is actually holding the value of the fields
+      //lv_log("token = %s\n", token);
+      // Adjust field for empty fields
+      while (nmea_str[field] == ',')
+        field++;
+      // Get all the field from the NMEAstring seperated by ','
+      while (token != NULL)
+      {
+        cvalue[0] = 0;
+        // lv_log("received string: %s ci =%d  li=%d\n", buff, ci, li);
+        if ((ptr = strstr(bfr, "MWV")) != NULL ||
+            (ptr = strstr(bfr, "RMC")) != NULL ||
+            (ptr = strstr(bfr, "CTS")) != NULL ||
+            (ptr = strstr(bfr, "TOB")) != NULL ||
+            (ptr = strstr(bfr, "VWR")) != NULL ||
+            (ptr = strstr(bfr, "BAT")) != NULL ||
+            (ptr = strstr(bfr, "HDG")) != NULL ||
+            (ptr = strstr(bfr, "MTW")) != NULL ||
+            (ptr = strstr(bfr, "DPT")) != NULL ||
+            (ptr = strstr(bfr, "DBT")) != NULL ||
+            (ptr = strstr(bfr, "DBK")) != NULL ||
+            (ptr = strstr(bfr, "BWC")) != NULL ||
+            (ptr = strstr(bfr, "VHW")) != NULL)
+        {
+          // prepare for further manupulation and to prevent pointer problems
+          // make a copy of the token
+          strcpy(cvalue, token);
+          //lv_log("value = %s\n", cvalue);
+          //   Set to next field
+          //  field++;
 
-      // Prepare AWS and AWA values, from MWV or VWR tags
-      if ((strstr(buff, "MWV") != NULL && strstr(buff, ",R,") != NULL) ||
-          strstr(buff, "VWR") != NULL)
-      {
-        if (field == 1)
-        {
-          boat_awa = atof(cvalue);
-          boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
-          sprintf(tmp, "%3.1f", boat_vmg);
-          set_data_store(AWA, cvalue);
-          set_data_store(VMG, tmp);
-        }
-        if (field == 2)
-        {
-          // Correct for +(SB) or -(Port) depending on value
-          if (cvalue[0] == 'L' || cvalue[0] == 'T')
+          // Prepare AWS and AWA values, from MWV or VWR tags
+          if ((strstr(bfr, "MWV") != NULL && strstr(bfr, ",R,") != NULL) ||
+              strstr(bfr , "VWR") != NULL)
           {
+            if (field == 1)
+            {
+              boat_awa = atof(cvalue);
+              boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
+              sprintf(tmp, "%3.1f", boat_vmg);
+              set_data_store(AWA, cvalue);
+              set_data_store(VMG, tmp);
+            }
+            if (field == 2)
+            {
+              // Correct for +(SB) or -(Port) depending on value
+              if (cvalue[0] == 'L' || cvalue[0] == 'T')
+              {
 
-            memmove(cvalue + 1, cvalue, FIELD_BUFFER - 2);
-            cvalue[0] = '-';
-            set_data_store(DIR, ">>>");
+                memmove(cvalue + 1, cvalue, FIELD_BUFFER - 2);
+                cvalue[0] = '-';
+                set_data_store(DIR, ">>>");
+              }
+              else
+                set_data_store(DIR, "<<<");
+            }
+            if (field == 3)
+            {
+              set_data_store(AWS, cvalue);
+            }
           }
-          else
-            set_data_store(DIR, "<<<");
-        }
-        if (field == 3)
-        {
-          set_data_store(AWS, cvalue);
-        }
-      }
-      // Prepare for SOF and COG values from RMC tags
-      if (strstr(buff, "RMC") != NULL)
-      {
-        if (field == 3)
-        {
-          strcpy(lat_old, lat_new);
-          sprintf(lat_new, "%s,", cvalue);
-        }
-        if (field == 4)
-        {
-          strcat(lat_new, cvalue);
-        }
-        if (field == 5)
-        {
-          strcpy(lon_old, lon_new);
-          sprintf(lon_new, "%s,", cvalue);
-        }
-        if (field == 6)
-        {
-          strcat(lon_new, cvalue);
-          // when the lat lon is received for the 1st time set old values to this
-          // position to make sure trip start at 0
-          if (!trip_started)
+          // Prepare for SOF and COG values from RMC tags
+          if (strstr(bfr, "RMC") != NULL)
           {
-            trip_started = true;
-            //lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_subject_log));
-            //set_boat_log(lv_subject_get_float(&mfd_subject_log));
-            lv_subject_set_float(&mfd_subject_log, get_boat_log());
-            lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(), lv_subject_get_float(&mfd_subject_log));
-            strcpy(lat_old, lat_new);
-            strcpy(lon_old, lon_new);
-          }
-          distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
-          boat_trp += distance;
-          increase_boat_log(distance);
-          //lv_log(" boat_log = %.1f\n", get_boat_log());
+            if (field == 3)
+            {
+              strcpy(lat_old, lat_new);
+              sprintf(lat_new, "%s,", cvalue);
+            }
+            if (field == 4)
+            {
+              strcat(lat_new, cvalue);
+            }
+            if (field == 5)
+            {
+              strcpy(lon_old, lon_new);
+              sprintf(lon_new, "%s,", cvalue);
+            }
+            if (field == 6)
+            {
+              strcat(lon_new, cvalue);
+              // when the lat lon is received for the 1st time set old values to this
+              // position to make sure trip start at 0
+              if (!trip_started)
+              {
+                trip_started = true;
+                // lv_log("before trip started boat log was %.1f and mfd_log %.1f\n", get_boat_log(),lv_subject_get_float(&mfd_subject_log));
+                // set_boat_log(lv_subject_get_float(&mfd_subject_log));
+                lv_subject_set_float(&mfd_subject_log, get_boat_log());
+                lv_log("trip started with boat log %.1f\n and mfd log %.1f", get_boat_log(), lv_subject_get_float(&mfd_subject_log));
+                strcpy(lat_old, lat_new);
+                strcpy(lon_old, lon_new);
+              }
+              distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
+              boat_trp += distance;
+              increase_boat_log(distance);
+              // lv_log(" boat_log = %.1f\n", get_boat_log());
 
-          sprintf(tmp, "%.1f", boat_trp);
-          set_data_store(TRP, tmp);
-          sprintf(tmp, "%f", get_boat_log());
-          set_data_store(LOG, tmp);
-        }
-        if (field == 7)
-        {
-          boat_sog = atof(cvalue);
-          boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
-          sprintf(tmp, "%3.1f", boat_vmg);
-          set_data_store(SOG, cvalue);
-          set_data_store(VMG, tmp);
-        }
-        if (field == 8)
-        {
-          sprintf(tmp, "%.3s", cvalue);
-          boat_cog = atoi(cvalue);
-          set_data_store(COG, tmp);
-        }
-      }
-      // Prepare for DPT values, can be comming DBK,DBT or DPT tags
-      if (strstr(buff, "DBK") != NULL)
-      {
-        if (field == 2)
-        {
-          boat_dpt = atof(cvalue);
-          set_data_store(DPT, cvalue);
-        }
-        if (field == 3 && cvalue[0] == 'f')
-        {
-          boat_dpt = atof(cvalue);
-          boat_dpt *= FTM;
-          sprintf(cvalue, "%.1f", boat_dpt);
-          set_data_store(DPT, cvalue);
-        }
-      }
-      else if (strstr(buff, "DBT") != NULL)
-      {
-        if (field == 3)
-        {
-          boat_dpt = atof(cvalue);
-          set_data_store(DPT, cvalue);
-        }
-      }
-      else if (strstr(buff, "DPT") != NULL)
-      {
-        if (field == 1)
-        {
-          boat_dpt = atof(cvalue);
-          set_data_store(DPT, cvalue);
-        }
-      }
-      // Prepare for BAT values, either from TOB or BAT tags
-      if (strstr(buff, "TOB") != NULL)
-      {
-        if (field == 1)
-        {
-          set_data_store(BAT, cvalue);
-        }
-      }
-      else if (strstr(buff, "BAT") != NULL)
-      {
-        if (field == 2)
-        {
-          set_data_store(BAT, cvalue);
-        }
-      }
-      // Get CTS from BWC
-      if (strstr(buff, "BWC") != NULL)
-      {
-        if (field == 6)
-        {
-          sprintf(tmp, "%.3s", cvalue);
-          boat_cts = atoi(cvalue);
-          set_data_store(CTS, tmp);
-          sprintf(tmp, "%d", boat_cts - boat_cog);
-          set_data_store(CMG,tmp);
-        }
-      }
-      // Prepare for HDG values, converting from magnetic to true values
-      if (strstr(buff, "HDG") != NULL)
-      {
-        //lv_log("HDG buff = %s, fieldnr= %d\n", buff, field);
-        if (field == 1)
-        {
-          // Magnetinc Sensor reading
-          tmpVal = atof(cvalue);
-        }
-        if (field == 2)
-        {
-          // Magnetic Deviation
-          tmpVar = atof(cvalue);
-        }
-        if (field == 3)
-        {
-          if (cvalue[0] = 'E')
-          {
-            // For Easterly deviation add to magnetic sensor reading
-            // For Magnetic Heading
-            tmpVal += tmpVar;
+              sprintf(tmp, "%.1f", boat_trp);
+              set_data_store(TRP, tmp);
+              sprintf(tmp, "%f", get_boat_log());
+              set_data_store(LOG, tmp);
+            }
+            if (field == 7)
+            {
+              boat_sog = atof(cvalue);
+              boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
+              sprintf(tmp, "%3.1f", boat_vmg);
+              set_data_store(SOG, cvalue);
+              set_data_store(VMG, tmp);
+            }
+            if (field == 8)
+            {
+              sprintf(tmp, "%.3s", cvalue);
+              boat_cog = atoi(cvalue);
+              set_data_store(COG, tmp);
+            }
           }
-          else
+          // Prepare for DPT values, can be comming DBK,DBT or DPT tags
+          if (strstr(bfr, "DBK") != NULL)
           {
-            // For Westerly deviation subtract from magnetic sensor reading
-            // for Mahnetic Heading
-            tmpVal -= tmpVar;
+            if (field == 2)
+            {
+              boat_dpt = atof(cvalue);
+              set_data_store(DPT, cvalue);
+            }
+            if (field == 3 && cvalue[0] == 'f')
+            {
+              boat_dpt = atof(cvalue);
+              boat_dpt *= FTM;
+              sprintf(cvalue, "%.1f", boat_dpt);
+              set_data_store(DPT, cvalue);
+            }
           }
-        }
-        if (field == 4)
-        {
-          // Magnetic Variation
-          tmpVar = atof(cvalue);
-        }
-        if (field == 5)
-        {
-          if (cvalue[0] = 'E')
+          else if (strstr(bfr, "DBT") != NULL)
           {
-            // For Easterly variation add to magnetic heading
-            // For True Heading
-            tmpVal += tmpVar;
+            if (field == 3)
+            {
+              boat_dpt = atof(cvalue);
+              set_data_store(DPT, cvalue);
+            }
           }
-          else
+          else if (strstr(bfr, "DPT") != NULL)
           {
-            // For Westerly variation subtract from magnetic heading
-            // for True Heading
-            tmpVal -= tmpVar;
+            if (field == 1)
+            {
+              boat_dpt = atof(cvalue);
+              set_data_store(DPT, cvalue);
+            }
           }
-        }
+          // Prepare for BAT values, either from TOB or BAT tags
+          if (strstr(bfr, "TOB") != NULL)
+          {
+            if (field == 1)
+            {
+              set_data_store(BAT, cvalue);
+            }
+          }
+          else if (strstr(bfr, "BAT") != NULL)
+          {
+            if (field == 2)
+            {
+              set_data_store(BAT, cvalue);
+            }
+          }
+          // Get CTS from BWC
+          if (strstr(bfr, "BWC") != NULL)
+          {
+            if (field == 6)
+            {
+              sprintf(tmp, "%.3s", cvalue);
+              boat_cts = atoi(cvalue);
+              set_data_store(CTS, tmp);
+              sprintf(tmp, "%d", boat_cts - boat_cog);
+              set_data_store(CMG, tmp);
+            }
+          }
+          // Prepare for HDG values, converting from magnetic to true values
+          if (strstr(bfr, "HDG") != NULL)
+          {
+            // lv_log("HDG buff = %s, fieldnr= %d\n", buff, field);
+            if (field == 1)
+            {
+              // Magnetinc Sensor reading
+              tmpVal = atof(cvalue);
+            }
+            if (field == 2)
+            {
+              // Magnetic Deviation
+              tmpVar = atof(cvalue);
+            }
+            if (field == 3)
+            {
+              if (cvalue[0] = 'E')
+              {
+                // For Easterly deviation add to magnetic sensor reading
+                // For Magnetic Heading
+                tmpVal += tmpVar;
+              }
+              else
+              {
+                // For Westerly deviation subtract from magnetic sensor reading
+                // for Mahnetic Heading
+                tmpVal -= tmpVar;
+              }
+            }
+            if (field == 4)
+            {
+              // Magnetic Variation
+              tmpVar = atof(cvalue);
+            }
+            if (field == 5)
+            {
+              if (cvalue[0] = 'E')
+              {
+                // For Easterly variation add to magnetic heading
+                // For True Heading
+                tmpVal += tmpVar;
+              }
+              else
+              {
+                // For Westerly variation subtract from magnetic heading
+                // for True Heading
+                tmpVal -= tmpVar;
+              }
+            }
 
-        // Storing True Heading!!
-        sprintf(cvalue, "%.1f", tmpVal);
-        set_data_store(HDG, cvalue);
-      }
-      else if (strstr(buff, "VHW") != NULL)
-      {
-        //lv_log("VHW buff = %s, fieldnr= %d\n", buff, field);
-        if (field == 1 && cvalue != NULL)
-        {
-          // Heading degrees True
-          set_data_store(HDG, cvalue);
-        }
-        if (field == 3 && cvalue != NULL)
-        {
-          // Heading degrees Magnetic
+            // Storing True Heading!!
+            sprintf(cvalue, "%.1f", tmpVal);
+            set_data_store(HDG, cvalue);
+          }
+          else if (strstr(bfr, "VHW") != NULL)
+          {
+            // lv_log("VHW buff = %s, fieldnr= %d\n", buff, field);
+            if (field == 1 && cvalue != NULL)
+            {
+              // Heading degrees True
+              set_data_store(HDG, cvalue);
+            }
+            if (field == 3 && cvalue != NULL)
+            {
+              // Heading degrees Magnetic
 
-          set_data_store(HDG, cvalue);
+              set_data_store(HDG, cvalue);
+            }
+            if (field == 5 && cvalue != NULL)
+            {
+              // Speed trough water
+              set_data_store(STW, cvalue);
+            }
+          }
+          // get next token
         }
-        if (field == 5 && cvalue != NULL)
-        {
-          // Speed trough water
-          set_data_store(STW, cvalue);
-        }
+        field++;
+        token = strtok(NULL, ",");
       }
-      // get next token
-    }
-    field++;
-    token = strtok(NULL, ",");
+    } else lv_log("\nno comma found in NMEA string: %s\n", bfr);
   }
 }
