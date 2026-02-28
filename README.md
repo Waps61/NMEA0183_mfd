@@ -74,15 +74,18 @@ The file `custom_partitons.csv` file wil maked use of the full memory potential.
 `coredump, data, coredump,0xFF0000,0x10000,`\
 
 ## Example
-### the mainscreen
-![screenshot of the mainscreen](/screenshots/IMG_4342.jpg)
+### the mainscreen in daylight mode
+![screenshot of the mainscreen](/screenshots/trip_screen_daylight.jpg)
 
-### the brightness screen
-![screenshot of the brightness screen](/screenshots/IMG_4332.jpg)
+### the main screen in sunlight mode
+![screenshot of the brightness screen](/screenshots/trip_screen_sunlight.jpg)
 
-### the settingsscreen
-![screenshot of the settings screen](/screenshots/IMG_4333.jpg)
+### the main screen in dawn mode
+![screenshot of the settings screen](/screenshots/trip_screen_dawn.jpg)
+
+### the main screen in night mode
+![screenshot of the settings screen](/screenshots/trip_screen_night.jpg)
 
 
 ### video
->[Demo Video on tube](https://youtu.be/hAYLPJpzyHU)
+>[Demo Video on tube](https://youtu.be/ISXRW4jD3Wc?si=ROqHOkwfuZjdwLJk)
