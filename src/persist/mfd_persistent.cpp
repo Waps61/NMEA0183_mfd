@@ -5,7 +5,7 @@
 /*
   Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
   Contact:  waps61 @gmail.com
-  Persistance implementation. It is used to store some variables for configuration
+  Persistent implementation. It is used to store some variables for configuration
   setting of the program
 */
 #include <Arduino.h>
