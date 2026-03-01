@@ -231,7 +231,7 @@ void processNMEAData(const char *buff)
             (ptr = strstr(bfr, "CTS")) != NULL ||
             (ptr = strstr(bfr, "TOB")) != NULL ||
             (ptr = strstr(bfr, "VWR")) != NULL ||
-            (ptr = strstr(bfr, "BAT")) != NULL ||
+            (ptr = strstr(bfr, "XDR")) != NULL ||
             (ptr = strstr(bfr, "HDG")) != NULL ||
             (ptr = strstr(bfr, "MTW")) != NULL ||
             (ptr = strstr(bfr, "DPT")) != NULL ||
@@ -368,7 +368,7 @@ void processNMEAData(const char *buff)
               set_data_store(BAT, cvalue);
             }
           }
-          else if (strstr(bfr, "BAT") != NULL)
+          else if (strstr(bfr, "XDR") != NULL)
           {
             if (field == 2)
             {
@@ -376,7 +376,7 @@ void processNMEAData(const char *buff)
             }
           }
           // Get CTS from BWC
-          if (strstr(bfr, "BWC") != NULL)
+          if (strstr(bfr, "BWC") != NULL )
           {
             if (field == 6)
             {
