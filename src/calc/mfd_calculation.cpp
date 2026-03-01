@@ -15,7 +15,7 @@
 // *** by commenting out the line(s) below the debugger and or test statements will
 // *** be ommitted from the code
 // #define DEBUG 1
-//#define TEST 1
+// #define TEST 1
 
 /***********************************************************************************
    Global variables go here
@@ -112,9 +112,9 @@ float parse_coordinate(const char *coord_str, int coord_type)
 }
 
 /**
- * Claude AI generated code for calculating distance between two points 
+ * Claude AI generated code for calculating distance between two points
  * given in NMEA coordinate format, using the Haversine formula.
- * 
+ *
  * @param lat1_str Latitude of point 1, e.g., "5221.5621,N"
  * @param lon1_str Longitude of point 1, e.g., "00540.8482,E"
  * @param lat2_str Latitude of point 2
@@ -188,7 +188,7 @@ void NMEA_runSoftGenerator()
     softIndex %= SIZE_NMEA_STREAM;
   }
 }
-#endif //TEST
+#endif // TEST
 /**
  *  function to processes the receivedChars buffer and filters sentence MWV,RM and VWR,
  * and more, which contain the SOG,COG, AWS and AWA parameters, when new data has arrived
@@ -196,7 +196,7 @@ void NMEA_runSoftGenerator()
 void processNMEAData(const char *buff)
 {
 
-  //lv_log("received string: %s length= %d\n", buff, strlen(buff));
+  // lv_log("received string: %s length= %d\n", buff, strlen(buff));
   if (strlen(buff) > 0)
   {
     int field = 0; // the field number in the NMEA string,
@@ -209,23 +209,25 @@ void processNMEAData(const char *buff)
     char *ptr;
 
     char *nmea_str;              // used to proces the tokens (seperated by ',' )
-    char bfr[83]={0};            // a copy of the referenced nmead buffer to prevent pointe problems
+    char bfr[83] = {0};          // a copy of the referenced nmead buffer to prevent pointe problems
     strcpy(bfr, buff);           // make the copy!
     field = 0;                   // ignore sentence tag, the first field as the tag
     nmea_str = strstr(bfr, ","); // find the tokens in the NMEA string
     if (nmea_str != NULL)
     {
       char *token = strtok(nmea_str, ","); // the token is actually holding the value of the fields
-      
-      // Adjust field for empty fields
+
+      // Adjust field for empty fields at start of the NMEA string, for example when the NMEA string
+      // starts with ",," then the first two fields are empty and the first value is in field 3, so we
+      // need to adjust the field number accordingly
       while (nmea_str[field] == ',')
         field++;
-      // Get all the field from the NMEAstring seperated by ','
+      // Get all the fields from the NMEAstring seperated by ','
       while (token != NULL)
       {
         cvalue[0] = 0;
-        // The below NMEA TAGs are processed, if the NMEA string contains one of these 
-        //tags then the value of the field is stored in the cvalue variable and processed further
+        // The below NMEA TAGs are processed, if the NMEA string contains one of these
+        // tags then the value of the field is stored in the cvalue variable and processed further
         if ((ptr = strstr(bfr, "MWV")) != NULL ||
             (ptr = strstr(bfr, "RMC")) != NULL ||
             (ptr = strstr(bfr, "CTS")) != NULL ||
@@ -243,10 +245,10 @@ void processNMEAData(const char *buff)
           // prepare for further manupulation and to prevent pointer problems
           // make a copy of the token
           strcpy(cvalue, token);
-          
+
           // Prepare AWS and AWA values, from MWV or VWR tags
           if ((strstr(bfr, "MWV") != NULL && strstr(bfr, ",R,") != NULL) ||
-              strstr(bfr , "VWR") != NULL)
+              strstr(bfr, "VWR") != NULL)
           {
             if (field == 1)
             {
@@ -274,7 +276,7 @@ void processNMEAData(const char *buff)
               set_data_store(AWS, cvalue);
             }
           }
-          // Prepare for SOF and COG values from RMC tags
+          // Prepare for SOG and COG values from RMC tags
           if (strstr(bfr, "RMC") != NULL)
           {
             if (field == 3)
@@ -307,7 +309,7 @@ void processNMEAData(const char *buff)
               distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
               boat_trp += distance;
               increase_boat_log(distance);
-          
+
               sprintf(tmp, "%.1f", boat_trp);
               set_data_store(TRP, tmp);
               sprintf(tmp, "%f", get_boat_log());
@@ -376,7 +378,7 @@ void processNMEAData(const char *buff)
             }
           }
           // Get CTS from BWC
-          if (strstr(bfr, "BWC") != NULL )
+          if (strstr(bfr, "BWC") != NULL)
           {
             if (field == 6)
             {
@@ -464,9 +466,10 @@ void processNMEAData(const char *buff)
         field++;
         token = strtok(NULL, ",");
       }
-    } 
-    #ifdef DEBUG 
-      else lv_log("\nno comma found in NMEA string: %s\n", bfr);
-    #endif
+    }
+#ifdef DEBUG
+    else
+      lv_log("\nno comma found in NMEA string: %s\n", bfr);
+#endif
   }
 }
