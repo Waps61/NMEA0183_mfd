@@ -6,7 +6,7 @@
   Project:  Yazz_NMEAtor_ESP32.cpp, Copyright 2020, Roy Wassili
   Contact:  waps61 @gmail.com
 /*
-    This is the NMEA comminication unit for receiving and sending NMEA data
+    This is the NMEA communication unit for receiving and sending NMEA data
     Include the necessary libraries
 */
 #include <comms/mfd_communication.h>
