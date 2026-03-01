@@ -1,4 +1,29 @@
 # NMEA0183-MFD
+
+#### Update:28-02-2026
+Per version 0.6 it is a functional version as an MVP. Meaning it communicates NMEA-0183 over serial data, settings can be stored to flash persistently,
+Day-, Sun-, Dawn- and Night modes are functional. The following data is presented on screen:
+Trip panel: CTS, COG, SOG(including history graph), DPT(including history graph), AWS, and TRP(trip distance in nautical miles)
+Wind panel: AWA, TWA, AWS and TWS and two blanc panels
+Course panel: CTS, HDG, COG, SOG, VMG and CMG
+Data is interpreted from the following NMEA-0183 sentences:
+* $--MVW
+* $--RMC
+* $--CTS
+* $--TOB (not an official NMEA message but comming from my old network as a special for battery voltages)
+* $--VWR
+* $--XDR (general purpose field specified by NMEA used for battery voltage)
+* $--HDG
+* $--MTW
+* $--DPT
+* $--DBK
+* $--DBT
+* $--BWC
+* $--VHW\
+RX on GPIO 32, TX on GPIO33\
+![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)
+
+### Initiation
 An attempt to get NMEA1083 data displayed on a MFD JC1060P470 with an ESP32-P4-C6 on board with LVGL
 Because I could not get the provided examples to run. Most examples have faulty references to libraries.
 Nor does it support the graphics driver in the GFX library for Arduino.
@@ -74,15 +99,18 @@ The file `custom_partitons.csv` file wil maked use of the full memory potential.
 `coredump, data, coredump,0xFF0000,0x10000,`\
 
 ## Example
-### the mainscreen
-![screenshot of the mainscreen](/screenshots/IMG_4342.jpg)
+### the mainscreen in daylight mode
+![screenshot of the mainscreen](/screenshots/trip_screen_daylight.jpg)
 
-### the brightness screen
-![screenshot of the brightness screen](/screenshots/IMG_4332.jpg)
+### the main screen in sunlight mode
+![screenshot of the brightness screen](/screenshots/trip_screen_sunlight.jpg)
 
-### the settingsscreen
-![screenshot of the settings screen](/screenshots/IMG_4333.jpg)
+### the main screen in dawn mode
+![screenshot of the settings screen](/screenshots/trip_screen_dawn.jpg)
+
+### the main screen in night mode
+![screenshot of the settings screen](/screenshots/trip_screen_night.jpg)
 
 
 ### video
->[Demo Video on tube](https://youtu.be/hAYLPJpzyHU)
+>[Demo Video on tube](https://youtu.be/ISXRW4jD3Wc?si=ROqHOkwfuZjdwLJk)
