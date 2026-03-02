@@ -2,7 +2,14 @@
  * @file screen_about.c
  * 
  */
-
+/*
+  Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
+  Contact:  waps61 @gmail.com
+  Screen_about is an Easter-egg for my wife Jeannet, who is the inspiration for this project. 
+  It is a simple screen with a random message from a list of 9 messages that I have collected over the years. 
+  The messages are in Frysian, since Jeannet is Frysian and I am not. 
+  Future use is that this screen hold some favorite gauges etc she is using while at the helm :-)
+*/
 /*********************
  *      INCLUDES
  *********************/
@@ -83,9 +90,7 @@ lv_obj_t *screen_about_create(void)
   lv_label_set_text(lv_label_2, "Back");
   lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
 
-  // lv_obj_t *lv_label_2 = lv_label_create(lv_button_0);
-  // lv_label_set_text(lv_label_2, "Back");
-
+  
   lv_obj_add_screen_load_event(lv_button_0, LV_EVENT_CLICKED, screen_main, LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
 
   LV_TRACE_OBJ_CREATE("finished");

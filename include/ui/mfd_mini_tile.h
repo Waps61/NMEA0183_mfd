@@ -21,8 +21,8 @@ extern "C"
   /*********************
    *      DEFINES
    *********************/
-#define MINI_TILE_WIDTH 250
-#define MINI_TILE_HEIGHT 65
+#define MINI_TILE_WIDTH 250 // The width of the mini tile, set to 250 pixels
+#define MINI_TILE_HEIGHT 65 // The height of the mini tile, set to 65 pixels
 
   /**********************
    *      TYPEDEFS

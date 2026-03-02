@@ -26,9 +26,9 @@ static lv_style_t style_btnbase;
 void init_style_btnbase()
 {
   lv_style_init(&style_btnbase);
-  //lv_style_set_bg_color(&style_btnbase, lv_palette_main(LV_PALETTE_GREY));
+  
   lv_style_set_bg_color(&style_btnbase, lv_color_hex(DAWN_BACKGROUND));
-  //lv_style_set_border_color(&style_btnbase, lv_palette_darken(LV_PALETTE_BLUE_GREY, 0));
+  
   lv_style_set_bg_color(&style_btnbase, lv_color_lighten(lv_color_hex(DAWN_SURFACE),LV_OPA_30));
   lv_style_set_border_width(&style_btnbase, 2);
   lv_style_set_border_color(&style_btnbase, lv_color_hex(DAY_LINE_COLOR));
@@ -54,7 +54,7 @@ static void brightness_slider_event_cb(lv_event_t *e)
   { // sent once when Slider is released
     brightness_changed = true;
     brightness_value = (int)(lv_slider_get_value(slider) * 2.5);
-    // LV_LOG_INFO("slider %% %d, value %d, btn=%d", (int)lv_slider_get_value(slider), brightness_value, (int)brightness_changed);
+    
     set_backlight(brightness_value);
   }
 }

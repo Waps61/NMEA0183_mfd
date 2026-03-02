@@ -134,6 +134,12 @@ void NMEA_startListening()
     case CHECKSUMMING:
       nmeaBuffer[nmeaIndex] = cIn;
       nmeaIndex++;
+      if(nmeaIndex >= NMEA_BUFFER_SIZE)
+      {
+        nmeaStatus = TERMINATING;
+        nmeaIndex = 0;
+        nmeaDataReady = false;
+      }
       break;
     case TERMINATING:
 

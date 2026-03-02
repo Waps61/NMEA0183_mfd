@@ -46,11 +46,8 @@
 
 lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *tag_unit, lv_obj_t *tile)
 {
-  lv_log("adding tile %s with unit %s to panel %s\n", nmea_tag, tag_unit, lv_obj_get_name(panel));
   mfd_panel_t *pdata = (mfd_panel_t *)lv_obj_get_user_data(panel);
-  lv_log("paneldata :\n");
-
-  lv_log("max_tiles: %d, spacing x,y: %d, %d, nt_tiles: %d\n", pdata->max_nr_of_tiles, pdata->tile_spacing_x, pdata->tile_spacing_y, pdata->tile_count);
+  
   if (pdata->tile_count < pdata->max_nr_of_tiles)
   {
     tile = mfd_tile_create(panel);

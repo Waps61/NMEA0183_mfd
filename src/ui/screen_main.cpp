@@ -53,11 +53,17 @@ static lv_obj_t *mfd_course_panel = NULL;     // a static panel to display cours
 static lv_obj_t *mfd_brightness_panel = NULL; // a static panel for brigtness settings
 static lv_obj_t *mfd_config_panel = NULL;     // a static panel for the config setting
 static lv_obj_t *mfd_panel_array[5] = {0};
-static int TRIP_PNL = 0;
-static int WIND_PNL = 1;
+static int TRIP_PNL = 0; // Thes indexes are uses to improve readability of the code, since the panel are stored in an array
+static int WIND_PNL = 1; // and are actually used as the key in a hash style of use
 static int COURSE_PNL = 2;
 static int BRIGHT_PNL = 3;
 static int CONFIG_PNL = 4;
+/**
+ * Below hash is used since I needed a reference to the panel which is referred to as a void pointer in the event handler.
+ * So I can not use the integer itself but have to use a pinter to the integer as reference in the event handler.
+ * It is not the most efficient but this it is what could think of to solve the problem. The hash is used in the
+ * menu_btn_event_cb to show and hide the panels.
+ */
 static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL};
 
 static char tile_data_buffer[15];
@@ -70,14 +76,23 @@ size_t free_bytes;
 /***********************
  *  STATIC PROTOTYPES
  **********************/
-lv_obj_t *tile_hash[NR_OF_NMEA_TAGS] = {0};
-lv_obj_t *sogplot, *dptplot;
-lv_chart_series_t *ser_sog, *ser_dpt;
+lv_obj_t *tile_hash[NR_OF_NMEA_TAGS] = {0}; // hash to store the reference to a tile, so it can be updated when new data is received
+lv_obj_t *sogplot, *dptplot;                // reference to the chart objects to update the plot with new data
+lv_chart_series_t *ser_sog, *ser_dpt;       // reference to the chart series to update the plot with new data
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-// implement function declared in  NMEA0183.h
+/**
+ *  implement function declared in  mfd_conf.h
+ * This is a function to set the boat log value and update the corresponding subject, so that the value is updated in the display.
+ * The boat log value is used to calculate the trip distance and is updated when a new NMEA sentence with the log value is received. 
+ * The function is also used to set the initial value of
+ * the boat log when the EEPROM is read at the start of the program.
+ * It is a bit unusual, but since mfd_conf_h has no implementation file and is only used to declare the configuration 
+ * constants and variables, I thought it would be a good idea to implement the function in the screen_main.cpp file, 
+ * since it is the main screen that is responsible for displaying the trip data and updating the boat log value.
+ */
 
 void set_boat_log(float value)
 {
@@ -101,20 +116,27 @@ void init_data_store()
   for (int i = 0; i < NR_OF_NMEA_TAGS; i++)
   {
     strcpy(NMEA_DATA_STORE[i], "---");
-    // lv_log("NMEA_DATA_STORE[ %d] = %s\n", i, NMEA_DATA_STORE[i]);
   }
   data_store_inited = true;
 }
 
+/**
+ * This function is used to set the value of a specific NMEA tag in the data store and update the corresponding tile with the new value.
+ * The function takes the tag and the data as input, formats the data and updates the NMEA_DATA_STORE with the new value.
+ * The function also updates the boat_sog and boat_dpt variables when the SOG and DPT tags are updated, so that the values can be used to update the plots in the display.
+ * The function is called when a new NMEA sentence is received and parsed, and the corresponding tag is updated with the new value.
+ */
 void set_data_store(enum sequence_id tag, const char data[15])
 {
   char fmt_data[15] = {0};
   int j = 0;
+  // Remove leading zeros and keep the dot for decimal values, so that the value is displayed in a more readable format on the display.
   for (int i = 0; (i < strlen(data) || data[i] == '.'); i++)
   {
     if (data[i] != '0' || j > 0)
       fmt_data[j++] = data[i];
   }
+  // Some tags need special handling and formatting, to be display in a correct manner.
   switch (tag)
   {
 
@@ -138,12 +160,13 @@ void set_data_store(enum sequence_id tag, const char data[15])
   }
 }
 
+#ifdef DEMO
 void test_screen_data_updates()
 {
   current_millis = millis();
   NMEA_runSoftGenerator();
 }
-
+#endif //DEMO
 /**
  * Read the data from the NMEA_DATA_STORE and write
  * the value to the specific label if it excist
@@ -151,17 +174,17 @@ void test_screen_data_updates()
 void mfd_update_tile_data()
 {
   current_millis = millis();
+  // Update the data in the display every 250ms, to avoid updating the display too often and causing performance issues.
   if (millis() - previous_millis > UPDATE_DELAY)
   {
-    // update the tags thta are use once, the tags that are copies
-    // ar eput in the switch statement.
+    // update the tags that are used once, the tags that are copies
+    // are put in the switch statement.
     for (int i = CTS; i < BAT; i++)
     {
 
       // If label excist update value
       if (tile_hash[i] != NULL)
       {
-        // lv_log("wrting value to label %d: %s\n", i, NMEA_DATA_STORE[i]);
         lv_label_set_text(tile_hash[i], NMEA_DATA_STORE[i]);
       }
       switch (i)
@@ -195,11 +218,10 @@ void mfd_update_tile_data()
  * Cuurently trip panel is always visible but overlayed with the follwoing panels
  * So need to press a button once to show and twcie to hide
  *
- * TO DO: pressing a button should hide all others and visa versa
+ * 
  */
 void menu_btn_event_cb(lv_event_t *event)
 {
-  // lv_obj_t *panel_btn = NULL;
   lv_event_code_t code = lv_event_get_code(event);
   lv_obj_t *btn = lv_event_get_target_obj(event);
   if (code == LV_EVENT_CLICKED)
@@ -219,16 +241,14 @@ void menu_btn_event_cb(lv_event_t *event)
   }
   /**
    * Without below code an Assertion is causing a crash after a couple of panelswitches due to low memory.
-   * Loggin the memory monitor did not reveal a leakage of memory .
-   * It seems that the memory allocated for the user data is not sufficient or not properly managed. 
-   * By adding the below code the assertion does not seem to happen anymore. It is not clear why this is the case, 
+   * Logging the memory monitor did not reveal a memory leak.
+   * It seems that the memory allocated for the user data is not sufficient or not properly managed.
+   * By adding the below code the assertion does not seem to happen anymore. It is not clear why this is the case,
    * but it might be related to the way the event system handles user data and memory management.
    */
   mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
   lv_mem_monitor(mem_monitor);
-  // lv_log("Memory monitor after btn press: total size: %d, free size: %d, used size: %d\n", 
-  //mem_monitor->total_size, mem_monitor->free_size, mem_monitor->total_size - mem_monitor->free_size);
-
+  
   lv_free(mem_monitor);
 }
 
@@ -250,11 +270,10 @@ lv_obj_t *screen_main_create(void)
   }
 
   if (screen_main == NULL)
-    screen_main = lv_obj_create(lv_screen_active()); // lv_obj_create(NULL);
+    screen_main = lv_obj_create(lv_screen_active()); 
   // Create the main screen as a permanent screen
 
   screen_active = screen_main;
-  // lv_log("screen active = %s", lv_obj_get_name(screen_main));
   lv_obj_set_name_static(screen_active, "screen_main_#");
 
   // 1st thing to do is initialize the data_store for NMEA values
@@ -264,7 +283,7 @@ lv_obj_t *screen_main_create(void)
   // Add a menubar
   lv_obj_t *menu_bar = lv_obj_create(screen_active);
   lv_obj_remove_style_all(menu_bar);
-   lv_obj_set_flex_flow(menu_bar, LV_FLEX_FLOW_COLUMN);
+  lv_obj_set_flex_flow(menu_bar, LV_FLEX_FLOW_COLUMN);
   mfd_set_menu_bar_style(menu_bar);
   lv_obj_set_x(menu_bar, 0);
   lv_obj_set_y(menu_bar, 0);
@@ -277,6 +296,7 @@ lv_obj_t *screen_main_create(void)
   lv_obj_t *mfd_trip_panel = mfd_panel_create(screen_active, "TRIP");
   mfd_panel_array[TRIP_PNL] = mfd_trip_panel;
   mfd_show_panel(mfd_trip_panel);
+
   lv_obj_t *mfd_wind_panel = mfd_panel_create(screen_active, "WIND");
   mfd_panel_array[WIND_PNL] = mfd_wind_panel;
   mfd_hide_panel(mfd_wind_panel);
@@ -286,41 +306,32 @@ lv_obj_t *screen_main_create(void)
   mfd_hide_panel(mfd_course_panel);
 
   lv_obj_t *mfd_bright_panel = mfd_brightness_panel_create(screen_active, "BRIGHT");
-  // mfd_brightness_panel_create(mfd_bright_panel);
   mfd_panel_array[BRIGHT_PNL] = mfd_bright_panel;
   mfd_hide_panel(mfd_bright_panel);
 
   lv_obj_t *mfd_settings_panel = mfd_config_panel_create(screen_active, " SETTING");
   mfd_panel_array[CONFIG_PNL] = mfd_settings_panel;
-  // mfd_config_panel_create(mfd_settings_panel);
   mfd_hide_panel(mfd_settings_panel);
 
   // Add the buttons and their link to their panel to the menubar
   // The void *userdata reference  is the reference to the panel to show
   lv_obj_t *trip_btn = mfd_button_create(menu_bar, "TRIP");
-  // lv_obj_add_flag(trip_btn, LV_OBJ_FLAG_CHECKABLE);
-  // lv_obj_add_event_cb(trip_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_trip_panel);
   lv_obj_add_event_cb(trip_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[TRIP_PNL]);
 
   lv_obj_t *wind_btn = mfd_button_create(menu_bar, "WIND");
-  // lv_obj_add_event_cb(wind_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_wind_panel);
   lv_obj_add_event_cb(wind_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[WIND_PNL]);
 
   lv_obj_t *course_btn = mfd_button_create(menu_bar, "COURSE");
-  // lv_obj_add_event_cb(course_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_course_panel);
   lv_obj_add_event_cb(course_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[COURSE_PNL]);
 
   lv_obj_t *bright_btn = mfd_button_create(menu_bar, "BRIGHT");
-  // lv_obj_add_event_cb(bright_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_bright_panel);
   lv_obj_add_event_cb(bright_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[BRIGHT_PNL]);
 
   lv_obj_t *setting_btn = mfd_button_create(menu_bar, "SETTING");
-  // lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_CLICKED, mfd_settings_panel);
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
   lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
-  // lv_obj_add_flag(wind_btn, LV_OBJ_FLAG_CHECKABLE);
-
+  
   // Create the about screen as a child of the main screen
   lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
 
@@ -420,5 +431,3 @@ lv_obj_t *screen_main_create(void)
 
   return screen_active;
 }
-
-

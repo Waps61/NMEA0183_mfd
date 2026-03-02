@@ -20,11 +20,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
-  lv_style_t style_main;
-  lv_style_t style_pressed;
-} lv_button_styles_t;
 
 /***********************
  *  STATIC VARIABLES
@@ -38,11 +33,8 @@ typedef struct
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 lv_obj_t *mfd_button_create(lv_obj_t *parent, const char *text)
 {
-  static lv_button_styles_t styles;
-  
 
   lv_obj_t *btn = lv_button_create(parent);
   mfd_set_btn_style(btn);

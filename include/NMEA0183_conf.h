@@ -40,11 +40,7 @@ int iType;
 bool touched;
 int32_t w, h, n, n1, cx, cy, cx1, cy1, cn, cn1;
 uint8_t tsa, tsb, tsc, ds;
-lv_obj_t *btn1, *btn2, *btn3;
-lv_obj_t *label1, *label2, *label3;
-lv_obj_t *swtch1, *cmps1;
 
-lv_style_t green, yellow, red;
 
 uint32_t millis_cb(void)
 {

@@ -14,7 +14,11 @@
 extern "C"
 {
 #endif
-
+    /**
+     * Below are static variables for the configuration panel, such as the options for the baudrate
+     * and the keyboard map for the on-screen keyboard
+     *
+     */
     static const char *baud_options = "4800\n38400";
     /*Create an AZERTY keyboard map*/
     static const char *kb_map[] = {"1", "2", "3", LV_SYMBOL_BACKSPACE, "\n",
@@ -28,7 +32,7 @@ extern "C"
                                                      LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, (lv_buttonmatrix_ctrl_t)(LV_BUTTONMATRIX_CTRL_HIDDEN | LV_BUTTONMATRIX_CTRL_WIDTH_6),
                                                      LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_4, LV_BUTTONMATRIX_CTRL_WIDTH_6};
 
-    lv_obj_t* mfd_config_panel_create(lv_obj_t *parent, const char* title);
+    lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title);
 
 #ifdef __cplusplus
 } /*extern "C"*/

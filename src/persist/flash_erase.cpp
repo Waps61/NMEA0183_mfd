@@ -1,14 +1,14 @@
 /**
  * @file flash_erase.c
  */
-/*                                                                                                    \
-  Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili                              \
-  Contact:  waps61 ,gmail.com                                                                         \
+/*
+  Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
+  Contact:  waps61 ,gmail.com
   Flash erase implementation. It is used to format the NVR when needed
     - due to corruption in the development phase
-    - due to NVR free space limitations                                                                            \
-*/                                                                                                    \
-#include<Arduino.h>
+    - due to NVR free space limitations
+*/
+#include <Arduino.h>
 #include <nvs_flash.h>
 #include <persist/flash_erase.h>
 
