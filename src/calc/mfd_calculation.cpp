@@ -240,7 +240,6 @@ void processNMEAData(const char *buff)
             (ptr = strstr(bfr, "DBT")) != NULL ||
             (ptr = strstr(bfr, "DBK")) != NULL ||
             (ptr = strstr(bfr, "BWC")) != NULL ||
-            (ptr = strstr(bfr, "MTW")) != NULL ||
             (ptr = strstr(bfr, "VHW")) != NULL)
         {
           // prepare for further manupulation and to prevent pointer problems
