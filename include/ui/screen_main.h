@@ -19,8 +19,7 @@ extern "C"
   /*********************
    *      DEFINES
    *********************/
-#define SCREEN_UPDATE_RATE 4
-#define UPDATE_DELAY (1000/SCREEN_UPDATE_RATE)
+#define UPDATE_DELAY 500 // Update the display every 500ms, to avoid updating the display too often and causing performance issues.
   /**********************
    *      TYPEDEFS
    **********************/

@@ -3,13 +3,24 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.6 28-02-2026
+  VERSION:  0.81 04-03-2026
   Date:     v0.1 31-01-2026
-  Last :    v0.6 28-02-2026
+  Last :    v0.81 04-03-2026
+  Update:   V0.81 04-03-2026
+            MTW tag added to NMEA_TAG enum and implemented in mfd_calculation.cpp since it was forgotton to be added 
+            in the previous version, and is used in the test data and is a common tag for water temperature.
+            Fixed unreliable serial cable leading to unreadable data from the UART leading to long debugging sessions
+            Implemented filtering of non-printable characters in the serial data, which can cause problems in the processing 
+            of the NMEA data and can lead to crashes or incorrect data being displayed.
+            V0.80 01-03-2026
+            FAT passed with real NMEA0183 data from the test network, and the display is working as expected.
+            2way communication crashed the program, so I have commented out the talker part for now, and will implement it in a later stage.
+             I have added some comments to the code to make it more clear what is going on.
+            v0.6 28-02-2026
             Implemented 2-way communication so that incomming NMEA data can be relayed
             I re-used my state based function from the Yazz_NMEAtor_ESP32 project to read the 
             NMEA data from the serial port, and added a function to process the data when it is ready.
-  Update:   fixed bugs, cleaned code, implemented version info on settings screen,
+            fixed bugs, cleaned code, implemented version info on settings screen,
             fixed toggle state for menubar, added spacer for panels when not all tiles are used
             implemented Sun-, Dawn and Night modes
   Previous  V0.5  22-02-2026

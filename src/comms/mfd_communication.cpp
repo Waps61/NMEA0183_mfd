@@ -17,7 +17,7 @@
 // *** Conditional Debug & Test Info to Serial Monitor
 // *** by commenting out the line(s) below the debugger and or test statements will
 // *** be ommitted from the code
- #define DEBUG 1
+#define DEBUG 1
 // #define TEST 1
 
 /*
@@ -51,13 +51,12 @@ void debugWrite(const char *debugMsg)
 #ifdef DEBUG
   if (strlen(debugMsg) > 1)
     lv_log("%s\n", debugMsg);
-  
+
 #endif
 }
 
-
 /*
-Clear the inputbuffer by reading until empty, since Serial.flush does not this anymore
+Clear the inputbuffer by reading until empty
 */
 void clearNMEAInputBuffer()
 {
@@ -76,15 +75,15 @@ int NMEA_startTalking(const char *nmea_buff)
   return i;
 }
 
-/** 
+/**
  * reads the serial port  and ckeks for valid nmea data starting with
  * character '$' only (~ and ! can be skipped as start charcter)
  * This is a state based process, where the state is determined by the nmeaStatus variable
  * Initial state is INVALID
- * When a start character is found, the state changes to RECEIVING and the nmeaBuffer is filled 
- * with the incoming characters until a '*' character is found, then the state changes to CHECKSUMMING 
- * and the checksum characters are read until a newline character is found, then the state changes to 
- * TERMINATING and the nmeaDataReady flag is set to true, and the nmeaBuffer is processed by the 
+ * When a start character is found, the state changes to RECEIVING and the nmeaBuffer is filled
+ * with the incoming characters until a '*' character is found, then the state changes to CHECKSUMMING
+ * and the checksum characters are read until a newline character is found, then the state changes to
+ * TERMINATING and the nmeaDataReady flag is set to true, and the nmeaBuffer is processed by the
  * processNMEAData function, and then the state changes back to INVALID
  */
 void NMEA_startListening()
@@ -93,12 +92,13 @@ void NMEA_startListening()
   while (Serial1.available() > 0 && nmeaStatus != TERMINATING)
   {
     cIn = Serial1.read();
+    
     switch (cIn)
     {
-    case '~':
-      // reserved by NMEA
-    case '!':
-      // for AIS info
+    // case '~':   //skipped and don't waste time on it, because it's not used in NMEA0183 and is reserved by NMEA
+    //  reserved by NMEA
+    // case '!':   //skipped and don't waste time on it, because we don't use AIS data in this project
+    //  for AIS info
     case '$':
       // for general NMEA info
       nmeaStatus = RECEIVING;
@@ -132,9 +132,17 @@ void NMEA_startListening()
       break;
     case RECEIVING:
     case CHECKSUMMING:
+      if( cIn>=32 && cIn <=126) // filter out non-printable characters, which can cause problems in the processing of the NMEA data
+      {
       nmeaBuffer[nmeaIndex] = cIn;
       nmeaIndex++;
-      if(nmeaIndex >= NMEA_BUFFER_SIZE)
+      } else 
+      {
+        nmeaStatus = INVALID; // if a non-printable character is found, the NMEA data is considered invalid and the state changes back to INVALID
+        nmeaIndex = 0;
+        nmeaDataReady = false;
+      }
+      if (nmeaIndex >= NMEA_BUFFER_SIZE)
       {
         nmeaStatus = TERMINATING;
         nmeaIndex = 0;
@@ -157,8 +165,8 @@ void NMEA_startListening()
         debugWrite(nmeaBuffer);
 #endif
 
-            processNMEAData(nmeaBuffer);
-
+        processNMEAData(nmeaBuffer);
+        
         // clear the NMEAbuffer with 0
         memset(nmeaBuffer, 0, NMEA_BUFFER_SIZE + 1);
         nmeaIndex = 0;
@@ -169,7 +177,6 @@ void NMEA_startListening()
   }
 }
 
-
 /*
  * Initializes UART 1 for incomming NMEA0183 data from the boat network
  */
@@ -178,17 +185,11 @@ bool initializeListener()
   bool status = true;
   int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
   Serial1.begin(baudrate, SERIAL_8N1, LISTENER_RX, LISTENER_TX, true);
-  // clearNMEAInputBuffer();
-  //  nmeaBuffer = (char *)malloc((NMEA_BUFFER_SIZE + 1) *sizeof(char));
   memset(nmeaBuffer, 32, NMEA_BUFFER_SIZE - 1);
   nmeaBuffer[NMEA_BUFFER_SIZE] = '\0';
 
   lv_log("nmeaBuffer initialized with %s\n", nmeaBuffer);
 
-  // for(int i = 0; i < NMEA_BUFFER_SIZE + 1; i++)
-  // {
-  //   nmeaBuffer[i] = '\0';
-  // }
 #ifdef DEBUG
   debugWrite("Listener initialized...");
 #endif
@@ -205,18 +206,15 @@ bool initializeTalker()
   int baudrate = lv_subject_get_int(&mfd_subject_baudrate);
   // Serial2.begin(baudrate, SERIAL_8N1, TALKER_RX, TALKER_TX, true);
   clearNMEAInputBuffer();
-  lv_log("Listener initialized..\n");
 #ifdef DEBUG
-  debugWrite("Listener initialized...");
+  debugWrite("Talker initialized...");
 #endif
   return status;
 }
-
-
 
 void mfd_setup_communication()
 {
 
   initializeListener();
-  initializeTalker();
+  // initializeTalker();
 }

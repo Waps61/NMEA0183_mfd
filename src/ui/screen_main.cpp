@@ -142,7 +142,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
 
   case SOG:
     boat_sog = atof(fmt_data);
-    sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
+    sprintf(NMEA_DATA_STORE[tag], "%1.3s", fmt_data);
     break;
   case DPT:
     boat_dpt = atof(fmt_data) * -1.0;
@@ -153,7 +153,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
     break;
   default:
     if (strlen(fmt_data) < 3)
-      sprintf(NMEA_DATA_STORE[tag], "0%2.4s", fmt_data);
+      sprintf(NMEA_DATA_STORE[tag], "0%1.2s", fmt_data);
     else
       sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
@@ -426,7 +426,7 @@ lv_obj_t *screen_main_create(void)
 
   CMGbox = mfd_panel_add_tile(mfd_course_panel, "CMG", "0", CMGbox);
   tile_hash[CMG] = mfd_tile_add_tile_data(CMGbox, tile_hash[CMG]);
-
+  
   LV_TRACE_OBJ_CREATE("finished");
 
   return screen_active;

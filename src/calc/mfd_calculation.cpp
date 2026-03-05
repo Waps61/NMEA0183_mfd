@@ -240,6 +240,7 @@ void processNMEAData(const char *buff)
             (ptr = strstr(bfr, "DBT")) != NULL ||
             (ptr = strstr(bfr, "DBK")) != NULL ||
             (ptr = strstr(bfr, "BWC")) != NULL ||
+            (ptr = strstr(bfr, "MTW")) != NULL ||
             (ptr = strstr(bfr, "VHW")) != NULL)
         {
           // prepare for further manupulation and to prevent pointer problems
@@ -362,6 +363,16 @@ void processNMEAData(const char *buff)
               set_data_store(DPT, cvalue);
             }
           }
+
+          // Prepare for Water Temperature values, comming from MTW tags
+          if (strstr(bfr, "MTW") != NULL)
+          {
+            if (field == 1)
+            {
+              set_data_store(MTW, cvalue);
+            }
+          }
+
           // Prepare for BAT values, either from TOB or BAT tags
           if (strstr(bfr, "TOB") != NULL)
           {

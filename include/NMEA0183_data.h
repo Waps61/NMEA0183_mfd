@@ -128,33 +128,34 @@ static char lat_old[FIELD_BUFFER] = {0};
 static char lon_old[FIELD_BUFFER] = {0};
 
 
-#define NR_OF_NMEA_TAGS 21 // make sure this equal to nr of NMEA_TAG
+#define NR_OF_NMEA_TAGS 22 // make sure this equal to nr of NMEA_TAG
 // Used as a reference to the required NMEA tag
 // oldVal is used for specific purposes while processing nmea data
 // if tags are used more then once add them at the last tag that 
 // is used only onde, like BAT in this case
 static enum sequence_id {
-  oldVal,
-  CTS,
-  COG,
-  SOG,
-  DPT,
-  AWA,
-  AWS,
-  TWA,
-  TWS,
-  HDG,
-  LOG,
-  TRP,
-  VMG,
-  CMG,
-  DIR,
-  STW,
-  BAT,
-  CTS2,
-  COG2,
-  SOG2,
-  AWS2
+  oldVal, // 0 used for specific purposes while processing nmea data
+  CTS,    // 1 Course To Steer
+  COG,    // 2 Course Over Ground
+  SOG,    // 3 Speed Over Ground 
+  DPT,    // 4 Depth
+  AWA,    // 5 Apparent Wind Angle
+  AWS,    // 6 Apparent Wind Speed
+  TWA,    // 7 True Wind Angle
+  TWS,    // 8 True Wind Speed
+  HDG,    // 9 Heading
+  LOG,    // 10 Log
+  TRP,    // 11 Trip
+  VMG,    // 12 Velocity Made Good
+  CMG,    // 13 Course Made Good
+  DIR,    // 14 Direction to Steer
+  STW,    // 15 Speed Through Water
+  MTW,    // 16 Water Temperature
+  BAT,    // 17 Battery Voltage
+  CTS2,   // 18 Course To Steer 2, calculated from COG and TWA
+  COG2,   // 19 Course Over Ground 2
+  SOG2,   // 20 Speed Over Ground 2
+  AWS2    // 21 Apparent Wind Speed 2
 } NMEA_TAG;
 
 /**
