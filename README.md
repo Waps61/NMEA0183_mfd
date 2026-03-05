@@ -1,5 +1,8 @@
-# NMEA0183-MFD
-
+# NMEA0183-MFD: A marine multifucntion display
+#### Update: 02-03-2026
+Per version 0.8 the FAT has been successfull performed, now waiting the SAT on board if succesfull, version will be released as V1.0.
+To assure the GPIO's of ESP32-P4 are working on the right Voltage level of 3.3V I had to shift down from 5V (measured with a multimeter with a scope funtion). Hence I've soldered a voltage divider with R2=10k and R1= 5k Ohm, so Vout = Vin*(R2/(R1+R2)) = 5V*(10/(5+10)) = 3,3V\
+![screenshot of GPIO's](/screenshots/voltage_divider.jpg)
 #### Update:28-02-2026
 Per version 0.6 it is a functional version as an MVP. Meaning it communicates NMEA-0183 over serial data, settings can be stored to flash persistently,
 Day-, Sun-, Dawn- and Night modes are functional. The following data is presented on screen:
@@ -97,7 +100,12 @@ The file `custom_partitons.csv` file wil maked use of the full memory potential.
 `app1,     app,  ota_1,   0x310000,0x300000,`\
 `ffat,     data, fat,     0x610000,0x9E0000,`\
 `coredump, data, coredump,0xFF0000,0x10000,`\
-
+## Conceptual view of the panels
+![screenshot of the mainscreen](/nmea0183_diagram.png)
+## Use cases:
+![screenshot of the mainscreen](/NMEA0183-mfd-Use-cases.png)
+## UML diagram
+![screenshot of the mainscreen](/NMEA0183-mfd-UML.png)
 ## Example
 ### the mainscreen in daylight mode
 ![screenshot of the mainscreen](/screenshots/trip_screen_daylight.jpg)
