@@ -38,6 +38,7 @@ lv_obj_t *mini_tile_container;
  *   GLOBAL FUNCTIONS
  **********************/
 
+
 void mfd_tile_set_label(lv_obj_t *tile, const char *title)
 {
   lv_obj_t *label = lv_label_create(tile);

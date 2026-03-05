@@ -15,6 +15,7 @@
 #include <ui/mfd_panel.h>
 #include <font/mfd_fonts.h>
 #include <ui/mfd_tile.h>
+#include <ui/mfd_tile_gauge.h>
 #include <NMEA0183_data.h>
 #include <stdlib.h>
 
@@ -40,8 +41,31 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+lv_obj_t *mfd_panel_add_gauge(lv_obj_t *panel, char const *nmea_tag, lv_obj_t *gauge_tile)
+{
+  mfd_panel_t *pdata = (mfd_panel_t *)lv_obj_get_user_data(panel);
 
-
+  if (pdata->tile_count < pdata->max_nr_of_tiles)
+  {
+    gauge_tile = mfd_tile_create(panel);
+    lv_obj_set_name_static(gauge_tile, "mfd_gauge");
+    mfd_set_tile_style(gauge_tile);
+    mfd_set_style_day(gauge_tile);
+    lv_obj_set_style_x(gauge_tile, pdata->draw_pos_x, 0);
+    lv_obj_set_style_y(gauge_tile, pdata->draw_pos_y, 0);
+    pdata->tile_count++;
+    pdata->draw_pos_x += TILE_WIDTH + pdata->tile_spacing_x;
+    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - TILE_WIDTH))
+    {
+      pdata->draw_pos_x = 10;
+      pdata->draw_pos_y += TILE_HEIGHT + pdata->tile_spacing_y;
+    }
+    mfd_gauge_set_label(gauge_tile, nmea_tag);
+    //lv_obj_align(gauge_tile, LV_ALIGN_BOTTOM_MID,0,-10);
+    
+  }
+  return gauge_tile;
+}
 
 
 lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *tag_unit, lv_obj_t *tile)

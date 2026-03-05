@@ -3,27 +3,32 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.81 04-03-2026
+  VERSION:  0.8.2 05-03-2026
   Date:     v0.1 31-01-2026
   Last :    v0.81 04-03-2026
-  Update:   V0.81 04-03-2026
-            MTW tag added to NMEA_TAG enum and implemented in mfd_calculation.cpp since it was forgotton to be added 
+  Update:   V0.8.2 05-03-2026
+            A gauge tile added (this was a feature on the prio list.The gauge is a graphical representation of 
+            the data, and can be used to display the wind angle for example. It is implemented as a separate tile type, 
+            since it has a different layout and functionality than the regular tiles. It is not problem free yet since
+            it drains the memory.
+            V0.81 04-03-2026
+            MTW tag added to NMEA_TAG enum and implemented in mfd_calculation.cpp since it was forgotton to be added
             in the previous version, and is used in the test data and is a common tag for water temperature.
             Fixed unreliable serial cable leading to unreadable data from the UART leading to long debugging sessions
-            Implemented filtering of non-printable characters in the serial data, which can cause problems in the processing 
+            Implemented filtering of non-printable characters in the serial data, which can cause problems in the processing
             of the NMEA data and can lead to crashes or incorrect data being displayed.
-            V0.80 01-03-2026
-            FAT passed with real NMEA0183 data from the test network, and the display is working as expected.
+Previous    V0.80 01-03-2026
+updates:    FAT passed with real NMEA0183 data from the test network, and the display is working as expected.
             2way communication crashed the program, so I have commented out the talker part for now, and will implement it in a later stage.
              I have added some comments to the code to make it more clear what is going on.
             v0.6 28-02-2026
             Implemented 2-way communication so that incomming NMEA data can be relayed
-            I re-used my state based function from the Yazz_NMEAtor_ESP32 project to read the 
+            I re-used my state based function from the Yazz_NMEAtor_ESP32 project to read the
             NMEA data from the serial port, and added a function to process the data when it is ready.
             fixed bugs, cleaned code, implemented version info on settings screen,
             fixed toggle state for menubar, added spacer for panels when not all tiles are used
             implemented Sun-, Dawn and Night modes
-  Previous  V0.5  22-02-2026
+            V0.5  22-02-2026
             fixed bugs, cleaned code, implemented version info on settings screen,
             fixed toggle state for menubar, added spacer for panels when not all tiles are used
             implemented Sun-, Dawn and Night modes
@@ -31,7 +36,7 @@
             Fixed toggle state. Cleaned dead code
             Version info implemented on Setting screen
             TO DO: Implement Sun-, Dawn and Night modes
-  updates:  v0.3 15-02-2026
+            v0.3 15-02-2026
             fixed bugs, cleaned code, spacer added for panels when not all tiles are used
             CMG implemented
             TO DO: Implement Sun-, Dawn and Night modes
@@ -142,7 +147,7 @@
  * It excludes all of your main program, unless you include them within the
  * testboundary here
  */
-//#define TEST // Exclude if not used for testing purposes
+// #define TEST // Exclude if not used for testing purposes
 #ifdef TEST
 #include "test/testlab.h"
 
@@ -167,9 +172,9 @@ lv_theme_t *mfd_theme_day;
 // static Preferences mfdsettings;
 lv_subject_t mfd_subject_baudrate; // default to 38400
 lv_subject_t mfd_subject_wifi;     // default to 0 = off
-lv_subject_t mfd_subject_ssid;
-lv_subject_t mfd_subject_pwd;
-lv_subject_t mfd_subject_log;
+lv_subject_t mfd_subject_ssid;     // obviously not disclosed, but read from the EEPROM
+lv_subject_t mfd_subject_pwd;      // obviously not disclosed, but read from the EEPROM
+lv_subject_t mfd_subject_log;     // total mileage of your ship
 
 #ifndef TEST
 mfd_pers_t ship_config;
@@ -205,7 +210,7 @@ void setup()
   mfd_theme_day = lv_theme_default_init(
       disp,                      /* Use DPI, size, etc. from this display */
       lv_color_hex(DAY_PRIMARY), /* Primary and secondary palette */
-      lv_palette_lighten(LV_PALETTE_GREY,1),
+      lv_palette_lighten(LV_PALETTE_GREY, 1),
       false, /* Dark theme?  False = light theme. */
       &ui_font_lv_conthrax_16);
 
@@ -276,7 +281,7 @@ void loop()
 #endif
 #ifndef DEMO
   NMEA_startListening();
-  
+
 #endif // DEMO
 
   mfd_update_tile_data();
@@ -291,6 +296,6 @@ void loop()
     mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
   }
 #endif // TEST
- 
+
   mfd_recolor(screen_main);
-  }
+}

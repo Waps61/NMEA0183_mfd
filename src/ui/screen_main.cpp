@@ -34,6 +34,7 @@
 #include <ui/mfd_bright_panel.h>
 #include <ui/mfd_config_panel.h>
 #include <esp_heap_caps.h>
+#include <ui/mfd_tile_gauge.h>
 
 /*********************
  *      DEFINES
@@ -86,11 +87,11 @@ lv_chart_series_t *ser_sog, *ser_dpt;       // reference to the chart series to 
 /**
  *  implement function declared in  mfd_conf.h
  * This is a function to set the boat log value and update the corresponding subject, so that the value is updated in the display.
- * The boat log value is used to calculate the trip distance and is updated when a new NMEA sentence with the log value is received. 
+ * The boat log value is used to calculate the trip distance and is updated when a new NMEA sentence with the log value is received.
  * The function is also used to set the initial value of
  * the boat log when the EEPROM is read at the start of the program.
- * It is a bit unusual, but since mfd_conf_h has no implementation file and is only used to declare the configuration 
- * constants and variables, I thought it would be a good idea to implement the function in the screen_main.cpp file, 
+ * It is a bit unusual, but since mfd_conf_h has no implementation file and is only used to declare the configuration
+ * constants and variables, I thought it would be a good idea to implement the function in the screen_main.cpp file,
  * since it is the main screen that is responsible for displaying the trip data and updating the boat log value.
  */
 
@@ -151,6 +152,10 @@ void set_data_store(enum sequence_id tag, const char data[15])
   case LOG:
     sprintf(NMEA_DATA_STORE[tag], "%2.5s", fmt_data);
     break;
+  case AWA:
+    mfd_gauge_update(AWAGauge, 135, atoi(fmt_data));
+    mfd_gauge_update(AWAGaugeZoom, 60, atoi(fmt_data));
+
   default:
     if (strlen(fmt_data) < 3)
       sprintf(NMEA_DATA_STORE[tag], "0%1.2s", fmt_data);
@@ -166,7 +171,7 @@ void test_screen_data_updates()
   current_millis = millis();
   NMEA_runSoftGenerator();
 }
-#endif //DEMO
+#endif // DEMO
 /**
  * Read the data from the NMEA_DATA_STORE and write
  * the value to the specific label if it excist
@@ -218,7 +223,7 @@ void mfd_update_tile_data()
  * Cuurently trip panel is always visible but overlayed with the follwoing panels
  * So need to press a button once to show and twcie to hide
  *
- * 
+ *
  */
 void menu_btn_event_cb(lv_event_t *event)
 {
@@ -248,7 +253,7 @@ void menu_btn_event_cb(lv_event_t *event)
    */
   mem_monitor = (lv_mem_monitor_t *)malloc(sizeof(lv_mem_monitor_t));
   lv_mem_monitor(mem_monitor);
-  
+
   lv_free(mem_monitor);
 }
 
@@ -270,7 +275,7 @@ lv_obj_t *screen_main_create(void)
   }
 
   if (screen_main == NULL)
-    screen_main = lv_obj_create(lv_screen_active()); 
+    screen_main = lv_obj_create(lv_screen_active());
   // Create the main screen as a permanent screen
 
   screen_active = screen_main;
@@ -331,7 +336,7 @@ lv_obj_t *screen_main_create(void)
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
   lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
-  
+
   // Create the about screen as a child of the main screen
   lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
 
@@ -398,7 +403,8 @@ lv_obj_t *screen_main_create(void)
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
 
-  mfd_panel_add_spacer(mfd_wind_panel);
+  AWAGaugeTile = mfd_panel_add_gauge(mfd_wind_panel, "AWA", AWAGaugeTile);
+  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 135, 20, 60);
 
   AWSbox2 = mfd_panel_add_tile(mfd_wind_panel, "AWS", "KTS", AWSbox2);
   tile_hash[AWS2] = mfd_tile_add_tile_data(AWSbox2, tile_hash[AWS2]);
@@ -406,7 +412,8 @@ lv_obj_t *screen_main_create(void)
   TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
   tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
 
-  mfd_panel_add_spacer(mfd_wind_panel);
+  AWAGaugeTileZoom = mfd_panel_add_gauge(mfd_wind_panel, "AWA+", AWAGaugeTileZoom);
+  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 60);
 
   // Add the tiles and their tile_data objects to thwe course panel
   CTSbox2 = mfd_panel_add_tile(mfd_course_panel, "CTS", "o", CTSbox2);
@@ -426,7 +433,7 @@ lv_obj_t *screen_main_create(void)
 
   CMGbox = mfd_panel_add_tile(mfd_course_panel, "CMG", "0", CMGbox);
   tile_hash[CMG] = mfd_tile_add_tile_data(CMGbox, tile_hash[CMG]);
-  
+
   LV_TRACE_OBJ_CREATE("finished");
 
   return screen_active;

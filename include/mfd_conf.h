@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "81" //post FAT and pre SAT
+#define VERSION_MINOR "8.2" // post FAT and pre SAT
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -44,8 +44,11 @@ static lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *
     *TRPbox, *VMGbox, *CMGbox, *LOGbox, *HDGbox = NULL;
 // some boxes ure used twice
 static lv_obj_t *SOGbox2, *COGbox2, *CTSbox2, *AWSbox2 = NULL;
+static lv_obj_t *AWAGaugeZoom, *AWAGaugeTileZoom = NULL;
+static lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
 
-extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
+
+    extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
 
 // static Preferences mfdsettings;
 extern lv_subject_t mfd_subject_baudrate;
