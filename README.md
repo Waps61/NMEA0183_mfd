@@ -1,4 +1,6 @@
 # NMEA0183-MFD: A marine multifucntion display
+#### Update 06-03-2026
+The program suffered from memory assertions due to lack of free memory. Altought I assumed this was caused by memory leaks, it seems to be a settings issue with LV_MEM_SIZE in lv_conf.h (line 72) wich is default set to 64 * 1024 bytes. Increasing to 128 *1024 bytes seems to solve the issue
 #### Update: 02-03-2026
 Per version 0.8 the FAT has been successfull performed, now waiting the SAT on board if succesfull, version will be released as V1.0.
 To assure the GPIO's of ESP32-P4 are working on the right Voltage level of 3.3V I had to shift down from 5V (measured with a multimeter with a scope funtion). Hence I've soldered a voltage divider with R2=10k and R1= 5k Ohm, so Vout = Vin*(R2/(R1+R2)) = 5V*(10/(5+10)) = 3,3V\
