@@ -3,12 +3,17 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.8.2 05-03-2026
+  VERSION:  0.8.3 06-03-2026
   Date:     v0.1 31-01-2026
-  Last :    v0.81 04-03-2026
-  Update:   V0.8.2 05-03-2026
-            A gauge tile added (this was a feature on the prio list.The gauge is a graphical representation of 
-            the data, and can be used to display the wind angle for example. It is implemented as a separate tile type, 
+  Last :    v0.8.3 06-03-2026:
+  Changes:  V0.8.3 06-03-2026
+            Memory assertion seems to besolved by changing line 72 in l_conf.h, size of memory available
+            for `lv_malloc()` in bytes (>= 2kB) #define LV_MEM_SIZE (128 * 1024U) (used to 64 *124u by default).
+            Two wind gaugaes added to the wind panel; one for apparent wind angele between -135 and +135 degrees and
+            and an apparent wind angle +, showing a zoomed view  between -60 and +60 degrees for higher precision
+ Previous   V08.2 05-03-2026
+ updates:   A gauge tile added (this was a feature on the prio list.The gauge is a graphical representation of
+            the data, and can be used to display the wind angle for example. It is implemented as a separate tile type,
             since it has a different layout and functionality than the regular tiles. It is not problem free yet since
             it drains the memory.
             V0.81 04-03-2026
@@ -17,8 +22,8 @@
             Fixed unreliable serial cable leading to unreadable data from the UART leading to long debugging sessions
             Implemented filtering of non-printable characters in the serial data, which can cause problems in the processing
             of the NMEA data and can lead to crashes or incorrect data being displayed.
-Previous    V0.80 01-03-2026
-updates:    FAT passed with real NMEA0183 data from the test network, and the display is working as expected.
+            V0.80 01-03-2026
+            FAT passed with real NMEA0183 data from the test network, and the display is working as expected.
             2way communication crashed the program, so I have commented out the talker part for now, and will implement it in a later stage.
              I have added some comments to the code to make it more clear what is going on.
             v0.6 28-02-2026
