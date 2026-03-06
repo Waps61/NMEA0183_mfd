@@ -153,8 +153,21 @@ void set_data_store(enum sequence_id tag, const char data[15])
     sprintf(NMEA_DATA_STORE[tag], "%2.5s", fmt_data);
     break;
   case AWA:
-    mfd_gauge_update(AWAGauge, 135, atoi(fmt_data));
-    mfd_gauge_update(AWAGaugeZoom, 60, atoi(fmt_data));
+  boat_awa = atoi(fmt_data);
+  
+  if(NMEA_DATA_STORE[DIR] != NULL && NMEA_DATA_STORE[DIR][0] == '>')
+    {
+      
+      mfd_gauge_update(AWAGauge, 135, -boat_awa);
+      mfd_gauge_update(AWAGaugeZoom, 60, -boat_awa);
+       
+    }
+    else
+    {
+      mfd_gauge_update(AWAGauge, 135, boat_awa);
+      mfd_gauge_update(AWAGaugeZoom, 60, boat_awa);
+    }
+    
 
   default:
     if (strlen(fmt_data) < 3)
@@ -413,7 +426,7 @@ lv_obj_t *screen_main_create(void)
   tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
 
   AWAGaugeTileZoom = mfd_panel_add_gauge(mfd_wind_panel, "AWA+", AWAGaugeTileZoom);
-  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 60);
+  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 50);
 
   // Add the tiles and their tile_data objects to thwe course panel
   CTSbox2 = mfd_panel_add_tile(mfd_course_panel, "CTS", "o", CTSbox2);

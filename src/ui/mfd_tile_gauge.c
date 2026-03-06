@@ -114,11 +114,11 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
 
   lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
   lv_scale_set_range(scale, (0 - range), range);
-  lv_scale_set_total_tick_count(scale, 15);
-  lv_scale_set_major_tick_every(scale, 3);
+  lv_scale_set_total_tick_count(scale, 31);
+  lv_scale_set_major_tick_every(scale, 5);
   lv_scale_set_angle_range(scale, 270);
   lv_scale_set_rotation(scale, 135);
-  lv_scale_set_label_show(scale, false);
+  lv_scale_set_label_show(scale, true);
 
   lv_obj_set_style_length(scale, 6, LV_PART_ITEMS);
   lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
@@ -128,10 +128,10 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
   /* Zone 3: (Grey) */
   init_section_styles(&zone3_styles, lv_palette_main(LV_PALETTE_GREY));
   add_section(scale, (0 - range), range, &zone3_styles);
-  /* Zone 1: (Red) */
+  /* Zone 1: (Red) Port*/
   init_section_styles(&zone1_styles, lv_palette_main(LV_PALETTE_RED));
   add_section(scale, (0 - sector_end), (0 - sector_start), &zone1_styles);
-  /* Zone 2: (Green) */
+  /* Zone 2: (Green) Starbord*/
   init_section_styles(&zone2_styles, lv_palette_main(LV_PALETTE_GREEN));
   add_section(scale, sector_start, sector_end, &zone2_styles);
 
@@ -144,10 +144,11 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
   lv_obj_set_style_length(needle_line, 20, LV_PART_MAIN);
   lv_obj_set_style_line_rounded(needle_line, false, LV_PART_MAIN);
   lv_obj_set_style_pad_right(needle_line, 50, LV_PART_MAIN);
+  lv_obj_set_style_pad_radial(scale, 15, LV_PART_INDICATOR);
+      lv_scale_set_draw_ticks_on_top(scale, true);
   lv_log("neeedle line created created...\n");
-  int32_t current_hr = 0;
 
-  lv_scale_set_line_needle_value(scale, needle_line, 124, current_hr);
+  lv_scale_set_line_needle_value(scale, needle_line, 124, 0);
 
   lv_obj_t *circle = lv_obj_create(scale);
   lv_obj_set_size(circle, 140, 140);
