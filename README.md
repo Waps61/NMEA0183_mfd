@@ -119,6 +119,7 @@ The file `custom_partitons.csv` file wil maked use of the full memory potential.
 ### the main screen in night mode
 ![screenshot of the settings screen](/screenshots/trip_screen_night.jpg)
 
-
+### the wind panel with gauges
+![Screnshot of the windpanel with gauges](/screenshots/wind_panel.jpg)
 ### video
 >[Demo Video on tube](https://youtu.be/ISXRW4jD3Wc?si=ROqHOkwfuZjdwLJk)
