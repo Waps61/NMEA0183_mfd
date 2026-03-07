@@ -3,10 +3,12 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.8.3 06-03-2026
+  VERSION:  0.8.4 07-03-2026
   Date:     v0.1 31-01-2026
-  Last :    v0.8.3 06-03-2026:
-  Changes:  V0.8.3 06-03-2026
+  NOTE:     Version is set in major and minor tick in mfd_conf.h
+  Last :    v0.8.4 07-03-2026:
+  Changes:  Moved wind gauges from right to middle position on windpanel for better optical balance
+            V0.8.3 06-03-2026
             Memory assertion seems to besolved by changing line 72 in l_conf.h, size of memory available
             for `lv_malloc()` in bytes (>= 2kB) #define LV_MEM_SIZE (128 * 1024U) (used to 64 *124u by default).
             Two wind gaugaes added to the wind panel; one for apparent wind angele between -135 and +135 degrees and
@@ -179,7 +181,7 @@ lv_subject_t mfd_subject_baudrate; // default to 38400
 lv_subject_t mfd_subject_wifi;     // default to 0 = off
 lv_subject_t mfd_subject_ssid;     // obviously not disclosed, but read from the EEPROM
 lv_subject_t mfd_subject_pwd;      // obviously not disclosed, but read from the EEPROM
-lv_subject_t mfd_subject_log;     // total mileage of your ship
+lv_subject_t mfd_subject_log;      // total mileage of your ship
 
 #ifndef TEST
 mfd_pers_t ship_config;

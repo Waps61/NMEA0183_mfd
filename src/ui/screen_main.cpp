@@ -412,21 +412,23 @@ lv_obj_t *screen_main_create(void)
   tile_hash[AWA] = mfd_tile_add_tile_data(AWAbox, tile_hash[AWA]);
   lv_obj_t *DIRminitile = mfd_tile_add_mini_tile(AWAbox, DIRminitile);
   tile_hash[DIR] = mfd_mini_tile_add_data(DIRminitile);
+  
+  AWAGaugeTile = mfd_panel_add_gauge(mfd_wind_panel, "AWA", AWAGaugeTile);
+  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 135, 20, 60);
 
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
 
-  AWAGaugeTile = mfd_panel_add_gauge(mfd_wind_panel, "AWA", AWAGaugeTile);
-  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 135, 20, 60);
-
+  
   AWSbox2 = mfd_panel_add_tile(mfd_wind_panel, "AWS", "KTS", AWSbox2);
   tile_hash[AWS2] = mfd_tile_add_tile_data(AWSbox2, tile_hash[AWS2]);
 
-  TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
-  tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
-
+  
   AWAGaugeTileZoom = mfd_panel_add_gauge(mfd_wind_panel, "AWA+", AWAGaugeTileZoom);
   AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 50);
+
+  TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
+  tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
 
   // Add the tiles and their tile_data objects to thwe course panel
   CTSbox2 = mfd_panel_add_tile(mfd_course_panel, "CTS", "o", CTSbox2);
