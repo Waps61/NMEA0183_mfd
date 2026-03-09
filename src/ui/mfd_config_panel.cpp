@@ -8,15 +8,29 @@
   like baudrate, WiFi switch, adres* and password* (* to be done) and the total mileage log
 */
 #include <ui/mfd_config_panel.h>
-#include <mfd_conf.h>
-#include <ui/mfd_themes.h>
 
 char tmpVal[30] = {0};
 mfd_pers_t new_config;
-static lv_style_t style_radio, style_radio_chk;
-static int32_t radio_index = 0;
+static lv_style_t style_radio_btn, style_radio_btn_chk;
+static int32_t radio_btn_index = 0;
 
-static void radio_event_handler(lv_event_t *e)
+static void demo_event_handler(lv_event_t *e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t *obj = lv_event_get_target_obj(e);
+  LV_UNUSED(obj);
+  if (code == LV_EVENT_VALUE_CHANGED)
+  {
+    if (lv_obj_has_state(obj, LV_STATE_CHECKED))
+    {
+    set_demo_mode(true);
+    lv_log("Demo mode enabled, simulating data for the display\n");
+    }
+    else    set_demo_mode(false)  ;
+  }
+}
+
+static void radio_btn_event_handler(lv_event_t *e)
 {
   int32_t *active_id = (int32_t *)lv_event_get_user_data(e);
   lv_obj_t *cont = (lv_obj_t *)lv_event_get_current_target(e);
@@ -31,7 +45,7 @@ static void radio_event_handler(lv_event_t *e)
   lv_obj_add_state(act_cb, LV_STATE_CHECKED);    /*Check the current radio button*/
 
   *active_id = lv_obj_get_index(act_cb);
-  if (radio_index == 1)
+  if (radio_btn_index == 1)
     ship_config.baudrate = 38400;
   else
     ship_config.baudrate = 4800;
@@ -105,7 +119,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   }
 
   lv_obj_t *baudlabel = lv_label_create(panel);
-  lv_obj_set_pos(baudlabel, 30, 36);
+  lv_obj_set_pos(baudlabel, 5, 36);
   lv_obj_set_size(baudlabel, 250, 25);
   lv_obj_set_style_text_font(baudlabel, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_text_color(baudlabel, lv_color_hex(0xff515050), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
@@ -113,17 +127,17 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_style_pad_right(baudlabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_label_set_text(baudlabel, "Baudrate");
 
-  lv_style_init(&style_radio);
-  lv_style_set_radius(&style_radio, LV_RADIUS_CIRCLE);
-  lv_style_init(&style_radio_chk);
-  lv_style_set_bg_image_src(&style_radio_chk, NULL);
+  lv_style_init(&style_radio_btn);
+  lv_style_set_radius(&style_radio_btn, LV_RADIUS_CIRCLE);
+  lv_style_init(&style_radio_btn_chk);
+  lv_style_set_bg_image_src(&style_radio_btn_chk, NULL);
 
   lv_obj_t *baudvalue = lv_obj_create(panel);
-  lv_obj_set_x(baudvalue, 300);
+  lv_obj_set_x(baudvalue, 275);
   lv_obj_set_y(baudvalue, 29);
   lv_obj_set_width(baudvalue, 300);
   lv_obj_set_height(baudvalue, 43);
-  lv_obj_add_event_cb(baudvalue, radio_event_handler, LV_EVENT_CLICKED, &radio_index);
+  lv_obj_add_event_cb(baudvalue, radio_btn_event_handler, LV_EVENT_CLICKED, &radio_btn_index);
   lv_subject_set_int(&mfd_subject_baudrate, ship_config.baudrate);
   lv_obj_set_style_border_width(baudvalue, 1, 0);
   lv_obj_set_scrollbar_mode(baudvalue, LV_SCROLLBAR_MODE_OFF);
@@ -131,15 +145,15 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_t *radio_btn1 = lv_checkbox_create(baudvalue);
   lv_checkbox_set_text(radio_btn1, "4800");
   lv_obj_add_flag(radio_btn1, LV_OBJ_FLAG_EVENT_BUBBLE);
-  lv_obj_add_style(radio_btn1, &style_radio, LV_PART_INDICATOR);
-  lv_obj_add_style(radio_btn1, &style_radio_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
+  lv_obj_add_style(radio_btn1, &style_radio_btn, LV_PART_INDICATOR);
+  lv_obj_add_style(radio_btn1, &style_radio_btn_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
   lv_obj_set_style_align(radio_btn1, LV_ALIGN_LEFT_MID, 0);
 
   lv_obj_t *radio_btn2 = lv_checkbox_create(baudvalue);
   lv_checkbox_set_text(radio_btn2, "38400");
   lv_obj_add_flag(radio_btn2, LV_OBJ_FLAG_EVENT_BUBBLE);
-  lv_obj_add_style(radio_btn2, &style_radio, LV_PART_INDICATOR);
-  lv_obj_add_style(radio_btn2, &style_radio_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
+  lv_obj_add_style(radio_btn2, &style_radio_btn, LV_PART_INDICATOR);
+  lv_obj_add_style(radio_btn2, &style_radio_btn_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
   lv_obj_set_style_align(radio_btn2, LV_ALIGN_RIGHT_MID, 0);
   if (ship_config.baudrate != 38400)
     lv_obj_add_state(lv_obj_get_child(baudvalue, 0), LV_STATE_CHECKED);
@@ -147,8 +161,8 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
     lv_obj_add_state(lv_obj_get_child(baudvalue, 1), LV_STATE_CHECKED);
 
   lv_obj_t *wifilabel = lv_label_create(panel);
-  lv_obj_set_pos(wifilabel, 100, 103);
-  lv_obj_set_size(wifilabel, 130, 25);
+  lv_obj_set_pos(wifilabel, 5, 103);
+  lv_obj_set_size(wifilabel, 250, 25);
   lv_obj_set_style_text_font(wifilabel, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_text_color(wifilabel, lv_color_hex(0xff515050), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_pad_left(wifilabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
@@ -158,7 +172,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_t *wifivalue = lv_switch_create(panel);
   lv_subject_set_int(&mfd_subject_wifi, (int32_t)ship_config.wifi_on);
   lv_obj_set_name(wifivalue, "mfd_wifi_value");
-  lv_obj_set_pos(wifivalue, 300, 94);
+  lv_obj_set_pos(wifivalue, 275, 100);
   lv_obj_set_size(wifivalue, 50, 34);
   lv_obj_set_style_border_width(wifivalue, 1, 0);
   if (ship_config.wifi_on)
@@ -167,9 +181,29 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
     lv_obj_set_state(wifivalue, LV_STATE_CHECKED, false);
   lv_obj_bind_checked(wifivalue, &mfd_subject_wifi);
 
+  lv_obj_t *demolabel = lv_label_create(panel);
+  lv_obj_set_pos(demolabel, 350, 103);
+  lv_obj_set_size(demolabel, 250, 25);
+  lv_obj_set_style_text_font(demolabel, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_text_color(demolabel, lv_color_hex(0xff515050), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_pad_left(demolabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_pad_right(demolabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_label_set_text(demolabel, "Demo-mode");
+
+  lv_obj_t *demovalue = lv_switch_create(panel);
+  lv_obj_set_name(demovalue, "mfd_demo_value");
+  lv_obj_set_pos(demovalue, 570, 100);
+  lv_obj_set_size(demovalue, 50, 34);
+  lv_obj_set_style_border_width(demovalue, 1, 0);
+  if (mfd_demo_mode)
+    lv_obj_set_state(demovalue, LV_STATE_CHECKED, true);
+  else
+    lv_obj_set_state(demovalue, LV_STATE_CHECKED, false);
+  lv_obj_add_event_cb(demovalue, demo_event_handler, LV_EVENT_ALL, NULL);
+
   lv_obj_t *loglabel = lv_label_create(panel);
-  lv_obj_set_pos(loglabel, 0, 188);
-  lv_obj_set_size(loglabel, 306, 35);
+  lv_obj_set_pos(loglabel, 5, 188);
+  lv_obj_set_size(loglabel, 250, 35);
   lv_obj_set_style_text_font(loglabel, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_text_color(loglabel, lv_color_hex(0xff515050), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_pad_left(loglabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
@@ -190,7 +224,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_t *logvalue = lv_textarea_create(panel);
   lv_subject_set_float(&mfd_subject_log, (float)ship_config.ship_log);
   lv_obj_set_name(logvalue, "mfd_log_value");
-  lv_obj_set_pos(logvalue, 300, 179);
+  lv_obj_set_pos(logvalue, 275, 179);
   lv_obj_set_size(logvalue, 150, 70);
   lv_textarea_set_accepted_chars(logvalue, "1234567890.");
   lv_textarea_set_max_length(logvalue, 7);
@@ -212,7 +246,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
 
   // SaveBtn
   lv_obj_t *savebtn = lv_button_create(panel);
-  lv_obj_set_pos(savebtn, 625, 108);
+  lv_obj_set_pos(savebtn, 675, 50);
   lv_obj_set_size(savebtn, 150, 75);
   lv_obj_set_style_text_font(savebtn, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_bg_color(savebtn, lv_color_hex(0xff2bc33b), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));

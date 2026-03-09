@@ -3,18 +3,26 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.8.4 07-03-2026
+  VERSION:  0.8.5 07-03-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
-  Last :    v0.8.4 07-03-2026:
-  Changes:  Moved wind gauges from right to middle position on windpanel for better optical balance
+  Last :    v0.8.5 07-03-2026
+  Changes:  Added demo-mode.
+            This is useful for testing and demo purposes, without having to wait for real NMEA sentences to be received.
+            The demo mode can be enabled or disabled via a switch on the config panel. When enabled, the display will show
+            simulated data that changes over time, to mimic real sensor readings.
+ Previous   v0.8.4 07-03-2026:
+ updates:   Moved wind gauges from right to middle position on windpanel for better optical balance.
+            Driving the display on 5V using the 5V & GND pin can't handle max brightness. On 52% brightness the
+            display draws 520mA. Driving the display with the USB-C from the laptop does not show this issue.
+            Need to test with the Buck converter what is the right voltage to drive the display at max brightness
             V0.8.3 06-03-2026
             Memory assertion seems to besolved by changing line 72 in l_conf.h, size of memory available
             for `lv_malloc()` in bytes (>= 2kB) #define LV_MEM_SIZE (128 * 1024U) (used to 64 *124u by default).
             Two wind gaugaes added to the wind panel; one for apparent wind angele between -135 and +135 degrees and
             and an apparent wind angle +, showing a zoomed view  between -60 and +60 degrees for higher precision
- Previous   V08.2 05-03-2026
- updates:   A gauge tile added (this was a feature on the prio list.The gauge is a graphical representation of
+            V0.8.2 05-03-2026
+            A gauge tile added (this was a feature on the prio list.The gauge is a graphical representation of
             the data, and can be used to display the wind angle for example. It is implemented as a separate tile type,
             since it has a different layout and functionality than the regular tiles. It is not problem free yet since
             it drains the memory.
@@ -168,7 +176,7 @@
 #include <persist/mfd_persistent.h>
 #include <NMEA0183_data.h>
 #include <comms/mfd_communication.h>
-
+#include <mfd_conf.h>
 #include <persist/flash_erase.h>
 
 #endif // TEST
@@ -187,6 +195,17 @@ lv_subject_t mfd_subject_log;      // total mileage of your ship
 mfd_pers_t ship_config;
 float boat_log = 0.01;
 #endif // TEST
+
+void set_demo_mode(bool value)
+{
+  mfd_demo_mode = value;
+}
+
+bool get_demo_mode()
+{
+  return mfd_demo_mode;
+}
+
 /**
  * Set the backlight of the JC1060P470 display with integrated ESP32-P4-C6
  */
@@ -282,14 +301,14 @@ void loop()
 {
   lv_task_handler(); /* let the GUI do its work */
   delay(5);
-#ifndef TEST
-#ifdef DEMO
-  test_screen_data_updates();
-#endif
-#ifndef DEMO
-  NMEA_startListening();
+  if (!get_demo_mode())
+  {
+    NMEA_startListening();
+  }
+  else
+    test_screen_data_updates();
 
-#endif // DEMO
+
 
   mfd_update_tile_data();
 
@@ -302,7 +321,7 @@ void loop()
     // write last vale of ship log to NVR
     mfd_update_persistent_key(MFD_SHIPLOG, &ship_config);
   }
-#endif // TEST
+
 
   mfd_recolor(screen_main);
 }

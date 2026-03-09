@@ -5,10 +5,11 @@
 #define MFD_CONFIG_PANEL_H
 
 #include <lvgl.h>
-#include <ui/mfd_themes.h>
 #include <font/mfd_fonts.h>
 #include <persist/mfd_persistent.h>
 #include <ui/mfd_panel_gen.h>
+#include <mfd_conf.h>
+#include <ui/mfd_themes.h>
 
 #ifdef __cplusplus
 extern "C"

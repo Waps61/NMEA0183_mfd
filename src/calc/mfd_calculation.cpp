@@ -20,7 +20,7 @@
 /***********************************************************************************
    Global variables go here
 */
-#ifdef TEST
+
 
 /**
  * Test data set if nog real data is available
@@ -28,29 +28,29 @@
 #define SIZE_NMEA_STREAM 22
 String NmeaStream[SIZE_NMEA_STREAM] = {
     "$GPRMC,095218.000,A,5251.5621,N,00540.8482,E,5.1,201.77,120420,,,D*6D",
-    "$IIVWR,178,R,12.4,N,,,,",
+    "$IIVWR,25,R,12.4,N,,,,",
     "$TZBWC,095218.000,5251.3071,N,00541.7231,E,251.0,M,0.05,N,,S*7F",
     "$IIMTW,12.2,C",
-    "!$SDDPT,002.3,*78",
+    "!$SDDPT,004.3,*78",
     "$IIDBK,A,0014.4,f,,,,",
     "$IIVLW,1149.1,N,001.07,N",
     "$GPGLL,5251.3091,N,00541.8037,E,151314.000,A,D*5B",
     "$PSTOB,13.0,v",
-    "$IIVWR,179,L,02.3,N,,,,",
+    "$IIVWR,28,R,02.3,N,,,,",
     "$TZBWC,095318.000,5251.3171,N,00541.7331,E,250.0,M,0.05,N,,S*7F",
     "$IIVHW,,,213,M,04.57,N,,",
     "$GPRMC,095318.000,A,5251.6721,N,00540.9582,E,5.3,203.35,120420,,,D*6D",
-    "$IIVWR,168,L,13.3,N,,,,",
+    "$IIVWR,30,R,13.3,N,,,,",
     "$IIMTW,12.2,C",
-    "!$SDDPT,002.4,*78",
+    "!$SDDPT,004.2,*78",
     "$IIDBK,A,0014.7,f,,,,",
     "$IIVLW,1151.1,N,002.07,N",
     "$GPGLL,5251.3191,N,00541.8137,E,151314.000,A,D*5B",
     "$PSTOB,13.1,v",
-    "$IIVWR,175,R,12.7,N,,,,",
+    "$IIVWR,26,R,12.7,N,,,,",
     "$IIVHW,,,210,M,05.57,N,,"};
 
-#endif
+
 // Variable used to pass nmea tag values like SOG etc. back and forth between objects, max 15 char's long
 char cvalue[FIELD_BUFFER] = {0};
 
@@ -168,7 +168,7 @@ bool isNumeric(char *value)
   return result;
 }
 
-#ifdef TEST
+
 /**
  * Helper function to generate NMEA data streams for testing if
  * no NMEA data is available from talkers
@@ -188,7 +188,6 @@ void NMEA_runSoftGenerator()
     softIndex %= SIZE_NMEA_STREAM;
   }
 }
-#endif // TEST
 /**
  *  function to processes the receivedChars buffer and filters sentence MWV,RM and VWR,
  * and more, which contain the SOG,COG, AWS and AWA parameters, when new data has arrived
@@ -340,8 +339,9 @@ void processNMEAData(const char *buff)
             }
             if (field == 3 && cvalue[0] == 'f')
             {
-              boat_dpt = atof(cvalue);
+              //boat_dpt = atof(cvalue);
               boat_dpt *= FTM;
+              lv_log("converted dpt from feet to meters: %f\n", boat_dpt);
               sprintf(cvalue, "%.1f", boat_dpt);
               set_data_store(DPT, cvalue);
             }

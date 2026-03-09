@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "8.4" // post FAT and pre SAT
+#define VERSION_MINOR "8.5" // post FAT and pre SAT
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -56,6 +56,7 @@ extern lv_subject_t mfd_subject_ssid;
 extern lv_subject_t mfd_subject_pwd;
 extern lv_subject_t mfd_subject_log;
 // extern lv_subject_t *mfd_groupsettings_array_subject[];
+static bool mfd_demo_mode=false; // set to true to enable demo mode, which simulates data for the display
 
 static char mfd_ssid_curval[26];
 static char mfd_ssid_oldval[26];
@@ -65,5 +66,7 @@ static char mfd_pwd_oldval[26];
 extern void set_boat_log(float value);
 extern float increase_boat_log(float value);
 extern float get_boat_log();
+extern void set_demo_mode(bool value);
+extern bool get_demo_mode();
 
 #endif // MFD_CONF_H

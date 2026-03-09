@@ -178,13 +178,14 @@ void set_data_store(enum sequence_id tag, const char data[15])
   }
 }
 
-#ifdef DEMO
+
 void test_screen_data_updates()
 {
-  current_millis = millis();
+  
   NMEA_runSoftGenerator();
+  
 }
-#endif // DEMO
+
 /**
  * Read the data from the NMEA_DATA_STORE and write
  * the value to the specific label if it excist
@@ -192,9 +193,10 @@ void test_screen_data_updates()
 void mfd_update_tile_data()
 {
   current_millis = millis();
-  // Update the data in the display every 250ms, to avoid updating the display too often and causing performance issues.
-  if (millis() - previous_millis > UPDATE_DELAY)
+  // Update the data in the display every UPDATE_DELAY ms, to avoid updating the display too often and causing performance issues.
+  if (current_millis - previous_millis > UPDATE_DELAY)
   {
+    previous_millis = current_millis;
     // update the tags that are used once, the tags that are copies
     // are put in the switch statement.
     for (int i = CTS; i < BAT; i++)
