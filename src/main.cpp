@@ -3,10 +3,10 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.8.5 07-03-2026
+  VERSION:  0.8.5 09-03-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
-  Last :    v0.8.5 07-03-2026
+  Last :    v0.8.5 09-03-2026
   Changes:  Added demo-mode.
             This is useful for testing and demo purposes, without having to wait for real NMEA sentences to be received.
             The demo mode can be enabled or disabled via a switch on the config panel. When enabled, the display will show
