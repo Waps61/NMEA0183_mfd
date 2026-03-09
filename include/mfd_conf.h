@@ -3,11 +3,11 @@
  */
 #ifndef MFD_CONF_H
 #define MFD_CONF_H
-#include <lvgl.h> // v9.3.0
+#include <lvgl.h> // v9.5.0
 
 // Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "8.5" // post FAT and pre SAT
+#define VERSION_MINOR "8.6" // post FAT and pre SAT
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
