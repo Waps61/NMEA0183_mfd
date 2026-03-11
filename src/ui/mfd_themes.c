@@ -54,6 +54,10 @@ void mfd_set_style_changed(int styleID)
 
 /**
  * Update the style of an object to the new style. 
+ * This function is called recursively for all child objects of the parent object, to update their styles as well.
+ * The function checks if the new style has a background color, text color, border color or shadow color property, 
+ * and if so, it updates the corresponding style of the child object. The background color of the parent object is 
+ * also updated to the new background color of the style.
 */
 void mfd_update_style(lv_obj_t *parent, lv_style_t *newstyle)
 {

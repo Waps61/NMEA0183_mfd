@@ -11,8 +11,8 @@
 
 char tmpVal[30] = {0};
 mfd_pers_t new_config;
-static lv_style_t style_radio_btn, style_radio_btn_chk;
-static int32_t radio_btn_index = 0;
+ lv_style_t style_radio_btn, style_radio_btn_chk;
+ int32_t radio_btn_index = 0;
 
 static void demo_event_handler(lv_event_t *e)
 {
