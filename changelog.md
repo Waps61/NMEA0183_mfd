@@ -5,7 +5,8 @@ Moved all static definitions from include files to .c or .cpp files to avoid mul
 This is a common practice in C/C++ programming to ensure that global variables are defined only once and 
 can be accessed across multiple files without causing linker errors.\
 Moved changelofg from main.ccp comments to changelog.md file\
-### V0.8.6 LVGL updated to V9.5.0
+### V0.8.6 09-03-2026
+LVGL updated to V9.5.0\
 Added demo-mode.\
 This is useful for testing and demo purposes, without having to wait for real NMEA sentences to be received.
 The demo mode can be enabled or disabled via a switch on the config panel. When enabled, the display will show
