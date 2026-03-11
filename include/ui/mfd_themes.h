@@ -91,11 +91,11 @@ extern "C"
    *  STATIC VARIABLES
    **********************/
 
-  static lv_subject_t theme_subject;
-  static   lv_style_t mfd_style_day, mfd_style_night, mfd_style_sun, mfd_style_dawn, mfd_style;
-  static lv_style_t mfd_style_tile, mfd_style_menubar, mfd_style_btn, mfd_style_btn_pressed;
-  static bool mfd_styles_inited;
-  static int mfd_style_changed;
+  extern lv_subject_t theme_subject;
+  extern   lv_style_t mfd_style_day, mfd_style_night, mfd_style_sun, mfd_style_dawn, mfd_style;
+  extern lv_style_t mfd_style_tile, mfd_style_menubar, mfd_style_btn, mfd_style_btn_pressed;
+  extern bool mfd_styles_inited;
+  extern int mfd_style_changed;
 
   /**********************
    * GLOBAL PROTOTYPES

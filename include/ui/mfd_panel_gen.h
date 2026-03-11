@@ -44,11 +44,11 @@ extern "C"
   };
   typedef struct _mfd_panel_t mfd_panel_t;
 
-  static int max_row = 2;
-  static int max_col = 3;
-  static int max_tiles = 6;
-  static int tile_index = 0;
-  /**********************
+  // static int max_row = 2;
+  // static int max_col = 3;
+  // static int max_tiles = 6;
+  // static int tile_index = 0;
+ /**********************
    * GLOBAL PROTOTYPES
    **********************/
   void mfd_hide_panel(lv_obj_t *panel);

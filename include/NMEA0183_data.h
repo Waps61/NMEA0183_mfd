@@ -111,21 +111,22 @@ $HCXDR,A,171,D,PITCH,A,-37,D,ROLL,G,367,,MAGX,G,2420,,MAGY,G,-8984,,MAGZ*41
 
 #define FIELD_BUFFER 15 // length of the buffer for NMEA field values as a string
 
-// Helper variables for calculation on secondary data
-static float boat_sog; //= 0.0;
-static int boat_hdg; //= 0;
-static int boat_awa;//= 0;
-static int boat_cts; //= 0;
-static int boat_cog; //= 0;
-static float boat_dpt; // = 0.0;
-static float boat_vmg; // = 0.0;
 
-static float boat_trp; // = 0.0;
-static bool trip_started = false; // to ensure trip starts at 0
-static char lat_new[FIELD_BUFFER] = {0};
-static char lon_new[FIELD_BUFFER] = {0};
-static char lat_old[FIELD_BUFFER] = {0};
-static char lon_old[FIELD_BUFFER] = {0};
+  // Helper variables for calculation on secondary data
+   extern float boat_sog; //= 0.0;
+   extern int boat_hdg;   //= 0;
+   extern int boat_awa;   //= 0;
+   extern int boat_cts;   //= 0;
+   extern int boat_cog;   //= 0;
+   extern float boat_dpt; // = 0.0;
+   extern float boat_vmg; // = 0.0;
+
+   extern float boat_trp;            // = 0.0;
+   extern bool trip_started; // to ensure trip starts at 0
+   extern char lat_new[FIELD_BUFFER]; // = {0};
+   extern char lon_new[FIELD_BUFFER]; // = {0};
+   extern char lat_old[FIELD_BUFFER]; // = {0};
+   extern char lon_old[FIELD_BUFFER]; // = {0};
 
 
 #define NR_OF_NMEA_TAGS 22 // make sure this equal to nr of NMEA_TAG
@@ -163,11 +164,10 @@ static enum sequence_id {
  * and is used for incomming NMEA data and and to update the data_tiles
  */
 // Declare buffers for NMEA string and display parameters
-static char NMEA_DATA_STORE[NR_OF_NMEA_TAGS][NMEA_BUFFER_SIZE + 1] = {0};
+ extern char NMEA_DATA_STORE[NR_OF_NMEA_TAGS][NMEA_BUFFER_SIZE + 1]; // +1 for the null terminator
 // and provide a function to initiate it
-static bool data_store_inited = false;
-extern void init_data_store();
-extern void set_data_store(enum sequence_id tag, const char data[15]);
-
+ extern bool data_store_inited;
+ extern void init_data_store();
+ extern void set_data_store(enum sequence_id tag, const char data[15]);
 
 #endif // NMEA0183_DATA_H

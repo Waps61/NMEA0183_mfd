@@ -20,7 +20,6 @@ extern "C"
      * and the keyboard map for the on-screen keyboard
      *
      */
-    static const char *baud_options = "4800\n38400";
     /*Create an AZERTY keyboard map*/
     static const char *kb_map[] = {"1", "2", "3", LV_SYMBOL_BACKSPACE, "\n",
                                    "4", "5", "6", " ", "\n",

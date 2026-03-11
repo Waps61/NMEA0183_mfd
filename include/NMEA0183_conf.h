@@ -4,12 +4,12 @@
 #ifndef NMEA0183_CONF_H
 #define NMEA0183_CONF_H
 
-#include <Arduino_GFX_Library.h> // v1.6.4
-#include <lvgl.h>                // v9.3.0
+#include <Arduino_GFX_Library.h> 
+#include <lvgl.h>               
 
 #include <Wire.h>
 
-#include <bb_captouch.h> // v1§.3.2
+#include <bb_captouch.h> 
 #include "font/mfd_fonts.h"
 #include "mfd_conf.h"
 
