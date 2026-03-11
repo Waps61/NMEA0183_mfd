@@ -8,14 +8,14 @@
   Daylight, Sunlight, Dawn and NIght setting for the display. Typical color schemes are used.
   It is also used to control the backlight ilumination between 5 and 100%
 */
-#include<lvgl.h>
+#include <lvgl.h>
 
 #include <ui/mfd_bright_panel.h>
 #include <mfd_conf.h>
 #include <ui/mfd_themes.h>
 #include <font/mfd_fonts.h>
 
-static const char *btnm_map[] = {"Day", "Sun","Dawn", "Night", ""};
+static const char *btnm_map[] = {"Day", "Sun", "Dawn", "Night", ""};
 static int tstcntr = 0;
 
 static lv_style_t style_btnbase;
@@ -26,10 +26,10 @@ static lv_style_t style_btnbase;
 void init_style_btnbase()
 {
   lv_style_init(&style_btnbase);
-  
+
   lv_style_set_bg_color(&style_btnbase, lv_color_hex(DAWN_BACKGROUND));
-  
-  lv_style_set_bg_color(&style_btnbase, lv_color_lighten(lv_color_hex(DAWN_SURFACE),LV_OPA_30));
+
+  lv_style_set_bg_color(&style_btnbase, lv_color_lighten(lv_color_hex(DAWN_SURFACE), LV_OPA_30));
   lv_style_set_border_width(&style_btnbase, 2);
   lv_style_set_border_color(&style_btnbase, lv_color_hex(DAY_LINE_COLOR));
   lv_style_set_radius(&style_btnbase, 10);
@@ -38,7 +38,6 @@ void init_style_btnbase()
   lv_style_set_shadow_opa(&style_btnbase, LV_OPA_50);
   lv_style_set_text_font(&style_btnbase, &ui_font_lv_conthrax_24);
 
-  //lv_style_set_text_color(&style_btnbase, lv_color_white());
   lv_style_set_width(&style_btnbase, 750);
   lv_style_set_height(&style_btnbase, 200);
   mfd_style_changed = UNCHANGED_STYLE;
@@ -54,24 +53,18 @@ static void brightness_slider_event_cb(lv_event_t *e)
   { // sent once when Slider is released
     brightness_changed = true;
     brightness_value = (int)(lv_slider_get_value(slider) * 2.5);
-    
+
     set_backlight(brightness_value);
   }
 }
 
-
-
 static void buttonbar_event_cb(lv_event_t *e)
 {
-  /*
-  LV_UNUSED(e);
-    if(lv_subject_get_int(&theme_subject) == THEME_MODE_LIGHT) lv_subject_set_int(&theme_subject, THEME_MODE_DARK);
-    else lv_subject_set_int(&theme_subject, THEME_MODE_LIGHT);
-  */
+
   lv_obj_t *obj = lv_event_get_target_obj(e);
   lv_draw_task_t *draw_task = lv_event_get_draw_task(e);
   lv_draw_dsc_base_t *base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-  
+
   /*When the button matrix draws the buttons...*/
   if (base_dsc->part == LV_PART_ITEMS)
   {
@@ -93,34 +86,30 @@ static void buttonbar_event_cb(lv_event_t *e)
       lv_draw_fill_dsc_t *fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
       if (fill_draw_dsc)
       {
-        // fill_draw_dsc->radius = 0;
         if (pressed)
         {
-          fill_draw_dsc->color = lv_color_hex(DAY_SURFACE); // lv_palette_darken(LV_PALETTE_GREY, 1);
-          mfd_set_style_changed( DAY_STYLE);
-          //lv_style_copy(&mfd_style, &mfd_style_day);
-        }else
-          fill_draw_dsc->color = lv_color_hex(DAY_BACKGROUND); // lv_palette_main(LV_PALETTE_GREY);
+          fill_draw_dsc->color = lv_color_hex(DAY_SURFACE);
+          mfd_set_style_changed(DAY_STYLE);
+        }
+        else
+          fill_draw_dsc->color = lv_color_hex(DAY_BACKGROUND);
       }
       if (label_draw_dsc)
       {
         label_draw_dsc->color = lv_color_hex(DAY_TEXT_ON_BACKGROUND);
       }
-      
-      
     }
     else if (base_dsc->id1 == 1)
     {
       lv_draw_fill_dsc_t *fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
       if (fill_draw_dsc)
       {
-        // fill_draw_dsc->radius = 0;
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(SUN_SURFACE);
-          mfd_set_style_changed( SUN_STYLE);
-          //lv_style_copy(&mfd_style, &mfd_style_sun);
-            }else
+          mfd_set_style_changed(SUN_STYLE);
+        }
+        else
           fill_draw_dsc->color = lv_color_hex(SUN_BACKGROUND);
       }
 
@@ -128,8 +117,6 @@ static void buttonbar_event_cb(lv_event_t *e)
       {
         label_draw_dsc->color = lv_color_hex(SUN_TEXT_ON_BACKGROUND);
       }
-
-      
     }
 
     else if (base_dsc->id1 == 2)
@@ -137,23 +124,19 @@ static void buttonbar_event_cb(lv_event_t *e)
       lv_draw_fill_dsc_t *fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
       if (fill_draw_dsc)
       {
-        // fill_draw_dsc->radius = 0;
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(DAWN_SURFACE);
           mfd_set_style_changed(DAWN_STYLE);
-      
-          //lv_style_copy(&mfd_style, &mfd_style_dawn);
-        }else
+        }
+        else
           fill_draw_dsc->color = lv_color_hex(DAWN_BACKGROUND);
       }
 
-      //lv_draw_label_dsc_t *label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
       if (label_draw_dsc)
       {
         label_draw_dsc->color = lv_color_hex(DAWN_TEXT_ON_BACKGROUND);
       }
-      
     }
     /*Change the draw descriptor of the 3rd button*/
     else if (base_dsc->id1 == 3)
@@ -161,37 +144,25 @@ static void buttonbar_event_cb(lv_event_t *e)
       lv_draw_fill_dsc_t *fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
       if (fill_draw_dsc)
       {
-        // fill_draw_dsc->radius = LV_RADIUS_CIRCLE;
         if (pressed)
         {
           fill_draw_dsc->color = lv_color_hex(NIGHT_SURFACE);
-          //mfd_update_style(lv_screen_active(), &mfd_style_night);
-          mfd_set_style_changed( NIGHT_STYLE);
-          
-          //lv_style_copy(&mfd_style, &mfd_style_night);
-        }else
+          mfd_set_style_changed(NIGHT_STYLE);
+        }
+        else
           fill_draw_dsc->color = lv_color_hex(NIGHT_BACKGROUND);
       }
       if (label_draw_dsc)
       {
         label_draw_dsc->color = lv_color_hex(NIGHT_TEXT_ON_BACKGROUND);
       }
-      
-      // lv_draw_box_shadow_dsc_t *box_shadow_draw_dsc = lv_draw_task_get_box_shadow_dsc(draw_task);
-      // if (box_shadow_draw_dsc)
-      // {
-      //   box_shadow_draw_dsc->radius = LV_RADIUS_CIRCLE;
-      // }
     }
-    
   }
-  //mfd_update_style(obj, &mfd_style_night);
-  // lv_style_reset(&curr_style);
 }
 
-lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
+lv_obj_t *mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
 {
-  
+
   lv_obj_t *panel = lv_obj_create(parent);
   lv_obj_set_name_static(panel, title);
   lv_log("creating panel %s\n", lv_obj_get_name(panel));
@@ -222,13 +193,9 @@ lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   lv_subject_init_int(&brightness_subject, (int32_t)ACTUAL_BRIGHTNESS);
   lv_obj_t *btnm = lv_buttonmatrix_create(panel);
   lv_obj_add_style(btnm, &style_btnbase, 0);
-  // lv_obj_set_size(btnm, 600, 200);
   lv_obj_add_event_cb(btnm, buttonbar_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
   lv_obj_add_flag(btnm, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
   lv_buttonmatrix_set_map(btnm, btnm_map);
-  // lv_obj_set_style_bg_color(btnm, lv_palette_lighten(LV_PALETTE_GREY, 2), 0);
-
-  // lv_buttonmatrix_set_one_check(btnm, true);
   lv_obj_center(btnm);
 
   lv_obj_t *slider = lv_slider_create(panel);
@@ -238,14 +205,14 @@ lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   lv_slider_bind_value(slider, &brightness_subject);
   lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -60);
   lv_obj_set_style_border_width(slider, 1, 0);
-  lv_obj_add_style(slider, &mfd_style,0);
+  lv_obj_add_style(slider, &mfd_style, 0);
 
-  lv_obj_t* dimdown = lv_label_create(panel);
+  lv_obj_t *dimdown = lv_label_create(panel);
   lv_label_set_text(dimdown, "-");
   lv_obj_set_style_text_font(dimdown, &ui_font_lv_conthrax_24, 0);
   lv_obj_align(dimdown, LV_ALIGN_BOTTOM_LEFT, 225, -60);
 
-  lv_obj_t* dimup = lv_label_create(panel);
+  lv_obj_t *dimup = lv_label_create(panel);
   lv_label_set_text(dimup, "+");
   lv_obj_set_style_text_font(dimup, &ui_font_lv_conthrax_24, 0);
   lv_obj_align(dimup, LV_ALIGN_BOTTOM_RIGHT, -225, -60);
@@ -255,6 +222,5 @@ lv_obj_t* mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -90);
   lv_obj_add_style(label, &mfd_style_day, LV_STATE_DEFAULT);
   lv_label_bind_text(label, &brightness_subject, "%d %%");
-  // update_data_values = false;
   return panel;
 }
