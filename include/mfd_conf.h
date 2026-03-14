@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "8.7" // post FAT and pre SAT
+#define VERSION_MINOR "9.1" // post FAT and pre SAT
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024

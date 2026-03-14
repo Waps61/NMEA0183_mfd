@@ -3,13 +3,14 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.9 14-03-2026
+  VERSION:  0.9.1 14-03-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
   Change log: See CHANGELOG.MD file in the root of the project
 
 
-  Achieved: 31-01-2026 Succesful FAT  with Runnable version on ESP32 with JC1060P470 HMI
+  Achieved: 14-03-2026 Successful SAT with 2 minor improvement suggestions, see CHANGELOG.MD for details
+            31-01-2026 Succesful FAT  with Runnable version on ESP32 with JC1060P470 HMI
   Purpose:  Build a Multi Function Display for wired NMEA0183 data
             - Reading NMEA0183 v2.x data from a talker device such as a multiplexer
             - Parse the data and send data to display

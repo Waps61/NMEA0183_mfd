@@ -92,7 +92,6 @@ void NMEA_startListening()
   while (Serial1.available() > 0 && nmeaStatus != TERMINATING)
   {
     cIn = Serial1.read();
-    
     switch (cIn)
     {
     // case '~':   //skipped and don't waste time on it, because it's not used in NMEA0183 and is reserved by NMEA

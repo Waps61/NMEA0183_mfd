@@ -1,5 +1,10 @@
 # CHANGE LOG
-## V0.9 14-03-2026
+## V0.9.1 14-03-2026
+Implemented below suggestion to prevent unreliable distance and speed calcualtions when stationary.
+Assumption is that the boat is stationary when SOG is less than 0.3 kts and theoretical distance between position readings
+for a theoretical speed of 20 kts = 0,00556 nm. So to be safe it is assumed that position updates will take less then 30 sec
+so distance bigger then 20/3600*30 = 0.1668 nm are ignored.
+### V0.9 14-03-2026
 Successfull SAT. Some minor improvements advised: 
 * while SOG < 0.3 kts don't add up total mileage (log)
 * ignore calculated distance between 2 LAT /LON positions greater then 1 nm (which intheory can't be achieved given 

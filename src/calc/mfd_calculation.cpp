@@ -306,19 +306,38 @@ void processNMEAData(const char *buff)
                 strcpy(lon_old, lon_new);
               }
               distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
-              boat_trp += distance;
-              increase_boat_log(distance);
-
-              sprintf(tmp, "%.1f", boat_trp);
-              set_data_store(TRP, tmp);
-              sprintf(tmp, "%f", get_boat_log());
-              set_data_store(LOG, tmp);
+              
+              // distance between the new and previous position based omn a max speed of 20 knots
+              // greater than 20/3600 = 0,00556  nautical miles per second is not possible, so if the 
+              // distance is greater than this value then we assume that the position is not reliable and we do 
+              // not update the log and trip values. To be on the safe side lets assume that it will not take
+              // more then 30 seconds to receive a position update, so we will use a distance of 
+              // 0.00556 * 30 = 0.1668 nautical miles as the threshold for unreliable position updates
+              if( distance > 0.1668)
+              {
+                
+                distance = 0.0;
+              }
+              
             }
             if (field == 7)
             {
               boat_sog = atof(cvalue);
               boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
               sprintf(tmp, "%3.1f", boat_vmg);
+              // use a SOG threshold of 0.3 knots to prevent log and trip updates when the boat is not moving, because at 
+              // low speeds the position updates are not reliable and can cause log and trip values to increase when 
+              // the boat is actually stationary
+              if( boat_sog > 0.3) 
+              {
+                boat_trp += distance;
+                increase_boat_log(distance);
+
+                sprintf(tmp, "%.1f", boat_trp);
+                set_data_store(TRP, tmp);
+                sprintf(tmp, "%f", get_boat_log());
+                set_data_store(LOG, tmp);
+              }
               set_data_store(SOG, cvalue);
               set_data_store(VMG, tmp);
             }
