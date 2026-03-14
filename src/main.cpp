@@ -52,8 +52,9 @@
 
   Wiring Diagram (for NMEA0183 to NMEA0183 device):
      ESP32      | NMEA device
-     TX GPIO 33 |  RX +
-     RX GPIO 32 |  TX +
+     TX GPIO 33 |
+     RX GPIO 32 |  NMEA OUT -
+     GND        |  GND
 
   NOTE: The above settings works with the USB power to the ESP32
 
