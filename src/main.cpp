@@ -3,11 +3,11 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  0.8.7 10-03-2026
+  VERSION:  0.9 14-03-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
-  Change log: See changelog.md file in the root of the project
-  
+  Change log: See CHANGELOG.MD file in the root of the project
+
 
   Achieved: 31-01-2026 Succesful FAT  with Runnable version on ESP32 with JC1060P470 HMI
   Purpose:  Build a Multi Function Display for wired NMEA0183 data
@@ -52,8 +52,9 @@
 
   Wiring Diagram (for NMEA0183 to NMEA0183 device):
      ESP32      | NMEA device
-     TX GPIO 33 |  RX +
-     RX GPIO 32 |  TX +
+     TX GPIO 33 |
+     RX GPIO 32 |  NMEA OUT -
+     GND        |  GND
 
   NOTE: The above settings works with the USB power to the ESP32
 
@@ -64,12 +65,27 @@
   ---------------
   Terms of use:
   ---------------
-  The software is provided "AS IS", without any warranty of any kind, express or implied,
-  including but not limited to the warranties of mechantability, fitness for a particular
-  purpose and noninfringement. In no event shall the authors or copyright holders be liable
-  for any claim, damages or other liability, whether in an action of contract, tort or
-  otherwise, arising from, out of or in connection with the software or the use or other
-  dealings in the software.
+  IT License
+
+Copyright (c) 2026 Waps61
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
   -----------
   Warning:
@@ -126,7 +142,7 @@
 #endif // TEST
 /**
  * Initialize global variables for the boat data, NMEA data store, LVGL subjects and styles, and UI elements.
- * These variables will be used throughout the program to store and manage the state of the boat's data, 
+ * These variables will be used throughout the program to store and manage the state of the boat's data,
  * the NMEA data, the UI state, and the configuration settings.
  */
 float boat_sog = 0.0;
@@ -136,9 +152,9 @@ int boat_cts = 0;
 int boat_cog = 0;
 float boat_dpt = 0.0;
 float boat_vmg = 0.0;
-float boat_log= 0.1; // = 0.1;  // Will be set to real value when EEPROM is read
+float boat_log = 0.1; // = 0.1;  // Will be set to real value when EEPROM is read
 
-float boat_trp = 0.0;       // = 0.0;
+float boat_trp = 0.0;      // = 0.0;
 bool trip_started = false; // to ensure trip starts at 0
 char lat_new[FIELD_BUFFER] = {0};
 char lon_new[FIELD_BUFFER] = {0};
@@ -156,54 +172,53 @@ lv_obj_t *screen_active = NULL;
 lv_mem_monitor_t *mem_monitor = NULL;
 
 /*Create a Tabview box object*/
- lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *TWSbox,
+lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *TWSbox,
     *TRPbox, *VMGbox, *CMGbox, *LOGbox, *HDGbox = NULL;
 // some boxes ure used twice
- lv_obj_t *SOGbox2, *COGbox2, *CTSbox2, *AWSbox2 = NULL;
- lv_obj_t *AWAGaugeZoom, *AWAGaugeTileZoom = NULL;
- lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
+lv_obj_t *SOGbox2, *COGbox2, *CTSbox2, *AWSbox2 = NULL;
+lv_obj_t *AWAGaugeZoom, *AWAGaugeTileZoom = NULL;
+lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
 
- 
- // static Preferences mfdsettings;
-  lv_subject_t mfd_subject_baudrate;
-  lv_subject_t mfd_subject_wifi;
-  lv_subject_t mfd_subject_ssid;
-  lv_subject_t mfd_subject_pwd;
-  lv_subject_t mfd_subject_log;
- // extern lv_subject_t *mfd_groupsettings_array_subject[];
-  bool mfd_demo_mode = false; // set to true to enable demo mode, which simulates data for the display
+// static Preferences mfdsettings;
+lv_subject_t mfd_subject_baudrate;
+lv_subject_t mfd_subject_wifi;
+lv_subject_t mfd_subject_ssid;
+lv_subject_t mfd_subject_pwd;
+lv_subject_t mfd_subject_log;
+// extern lv_subject_t *mfd_groupsettings_array_subject[];
+bool mfd_demo_mode = false; // set to true to enable demo mode, which simulates data for the display
 
-  char mfd_ssid_curval[26]={0};
-  char mfd_ssid_oldval[26]={0};
-  char mfd_pwd_curval[26]={0};
-  char mfd_pwd_oldval[26]={0};
+char mfd_ssid_curval[26] = {0};
+char mfd_ssid_oldval[26] = {0};
+char mfd_pwd_curval[26] = {0};
+char mfd_pwd_oldval[26] = {0};
 
-   bool mfd_styles_inited=false;
-   int mfd_style_changed=-1;
+bool mfd_styles_inited = false;
+int mfd_style_changed = -1;
 
-    lv_subject_t theme_subject;
-    lv_style_t mfd_style_day, mfd_style_night, mfd_style_sun, mfd_style_dawn, mfd_style;
-    lv_style_t mfd_style_tile, mfd_style_menubar, mfd_style_btn, mfd_style_btn_pressed;
+lv_subject_t theme_subject;
+lv_style_t mfd_style_day, mfd_style_night, mfd_style_sun, mfd_style_dawn, mfd_style;
+lv_style_t mfd_style_tile, mfd_style_menubar, mfd_style_btn, mfd_style_btn_pressed;
 
-   // lv_style_t style_base;
-   lv_obj_t *main_view = NULL;
-   lv_theme_t *mfd_theme_day;
+// lv_style_t style_base;
+lv_obj_t *main_view = NULL;
+lv_theme_t *mfd_theme_day;
 
-    int nmeaStatus = INVALID;                    //*** state variable for the NMEA receiving process, initial state is INVALID
-    int nmeaIndex = 0;                           //*** index variable for the NMEA receiving process, initial state is 0
-    bool nmeaDataReady = false;                  //*** flag variable for the NMEA receiving process, initial state is false
-    bool recvInProgress = false;                 //*** flag variable to indicate if the receiving process is in progress, initial state is false
-    bool newData = false;                        // *** flag variable to indicate if new data is available, initial state is false
-    char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
+int nmeaStatus = INVALID;                    //*** state variable for the NMEA receiving process, initial state is INVALID
+int nmeaIndex = 0;                           //*** index variable for the NMEA receiving process, initial state is 0
+bool nmeaDataReady = false;                  //*** flag variable for the NMEA receiving process, initial state is false
+bool recvInProgress = false;                 //*** flag variable to indicate if the receiving process is in progress, initial state is false
+bool newData = false;                        // *** flag variable to indicate if new data is available, initial state is false
+char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
 
 #ifndef TEST
-   mfd_pers_t ship_config;
+mfd_pers_t ship_config;
 #endif // TEST
 
-   void set_demo_mode(bool value)
-   {
-     mfd_demo_mode = value;
-   }
+void set_demo_mode(bool value)
+{
+  mfd_demo_mode = value;
+}
 
 bool get_demo_mode()
 {

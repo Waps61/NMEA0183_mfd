@@ -90,6 +90,8 @@ void mfd_update_style(lv_obj_t *parent, lv_style_t *newstyle)
     // if(LV_RESULT_OK == lv_style_get_prop(newstyle,LV_STYLE_LINE_COLOR,&sval));
     //   lv_obj_set_style_line_color(child, sval.color, 0);
   }
+  if( lv_color_eq(bg_main.color, lv_color_hex(DAY_BACKGROUND)))
+    bg_main.color = lv_palette_lighten(LV_PALETTE_GREY,3);
   lv_obj_set_style_bg_color(parent, bg_main.color, 0);
 }
 

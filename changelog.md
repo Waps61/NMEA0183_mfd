@@ -1,6 +1,10 @@
 # CHANGE LOG
-
-##  V0.8.7 10-03-2026
+## V0.9 14-03-2026
+Successfull SAT. Some minor improvements advised: 
+* while SOG < 0.3 kts don't add up total mileage (log)
+* ignore calculated distance between 2 LAT /LON positions greater then 1 nm (which intheory can't be achieved given 
+the max boat speed less then 10 kts)
+###  V0.8.7 10-03-2026
 Moved all static definitions from include files to .c or .cpp files to avoid multiple definition errors. 
 This is a common practice in C/C++ programming to ensure that global variables are defined only once and 
 can be accessed across multiple files without causing linker errors.\
