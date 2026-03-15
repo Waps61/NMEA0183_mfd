@@ -33,14 +33,8 @@
 /*
  * Setting for Serial interrupt
  */
-//*** flag data on the listener port is ready
-volatile bool listenerDataReady = false;
 
-//*** ISR to set listerDataReady flag
-void listenerReady()
-{
-  listenerDataReady = true;
-}
+
 
 /*
 debugWrite() <--provides basic debug info from other tasks
