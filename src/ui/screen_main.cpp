@@ -20,6 +20,7 @@
 #include <math.h>
 #include <lvgl.h>
 #include <calc/mfd_calculation.h>
+#include <comms/mfd_communication.h>
 #include <mfd_conf.h>
 #include <ui/screen_main.h>
 #include <ui/screen_about.h>

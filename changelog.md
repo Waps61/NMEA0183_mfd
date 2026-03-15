@@ -1,5 +1,9 @@
 # CHANGE LOG
-## V0.9.1 14-03-2026
+## V0.9.2 15-03-2026
+Due to waitng times for delivery of a 12 to 5 V Buck converter the NMEA talker function has been implemented. Unfortunately
+the JC1060P470 only outputs 0,65V on the TX lines(?), far below the threshold of 1,5V resulting in devices reading the data don't see the data coming in. Hence the transmission of NMEA data has been outcomented for now. Looking for a solution to overcome this isse;
+The NMEASoftGenerator function moverd from the mfd_calculation layer to the mfd_communication layer, where it should be.
+### V0.9.1 14-03-2026
 Implemented below suggestion to prevent unreliable distance and speed calcualtions when stationary.
 Assumption is that the boat is stationary when SOG is less than 0.3 kts and theoretical distance between position readings
 for a theoretical speed of 20 kts = 0,00556 nm. So to be safe it is assumed that position updates will take less then 30 sec

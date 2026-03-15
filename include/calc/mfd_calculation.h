@@ -13,6 +13,5 @@
 
 extern bool isNumeric(char *value);
 extern void processNMEAData(  const char *buff );
-extern void NMEA_runSoftGenerator();
 
 #endif // MFD_CALCULATION_H

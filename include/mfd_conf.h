@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "9.1" // post FAT and pre SAT
+#define VERSION_MINOR "9.2" // post FAT and pre SAT
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -29,13 +29,12 @@
 #define DEFAULT_BRIGHTNESS 25 // 25% brightness as default
 #define ACTUAL_BRIGHTNESS DEFAULT_BRIGHTNESS
 
-
 // #define LISTENER_RATE 38400 // Baudrate for the listner, but now set through mfd_subject_baudrate
 #define LISTENER_RX 32 // Serial1 Rx port
 #define LISTENER_TX 33 // Serial1 TX port
 // #define TALKER_RATE 38400   // Baudrate for the talker
-#define TALKER_RX 22
-#define TALKER_TX 23 // SoftSerial port 2
+#define TALKER_RX 46
+#define TALKER_TX 47 // SoftSerial port 2
 
 // #define DEMO // When active data is simulated for the display outcomment if not used
 //  #define TEST
