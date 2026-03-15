@@ -30,8 +30,8 @@
 #define ACTUAL_BRIGHTNESS DEFAULT_BRIGHTNESS
 
 // #define LISTENER_RATE 38400 // Baudrate for the listner, but now set through mfd_subject_baudrate
-#define LISTENER_RX 32 // Serial1 Rx port
-#define LISTENER_TX 33 // Serial1 TX port
+#define LISTENER_RX 1 // Serial1 Rx port
+#define LISTENER_TX 2 // Serial1 TX port
 // #define TALKER_RATE 38400   // Baudrate for the talker
 #define TALKER_RX 46
 #define TALKER_TX 47 // SoftSerial port 2
