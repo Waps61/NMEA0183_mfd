@@ -1,6 +1,9 @@
 # NMEA0183-MFD: A marine multifucntion display
+#### V1.0 released 17-03-2026
+Package available. See [changelog.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/changelog.md)
+
 #### Update 15-03-2026
-To see what has changed , read the changelog.md.
+To see what has changed , read the [changelog.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/changelog.md)
 On March 14, 2026 a succesfull SAT has been executed. Some improvements have been noted, see changelog.md
 #### Update 06-03-2026
 The program suffered from memory assertions due to lack of free memory. Altought I assumed this was caused by memory leaks, it seems to be a settings issue with LV_MEM_SIZE in lv_conf.h (line 72) wich is default set to 64 * 1024 bytes. Increasing to 128 *1024 bytes seems to solve the issue
