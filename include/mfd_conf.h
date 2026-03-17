@@ -6,8 +6,8 @@
 #include <lvgl.h> // v9.5.0
 
 // Version
-#define VERSION_MAJOR "0"
-#define VERSION_MINOR "9.2" // post FAT and pre SAT
+#define VERSION_MAJOR "1"
+#define VERSION_MINOR "0" // 1ste released version
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024

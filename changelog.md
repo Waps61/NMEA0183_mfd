@@ -1,5 +1,12 @@
 # CHANGE LOG
-## V0.9.2 15-03-2026
+## V1.0 17-03-2026
+Relased version. With limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
+a known issue.
+Connection on the GPIO's:(for GPIO schema see JC1060p470gpio.jpeg.)
+![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)
+RX in GPIO 1
+GND on GND
+### V0.9.2 15-03-2026
 Due to waitng times for delivery of a 12 to 5 V Buck converter the NMEA talker function has been implemented. Unfortunately
 the JC1060P470 only outputs 0,65V on the TX lines(?), far below the threshold of 1,5V resulting in devices reading the data don't see the data coming in. Hence the transmission of NMEA data has been outcomented for now. Looking for a solution to overcome this isse;
 The NMEASoftGenerator function moverd from the mfd_calculation layer to the mfd_communication layer, where it should be.
