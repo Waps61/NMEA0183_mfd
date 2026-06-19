@@ -74,6 +74,7 @@ void save_btn_event_cb(lv_event_t *event)
     mfd_ship_config_set_log(atof(lv_textarea_get_text(text_area_array[LOG_AREA])));//lv_subject_get_float(&mfd_subject_log));
     set_boat_log(mfd_ship_config_get_log());
     mfd_ship_config_set_depth_offset(atof(lv_textarea_get_text(text_area_array[DEPTH_OFFSET_AREA])));//lv_subject_get_float(&mfd_subject_depth_offset));
+    set_depth_offset(mfd_ship_config_get_depth_offset());
     mfd_write_persistent_data(&ship_config);
   }
 }

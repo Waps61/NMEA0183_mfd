@@ -186,14 +186,14 @@ void set_data_store(enum sequence_id tag, const char data[15])
     strncpy(lat_degrees, data, 2);
     strncpy(lat_minutes, data + 2, strlen(data) - 4);
     strncpy(lat_dir, data + strlen(data) - 1, 1);
-    sprintf(NMEA_DATA_STORE[tag], "%s°%s' %s", lat_degrees, lat_minutes, lat_dir);
+    sprintf(NMEA_DATA_STORE[tag], "%2s°%2.7s' %s", lat_degrees, lat_minutes, lat_dir);
     
     break;
   case LON:
     strncpy(lon_degrees, data, 3);
     strncpy(lon_minutes, data + 3, strlen(data) - 5);
     strncpy(lon_dir, data + strlen(data) - 1, 1);
-    sprintf(NMEA_DATA_STORE[tag], "%s°%s' %s", lon_degrees, lon_minutes, lon_dir);
+    sprintf(NMEA_DATA_STORE[tag], "%3s°%2.7s' %s", lon_degrees, lon_minutes, lon_dir);
     
     break;
   default:
