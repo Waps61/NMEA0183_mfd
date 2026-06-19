@@ -1,5 +1,9 @@
 # CHANGE LOG
-## V1.0.2 19-06-2026
+## V1.0.4
+Pre-SAT version. LAT and LON minitiles data restricted to 4 decimals based on on board FAT.
+### V1.0.3 19-06-2026
+Wind gauge gets bigger range up to 150 degrees. No need to track deeper dan 150 degrees. Since skipper needs his eyes on the boom to prevent a spontanious jibe. Pre-SAT version
+### V1.0.2 19-06-2026
 * Depth sensor off-set need to be implemented to make it more generic. Status: Done
 
 Issues to be fixed (no change)
