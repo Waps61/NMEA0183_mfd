@@ -3,7 +3,7 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  1.0 17-03-2026
+  VERSION:  1.0.3 19-06-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
   Change log: See CHANGELOG.MD file in the root of the project
@@ -53,8 +53,8 @@
 
   Wiring Diagram (for NMEA0183 to NMEA0183 device):
      ESP32      | NMEA device
-     TX GPIO 33 |
-     RX GPIO 32 |  NMEA OUT -
+     TX GPIO 2 |
+     RX GPIO 1 |  NMEA OUT -
      GND        |  GND
 
   NOTE: The above settings works with the USB power to the ESP32
@@ -94,9 +94,10 @@ SOFTWARE.
   Do NOT use this compass in situations involving safety to life
   such as navigation at sea.
 
-  TO DO:    - Connect HMI to 5V from the Buck converter i.s.o. 3.3V pin on ESP32
+  TO DO:
             -Implement 2-way communication so that incomming NMEA data can be relayed
             to other devices. An NMEA0183 network is typically a daisy chained network
+            - WiFi functionality for wireless connection to a multiplexer or other NMEA0183 device, to read and send data to the display
 
   LIMITATIONS:
 
@@ -155,7 +156,7 @@ int boat_cts = 0;
 int boat_cog = 0;
 float boat_dpt = 0.0;
 float boat_vmg = 0.0;
-float boat_log = 0.1; // = 0.1;  // Will be set to real value when EEPROM is read
+float boat_log = 0.1;     // = 0.1;  // Will be set to real value when EEPROM is read
 float depth_offset = 0.0; // = 0.0; // Will be set to real value when EEPROM is read
 
 float boat_trp = 0.0;      // = 0.0;
@@ -297,7 +298,7 @@ void setup()
   lv_log("log: %.1f\n", mfd_ship_config_get_log());
   lv_log("depth offset: %.1f\n", mfd_ship_config_get_depth_offset());
 
-  set_boat_log(lv_subject_get_float(&mfd_subject_log)); // set boat_log to value from NVR
+  set_boat_log(lv_subject_get_float(&mfd_subject_log));              // set boat_log to value from NVR
   set_depth_offset(lv_subject_get_float(&mfd_subject_depth_offset)); // set depth_offset to value from NVR
   lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
   lv_log(" depth_offset initialize with value from mfd_depth_offset %.1f\n", get_depth_offset());
