@@ -111,34 +111,34 @@ $HCXDR,A,171,D,PITCH,A,-37,D,ROLL,G,367,,MAGX,G,2420,,MAGY,G,-8984,,MAGZ*41
 
 #define FIELD_BUFFER 15 // length of the buffer for NMEA field values as a string
 
+// Helper variables for calculation on secondary data
+extern float boat_sog; //= 0.0;
+extern int boat_hdg;   //= 0;
+extern int boat_awa;   //= 0;
+extern int boat_cts;   //= 0;
+extern int boat_cog;   //= 0;
+extern float boat_dpt; // = 0.0;
+extern float boat_vmg; // = 0.0;
+extern double boat_twa; // = 0.0;
+extern double boat_tws; // = 0.0;
 
-  // Helper variables for calculation on secondary data
-   extern float boat_sog; //= 0.0;
-   extern int boat_hdg;   //= 0;
-   extern int boat_awa;   //= 0;
-   extern int boat_cts;   //= 0;
-   extern int boat_cog;   //= 0;
-   extern float boat_dpt; // = 0.0;
-   extern float boat_vmg; // = 0.0;
+extern float boat_trp;             // = 0.0;
+extern bool trip_started;          // to ensure trip starts at 0
+extern char lat_new[FIELD_BUFFER]; // = {0};
+extern char lon_new[FIELD_BUFFER]; // = {0};
+extern char lat_old[FIELD_BUFFER]; // = {0};
+extern char lon_old[FIELD_BUFFER]; // = {0};
 
-   extern float boat_trp;            // = 0.0;
-   extern bool trip_started; // to ensure trip starts at 0
-   extern char lat_new[FIELD_BUFFER]; // = {0};
-   extern char lon_new[FIELD_BUFFER]; // = {0};
-   extern char lat_old[FIELD_BUFFER]; // = {0};
-   extern char lon_old[FIELD_BUFFER]; // = {0};
-
-
-#define NR_OF_NMEA_TAGS 22 // make sure this equal to nr of NMEA_TAG
+#define NR_OF_NMEA_TAGS 24 // make sure this equal to nr of NMEA_TAG
 // Used as a reference to the required NMEA tag
 // oldVal is used for specific purposes while processing nmea data
-// if tags are used more then once add them at the last tag that 
+// if tags are used more then once add them at the last tag that
 // is used only onde, like BAT in this case
 static enum sequence_id {
   oldVal, // 0 used for specific purposes while processing nmea data
   CTS,    // 1 Course To Steer
   COG,    // 2 Course Over Ground
-  SOG,    // 3 Speed Over Ground 
+  SOG,    // 3 Speed Over Ground
   DPT,    // 4 Depth
   AWA,    // 5 Apparent Wind Angle
   AWS,    // 6 Apparent Wind Speed
@@ -152,11 +152,13 @@ static enum sequence_id {
   DIR,    // 14 Direction to Steer
   STW,    // 15 Speed Through Water
   MTW,    // 16 Water Temperature
-  BAT,    // 17 Battery Voltage
-  CTS2,   // 18 Course To Steer 2, calculated from COG and TWA
-  COG2,   // 19 Course Over Ground 2
-  SOG2,   // 20 Speed Over Ground 2
-  AWS2    // 21 Apparent Wind Speed 2
+  LAT,    // 17 Latitude
+  LON,    // 18 Longitude
+  BAT,    // 19 Battery Voltage
+  CTS2,   // 20 Course To Steer 2, calculated from COG and TWA
+  COG2,   // 21 Course Over Ground 2
+  SOG2,   // 22 Speed Over Ground 2
+  AWS2    // 23 Apparent Wind Speed 2
 } NMEA_TAG;
 
 /**
@@ -164,10 +166,10 @@ static enum sequence_id {
  * and is used for incomming NMEA data and and to update the data_tiles
  */
 // Declare buffers for NMEA string and display parameters
- extern char NMEA_DATA_STORE[NR_OF_NMEA_TAGS][NMEA_BUFFER_SIZE + 1]; // +1 for the null terminator
-// and provide a function to initiate it
- extern bool data_store_inited;
- extern void init_data_store();
- extern void set_data_store(enum sequence_id tag, const char data[15]);
+extern char NMEA_DATA_STORE[NR_OF_NMEA_TAGS][NMEA_BUFFER_SIZE + 1]; // +1 for the null terminator
+                                                                    // and provide a function to initiate it
+extern bool data_store_inited;
+extern void init_data_store();
+extern void set_data_store(enum sequence_id tag, const char data[15]);
 
 #endif // NMEA0183_DATA_H

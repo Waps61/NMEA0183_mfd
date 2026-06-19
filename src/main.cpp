@@ -149,6 +149,8 @@ SOFTWARE.
 float boat_sog = 0.0;
 int boat_hdg = 0;
 int boat_awa = 0;
+double boat_tws = 0.0;
+double boat_twa = 0.0;
 int boat_cts = 0;
 int boat_cog = 0;
 float boat_dpt = 0.0;
@@ -172,13 +174,17 @@ bool update_data_values = false;
 lv_obj_t *screen_active = NULL;
 lv_mem_monitor_t *mem_monitor = NULL;
 
-/*Create a Tabview box object*/
+/*Create a tile object*/
 lv_obj_t *SOGbox, *CTSbox, *COGbox, *DPTbox, *AWAbox, *TWAbox, *AWSbox, *TWSbox,
     *TRPbox, *VMGbox, *CMGbox, *LOGbox, *HDGbox = NULL;
-// some boxes ure used twice
+// some tiles are used twice
 lv_obj_t *SOGbox2, *COGbox2, *CTSbox2, *AWSbox2 = NULL;
 lv_obj_t *AWAGaugeZoom, *AWAGaugeTileZoom = NULL;
 lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
+
+// and some tiles are mini tiles
+lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTminitile, *SOGminitile,
+    *TRPminitile, *MTWminitile = NULL;
 
 // static Preferences mfdsettings;
 lv_subject_t mfd_subject_baudrate;
