@@ -1,5 +1,14 @@
 # CHANGE LOG
-## V1.0.4
+## V1.1
+Released version V1.1
+Added:
+* Depth sensor off-set implemented to make it more generic.
+* Default brightness incereased to 75%.
+* Fixed TWA and TWS calculation.
+* Water temperature added as minitile
+* Current position implemented, as separate LAT and LON minitiles on TRIP panel
+
+### V1.0.4
 Pre-SAT version. LAT and LON minitiles data restricted to 4 decimals based on on board FAT.
 ### V1.0.3 19-06-2026
 Wind gauge gets bigger range up to 150 degrees. No need to track deeper dan 150 degrees. Since skipper needs his eyes on the boom to prevent a spontanious jibe. Pre-SAT version
@@ -18,7 +27,7 @@ After using the device for a couple of months some improvements came up;
 * Current position is not implemented, but new insights says it is a must. Status: Done
 * Depth sensor off-set need to be implemented to make it more generic. Status: TBD
 ### V1.0 17-03-2026
-Relased version. With limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
+Released version. With limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
 a known issue.
 Connection on the GPIO's:(for GPIO schema see JC1060p470gpio.jpeg.)
 ![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)

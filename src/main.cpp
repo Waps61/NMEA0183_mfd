@@ -3,7 +3,7 @@
   Contact:  waps61 @gmail.com
   URL:      https://www.hackster.io/waps61
   TARGET:   ESP32-P4-evboard integrated with in a JC1060P470 display module
-  VERSION:  1.0.3 19-06-2026
+  VERSION:  1.1 19-06-2026
   Date:     v0.1 31-01-2026
   NOTE:     Version is set in major and minor tick in mfd_conf.h
   Change log: See CHANGELOG.MD file in the root of the project
