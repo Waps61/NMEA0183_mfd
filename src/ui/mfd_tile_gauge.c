@@ -114,10 +114,10 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
 
   lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
   lv_scale_set_range(scale, (0 - range), range);
-  lv_scale_set_total_tick_count(scale, 31);
-  lv_scale_set_major_tick_every(scale, 5);
-  lv_scale_set_angle_range(scale, 270);
-  lv_scale_set_rotation(scale, 135);
+  lv_scale_set_total_tick_count(scale, 151);
+  lv_scale_set_major_tick_every(scale, 15);
+  lv_scale_set_angle_range(scale, 310);
+  lv_scale_set_rotation(scale, 115);
   
   lv_scale_set_label_show(scale, true);
 

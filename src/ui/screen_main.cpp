@@ -173,12 +173,12 @@ void set_data_store(enum sequence_id tag, const char data[15])
     if (NMEA_DATA_STORE[DIR] != NULL && NMEA_DATA_STORE[DIR][0] == '>')
     {
 
-      mfd_gauge_update(AWAGauge, 135, -boat_awa);
+      mfd_gauge_update(AWAGauge, 150, -boat_awa);
       mfd_gauge_update(AWAGaugeZoom, 60, -boat_awa);
     }
     else
     {
-      mfd_gauge_update(AWAGauge, 135, boat_awa);
+      mfd_gauge_update(AWAGauge, 150, boat_awa);
       mfd_gauge_update(AWAGaugeZoom, 60, boat_awa);
     }
     break;
@@ -451,7 +451,7 @@ lv_obj_t *screen_main_create(void)
   tile_hash[DIR] = mfd_mini_tile_add_data(DIRminitile);
 
   AWAGaugeTile = mfd_panel_add_gauge(mfd_wind_panel, "AWA", AWAGaugeTile);
-  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 135, 25, 60);
+  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 150, 25, 60);
 
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
@@ -460,7 +460,7 @@ lv_obj_t *screen_main_create(void)
   tile_hash[AWS2] = mfd_tile_add_tile_data(AWSbox2, tile_hash[AWS2]);
 
   AWAGaugeTileZoom = mfd_panel_add_gauge(mfd_wind_panel, "AWA+", AWAGaugeTileZoom);
-  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 50);
+  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 20, 50);
 
   TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
   tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);
