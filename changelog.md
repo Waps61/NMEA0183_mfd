@@ -1,5 +1,12 @@
 # CHANGE LOG
-## V1.0.1 17-06-2026
+## V1.0.2 19-06-2026
+* Depth sensor off-set need to be implemented to make it more generic. Status: Done
+
+Issues to be fixed (no change)
+* limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
+a known issue.
+* WiFi functionality noy (yet) implemented
+### V1.0.1 17-06-2026
 After using the device for a couple of months some improvements came up;
 * default brightness need to be incereased to 75%. Status: Done
 * TWA and TWS are not calculated correctly (as in not al all). Status: Done
@@ -11,7 +18,8 @@ Relased version. With limitation of not sending data over TX line due to low vol
 a known issue.
 Connection on the GPIO's:(for GPIO schema see JC1060p470gpio.jpeg.)
 ![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)
-RX in GPIO 1
+RX on GPIO 1
+TX on GPIO 2
 GND on GND
 ### V0.9.2 15-03-2026
 Due to waitng times for delivery of a 12 to 5 V Buck converter the NMEA talker function has been implemented. Unfortunately

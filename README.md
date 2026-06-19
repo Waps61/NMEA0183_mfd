@@ -28,7 +28,7 @@ Data is interpreted from the following NMEA-0183 sentences:
 * $--DBT
 * $--BWC
 * $--VHW\
-RX on GPIO 32, TX on GPIO33\
+RX on GPIO 1, TX on GPIO2\
 ![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)
 
 ### Initiation

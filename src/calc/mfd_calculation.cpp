@@ -338,32 +338,35 @@ void processNMEAData(const char *buff)
           {
             if (field == 2)
             {
-              boat_dpt = atof(cvalue);
-              set_data_store(DPT, cvalue);
+              boat_dpt = atof(cvalue)+ get_depth_offset();
+              sprintf(tmp, "%1.1f", boat_dpt);
+              set_data_store(DPT, tmp);
             }
             if (field == 3 && cvalue[0] == 'f')
             {
               //boat_dpt = atof(cvalue);
-              boat_dpt *= FTM;
-              sprintf(cvalue, "%.1f", boat_dpt);
-              set_data_store(DPT, cvalue);
-            }
+              boat_dpt = boat_dpt *FTM + get_depth_offset();
+              sprintf(tmp, "%1.1f", boat_dpt);
+              set_data_store(DPT, tmp);
+              }
           }
           else if (strstr(bfr, "DBT") != NULL)
           {
             if (field == 3)
             {
-              boat_dpt = atof(cvalue);
-              set_data_store(DPT, cvalue);
-            }
+              boat_dpt = atof(cvalue)+ get_depth_offset();
+              sprintf(tmp, "%1.1f", boat_dpt);
+              set_data_store(DPT, tmp);
+              }
           }
           else if (strstr(bfr, "DPT") != NULL)
           {
             if (field == 1)
             {
-              boat_dpt = atof(cvalue);
-              set_data_store(DPT, cvalue);
-            }
+              boat_dpt = atof(cvalue)+ get_depth_offset();
+              sprintf(tmp, "%1.1f", boat_dpt);
+              set_data_store(DPT, tmp);
+              }
           }
 
           // Prepare for Water Temperature values, comming from MTW tags
@@ -452,8 +455,8 @@ void processNMEAData(const char *buff)
             }
 
             // Storing True Heading!!
-            sprintf(cvalue, "%.1f", tmpVal);
-            set_data_store(HDG, cvalue);
+            sprintf(tmp, "%.1f", tmpVal);
+            set_data_store(HDG, tmp);
           }
           else if (strstr(bfr, "VHW") != NULL)
           {

@@ -22,7 +22,8 @@ enum mfd_pers_key
   MFD_WIFI_ON,
   MFD_SSID,
   MFD_PWD,
-  MFD_SHIPLOG
+  MFD_SHIPLOG,
+  MFD_DEPTH_OFFSET
 };
 
 /**
@@ -36,6 +37,7 @@ struct mfd_pers_t
   String SSID;
   String pwd;
   float ship_log;
+  float depth_offset;
 };
 
 /**
@@ -65,5 +67,6 @@ extern void mfd_ship_config_set_pwd(String value);
 extern String mfd_ship_config_get_pwd();
 extern void mfd_ship_config_set_log(float value);
 extern float mfd_ship_config_get_log();
-
+extern void mfd_ship_config_set_depth_offset(float value);
+extern float mfd_ship_config_get_depth_offset();
 #endif // MFD_PERSISTENT_H
