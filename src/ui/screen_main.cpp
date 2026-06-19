@@ -111,6 +111,15 @@ float increase_boat_log(float value)
   lv_subject_set_float(&mfd_subject_log, boat_log);
   return boat_log;
 }
+void set_depth_offset(float value)
+{
+  depth_offset = value;
+  lv_subject_set_float(&mfd_subject_depth_offset, value);
+}
+float get_depth_offset()
+{
+  return depth_offset;
+}
 
 void init_data_store()
 {
@@ -131,6 +140,12 @@ void init_data_store()
 void set_data_store(enum sequence_id tag, const char data[15])
 {
   char fmt_data[15] = {0};
+  char lat_degrees[3] = {0};
+  char lat_minutes[10] = {0};
+  char lon_degrees[4] = {0};
+  char lon_minutes[10] = {0};
+  char lat_dir[2] = {0};
+  char lon_dir[2] = {0};
   int j = 0;
   // Remove leading zeros and keep the dot for decimal values, so that the value is displayed in a more readable format on the display.
   for (int i = 0; (i < strlen(data) || data[i] == '.'); i++)
@@ -141,35 +156,46 @@ void set_data_store(enum sequence_id tag, const char data[15])
   // Some tags need special handling and formatting, to be display in a correct manner.
   switch (tag)
   {
-
   case SOG:
     boat_sog = atof(fmt_data);
     sprintf(NMEA_DATA_STORE[tag], "%1.3s", fmt_data);
     break;
   case DPT:
-    boat_dpt = atof(fmt_data) * -1.0;
+    //boat_dpt = atof(fmt_data) * -1.0;
     sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
   case LOG:
     sprintf(NMEA_DATA_STORE[tag], "%2.5s", fmt_data);
     break;
   case AWA:
-  boat_awa = atoi(fmt_data);
-  
-  if(NMEA_DATA_STORE[DIR] != NULL && NMEA_DATA_STORE[DIR][0] == '>')
+    boat_awa = atoi(fmt_data);
+    sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
+    if (NMEA_DATA_STORE[DIR] != NULL && NMEA_DATA_STORE[DIR][0] == '>')
     {
-      
-      mfd_gauge_update(AWAGauge, 135, -boat_awa);
+
+      mfd_gauge_update(AWAGauge, 150, -boat_awa);
       mfd_gauge_update(AWAGaugeZoom, 60, -boat_awa);
-       
     }
     else
     {
-      mfd_gauge_update(AWAGauge, 135, boat_awa);
+      mfd_gauge_update(AWAGauge, 150, boat_awa);
       mfd_gauge_update(AWAGaugeZoom, 60, boat_awa);
     }
+    break;
+  case LAT:
+    strncpy(lat_degrees, data, 2);
+    strncpy(lat_minutes, data + 2, strlen(data) - 4);
+    strncpy(lat_dir, data + strlen(data) - 1, 1);
+    sprintf(NMEA_DATA_STORE[tag], "%2s°%2.7s' %s", lat_degrees, lat_minutes, lat_dir);
     
-
+    break;
+  case LON:
+    strncpy(lon_degrees, data, 3);
+    strncpy(lon_minutes, data + 3, strlen(data) - 5);
+    strncpy(lon_dir, data + strlen(data) - 1, 1);
+    sprintf(NMEA_DATA_STORE[tag], "%3s°%2.7s' %s", lon_degrees, lon_minutes, lon_dir);
+    
+    break;
   default:
     if (strlen(fmt_data) < 3)
       sprintf(NMEA_DATA_STORE[tag], "0%1.2s", fmt_data);
@@ -179,12 +205,10 @@ void set_data_store(enum sequence_id tag, const char data[15])
   }
 }
 
-
 void test_screen_data_updates()
 {
-  
+
   NMEA_runSoftGenerator();
-  
 }
 
 /**
@@ -224,7 +248,7 @@ void mfd_update_tile_data()
         lv_label_set_text(tile_hash[AWS2], NMEA_DATA_STORE[i]);
         break;
       case DPT:
-        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt);
+        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt*-1.0);
         break;
       default:
         break;
@@ -359,13 +383,19 @@ lv_obj_t *screen_main_create(void)
   // Add the tiles and their tile_data objects to the trip panel
   CTSbox = mfd_panel_add_tile(mfd_trip_panel, "CTS", "o", CTSbox);
   tile_hash[CTS] = mfd_tile_add_tile_data(CTSbox, tile_hash[CTS]);
-
+  LATminitile = mfd_tile_add_mini_tile(CTSbox, LATminitile);
+  tile_hash[LAT] = mfd_mini_tile_add_data(LATminitile);
+  mfd_mini_tile_set_label(LATminitile, "LAT");
+  
   COGbox = mfd_panel_add_tile(mfd_trip_panel, "COG", "o", COGbox);
   tile_hash[COG] = mfd_tile_add_tile_data(COGbox, tile_hash[COG]);
-
+  LONminitile = mfd_tile_add_mini_tile(COGbox, LONminitile);
+  tile_hash[LON] = mfd_mini_tile_add_data(LONminitile);
+  mfd_mini_tile_set_label(LONminitile, "LON");
+  
   SOGbox = mfd_panel_add_tile(mfd_trip_panel, "SOG", "KTS", SOGbox);
   tile_hash[SOG] = mfd_tile_add_tile_data(SOGbox, tile_hash[SOG]);
-  lv_obj_t *SOGminitile = mfd_tile_add_mini_tile(SOGbox, SOGminitile);
+  SOGminitile = mfd_tile_add_mini_tile(SOGbox, SOGminitile);
   sogplot = lv_chart_create(SOGminitile);
   lv_obj_set_size(sogplot, MINI_TILE_WIDTH, MINI_TILE_HEIGHT);
   lv_chart_set_type(sogplot, LV_CHART_TYPE_LINE);
@@ -383,7 +413,7 @@ lv_obj_t *screen_main_create(void)
 
   DPTbox = mfd_panel_add_tile(mfd_trip_panel, "DPT", "m", DPTbox);
   tile_hash[DPT] = mfd_tile_add_tile_data(DPTbox, tile_hash[DPT]);
-  lv_obj_t *DPTminitile = mfd_tile_add_mini_tile(DPTbox, DPTminitile);
+  DPTminitile = mfd_tile_add_mini_tile(DPTbox, DPTminitile);
   dptplot = lv_chart_create(DPTminitile);
   lv_obj_set_size(dptplot, MINI_TILE_WIDTH, MINI_TILE_HEIGHT);
   lv_chart_set_type(dptplot, LV_CHART_TYPE_LINE);
@@ -401,11 +431,15 @@ lv_obj_t *screen_main_create(void)
 
   AWSbox = mfd_panel_add_tile(mfd_trip_panel, "AWS", "KTS", AWSbox);
   tile_hash[AWS] = mfd_tile_add_tile_data(AWSbox, tile_hash[AWS]);
+  MTWminitile = mfd_tile_add_mini_tile(AWSbox, MTWminitile);
+  tile_hash[MTW] = mfd_mini_tile_add_data(MTWminitile);
+  mfd_mini_tile_set_label(MTWminitile, "MTW");
+  mfd_mini_tile_set_unit(MTWminitile, "°C");
 
   TRPbox = mfd_panel_add_tile(mfd_trip_panel, "TRP", "nm", TRPbox);
   tile_hash[TRP] = mfd_tile_add_tile_data(TRPbox, tile_hash[TRP]);
 
-  lv_obj_t *TRPminitile = mfd_tile_add_mini_tile(TRPbox, TRPminitile);
+  TRPminitile = mfd_tile_add_mini_tile(TRPbox, TRPminitile);
   tile_hash[LOG] = mfd_mini_tile_add_data(TRPminitile);
   mfd_mini_tile_set_label(TRPminitile, "LOG");
   mfd_mini_tile_set_unit(TRPminitile, "nm");
@@ -413,22 +447,20 @@ lv_obj_t *screen_main_create(void)
   // Add the tiles and their tile_data objects to thwe wind panel
   AWAbox = mfd_panel_add_tile(mfd_wind_panel, "AWA", "o", AWAbox);
   tile_hash[AWA] = mfd_tile_add_tile_data(AWAbox, tile_hash[AWA]);
-  lv_obj_t *DIRminitile = mfd_tile_add_mini_tile(AWAbox, DIRminitile);
+  DIRminitile = mfd_tile_add_mini_tile(AWAbox, DIRminitile);
   tile_hash[DIR] = mfd_mini_tile_add_data(DIRminitile);
-  
+
   AWAGaugeTile = mfd_panel_add_gauge(mfd_wind_panel, "AWA", AWAGaugeTile);
-  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 135, 20, 60);
+  AWAGauge = mfd_tile_gauge_create(AWAGaugeTile, 150, 25, 60);
 
   TWAbox = mfd_panel_add_tile(mfd_wind_panel, "TWA", "o", TWAbox);
   tile_hash[TWA] = mfd_tile_add_tile_data(TWAbox, tile_hash[TWA]);
 
-  
   AWSbox2 = mfd_panel_add_tile(mfd_wind_panel, "AWS", "KTS", AWSbox2);
   tile_hash[AWS2] = mfd_tile_add_tile_data(AWSbox2, tile_hash[AWS2]);
 
-  
   AWAGaugeTileZoom = mfd_panel_add_gauge(mfd_wind_panel, "AWA+", AWAGaugeTileZoom);
-  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 10, 50);
+  AWAGaugeZoom = mfd_tile_gauge_create(AWAGaugeTileZoom, 60, 20, 50);
 
   TWSbox = mfd_panel_add_tile(mfd_wind_panel, "TWS", "KTS", SOGbox);
   tile_hash[TWS] = mfd_tile_add_tile_data(TWSbox, tile_hash[TWS]);

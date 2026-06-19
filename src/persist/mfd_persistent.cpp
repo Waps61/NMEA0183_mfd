@@ -53,6 +53,14 @@ float mfd_ship_config_get_log()
 {
   return ship_config.ship_log;
 }
+void mfd_ship_config_set_depth_offset(float value)
+{
+  ship_config.depth_offset = value;
+}
+float mfd_ship_config_get_depth_offset()
+{
+  return ship_config.depth_offset;
+}
 
 bool mfd_persistent_open()
 {
@@ -81,6 +89,7 @@ mfd_pers_t mfd_read_persistent_data()
     persistent_data.SSID = mfd_preferences.getString("SSID", "---");
     persistent_data.pwd = mfd_preferences.getString("pwd", "***");
     persistent_data.ship_log = mfd_preferences.getFloat("ship_log", -0.1);
+    persistent_data.depth_offset = mfd_preferences.getFloat("depth_offset", 0.0);
     mfd_persistent_close();
   }
   else
@@ -99,6 +108,7 @@ bool mfd_write_persistent_data(mfd_pers_t *perst_data)
     lv_log("writing SSID %s to EEPROM was =%d\n", perst_data->SSID, (success &= (mfd_preferences.putString("SSID", perst_data->SSID) != 0)));
     lv_log("writing pwd %s to EEPROM was =%d\n", perst_data->pwd, (success &= (mfd_preferences.putString("pwd", perst_data->pwd) != 0)));
     lv_log("writing log %0.1f to EEPROM was =%d\n", perst_data->ship_log, (success &= (mfd_preferences.putFloat("ship_log", perst_data->ship_log) != 0)));
+    lv_log("writing depth offset %0.1f to EEPROM was =%d\n", perst_data->depth_offset, (success &= (mfd_preferences.putFloat("depth_offset", perst_data->depth_offset) != 0)));
     mfd_persistent_close();
   }
 
@@ -131,6 +141,10 @@ bool mfd_update_persistent_key(mfd_pers_key key_id, mfd_pers_t *perst_data)
     case MFD_SHIPLOG:
       success = mfd_preferences.putFloat("ship_log", perst_data->ship_log);
       lv_log("ship log update writen with value %.1f\n", perst_data->ship_log);
+      break;
+    case MFD_DEPTH_OFFSET:
+      success = mfd_preferences.putFloat("depth_offset", perst_data->depth_offset);
+      lv_log("depth offset update writen with value %.1f\n", perst_data->depth_offset);
       break;
     default:
       break;

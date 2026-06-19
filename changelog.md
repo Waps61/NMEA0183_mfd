@@ -1,15 +1,43 @@
 # CHANGE LOG
-## V1.0 17-03-2026
-Relased version. With limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
+## V1.1
+Released version V1.1
+Added:
+* Depth sensor off-set implemented to make it more generic.
+* Default brightness incereased to 75%.
+* Fixed TWA and TWS calculation.
+* Water temperature added as minitile
+* Current position implemented, as separate LAT and LON minitiles on TRIP panel
+
+### V1.0.4
+Pre-SAT version. LAT and LON minitiles data restricted to 4 decimals based on on board FAT.
+### V1.0.3 19-06-2026
+Wind gauge gets bigger range up to 150 degrees. No need to track deeper dan 150 degrees. Since skipper needs his eyes on the boom to prevent a spontanious jibe. Pre-SAT version
+### V1.0.2 19-06-2026
+* Depth sensor off-set need to be implemented to make it more generic. Status: Done
+
+Issues to be fixed (no change)
+* limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
+a known issue.
+* WiFi functionality noy (yet) implemented
+### V1.0.1 17-06-2026
+After using the device for a couple of months some improvements came up;
+* default brightness need to be incereased to 75%. Status: Done
+* TWA and TWS are not calculated correctly (as in not al all). Status: Done
+* Water temperature is not shown, although available. Status: Done
+* Current position is not implemented, but new insights says it is a must. Status: Done
+* Depth sensor off-set need to be implemented to make it more generic. Status: TBD
+### V1.0 17-03-2026
+Released version. With limitation of not sending data over TX line due to low voltage op ESP32-P4, which seems to be
 a known issue.
 Connection on the GPIO's:(for GPIO schema see JC1060p470gpio.jpeg.)
 ![screenshot of GPIO's](/screenshots/JC1060p470gpio.jpeg)
-RX in GPIO 1
+RX on GPIO 1
+TX on GPIO 2
 GND on GND
 ### V0.9.2 15-03-2026
 Due to waitng times for delivery of a 12 to 5 V Buck converter the NMEA talker function has been implemented. Unfortunately
 the JC1060P470 only outputs 0,65V on the TX lines(?), far below the threshold of 1,5V resulting in devices reading the data don't see the data coming in. Hence the transmission of NMEA data has been outcomented for now. Looking for a solution to overcome this isse;
-The NMEASoftGenerator function moverd from the mfd_calculation layer to the mfd_communication layer, where it should be.
+The NMEASoftGenerator function moved from the mfd_calculation layer to the mfd_communication layer, where it should be.
 ### V0.9.1 14-03-2026
 Implemented below suggestion to prevent unreliable distance and speed calcualtions when stationary.
 Assumption is that the boat is stationary when SOG is less than 0.3 kts and theoretical distance between position readings

@@ -31,8 +31,8 @@ void mfd_mini_tile_set_label(lv_obj_t *tile, const char *title)
 {
   lv_obj_t *label = lv_label_create(tile);
   lv_obj_add_style(label, &mfd_style_day, 0);
-  lv_obj_set_style_width(label, 50, 0);
-  lv_obj_set_style_align(label, LV_ALIGN_LEFT_MID, 0);
+  lv_obj_set_style_width(label, 55, 0);
+  lv_obj_set_style_align(label, LV_ALIGN_TOP_MID, 0);
   lv_label_set_text(label, title);
   lv_obj_set_style_text_font(label, &ui_font_lv_conthrax_16, 0);
 }
@@ -42,7 +42,7 @@ void mfd_mini_tile_set_unit(lv_obj_t *tile, const char *unit)
   lv_obj_t *label = lv_label_create(tile);
   lv_obj_add_style(label, &mfd_style_day, 0);
   lv_obj_set_style_width(label, 50, 0);
-  lv_obj_set_style_align(label, LV_ALIGN_RIGHT_MID, 0);
+  lv_obj_set_style_align(label, LV_ALIGN_BOTTOM_MID, 0);
   lv_label_set_text(label, unit);
   lv_obj_set_style_text_font(label, &ui_font_lv_conthrax_16, 0);
   lv_obj_set_style_text_color(label, lv_color_hex(NIGHT_TEXT_ON_BACKGROUND), 0);

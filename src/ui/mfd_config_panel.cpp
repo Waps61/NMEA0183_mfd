@@ -10,6 +10,12 @@
 #include <ui/mfd_config_panel.h>
 
 char tmpVal[30] = {0};
+lv_obj_t *text_area_array[4] = {0};
+int USRNAME_AREA = 0;
+int PWD_AREA = 1;
+int LOG_AREA = 2;
+int DEPTH_OFFSET_AREA = 3;
+int *text_area_hash[4] = {&USRNAME_AREA, &PWD_AREA, &LOG_AREA, &DEPTH_OFFSET_AREA};
 mfd_pers_t new_config;
  lv_style_t style_radio_btn, style_radio_btn_chk;
  int32_t radio_btn_index = 0;
@@ -63,9 +69,12 @@ void save_btn_event_cb(lv_event_t *event)
     mfd_ship_config_set_wifi(lv_subject_get_int(&mfd_subject_wifi));
     mfd_ship_config_set_ssid("to be implemented");
     mfd_ship_config_set_pwd("n*t yet implemented");
+    
 
-    mfd_ship_config_set_log(atof(lv_textarea_get_text(parent)));
+    mfd_ship_config_set_log(atof(lv_textarea_get_text(text_area_array[LOG_AREA])));//lv_subject_get_float(&mfd_subject_log));
     set_boat_log(mfd_ship_config_get_log());
+    mfd_ship_config_set_depth_offset(atof(lv_textarea_get_text(text_area_array[DEPTH_OFFSET_AREA])));//lv_subject_get_float(&mfd_subject_depth_offset));
+    set_depth_offset(mfd_ship_config_get_depth_offset());
     mfd_write_persistent_data(&ship_config);
   }
 }
@@ -209,7 +218,17 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_style_pad_left(loglabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_obj_set_style_pad_right(loglabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   sprintf(tmpVal, "%.1f", mfd_ship_config_get_log());
-  lv_label_set_text(loglabel, "Log-ofsset");
+  lv_label_set_text(loglabel, "Log-offset");
+
+  lv_obj_t *depthlabel = lv_label_create(panel);
+  lv_obj_set_pos(depthlabel, 5, 253);
+  lv_obj_set_size(depthlabel, 250, 35);
+  lv_obj_set_style_text_font(depthlabel, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_text_color(depthlabel, lv_color_hex(0xff515050), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_pad_left(depthlabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  lv_obj_set_style_pad_right(depthlabel, 10, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
+  sprintf(tmpVal, "%.1f", mfd_ship_config_get_depth_offset());
+  lv_label_set_text(depthlabel, "Depth offset");
 
   // cfgKeyboard
   lv_obj_t *kbd = lv_keyboard_create(panel);
@@ -222,6 +241,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   
   // logTextbox
   lv_obj_t *logvalue = lv_textarea_create(panel);
+  text_area_array[LOG_AREA] = logvalue;
   lv_subject_set_float(&mfd_subject_log, (float)ship_config.ship_log);
   lv_obj_set_name(logvalue, "mfd_log_value");
   lv_obj_set_pos(logvalue, 275, 179);
@@ -244,6 +264,31 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_textarea_add_text(logvalue, tmpVal);
   lv_keyboard_set_textarea(kbd, logvalue);
 
+  // depthTextbox
+  lv_obj_t *depthvalue = lv_textarea_create(panel);
+  text_area_array[DEPTH_OFFSET_AREA] = depthvalue;
+  lv_subject_set_float(&mfd_subject_depth_offset, (float)ship_config.depth_offset);
+  lv_obj_set_name(depthvalue, "mfd_depth_value");
+  lv_obj_set_pos(depthvalue, 275, 253);
+  lv_obj_set_size(depthvalue, 150, 70);
+  lv_textarea_set_accepted_chars(depthvalue, "1234567890.");
+  lv_textarea_set_max_length(depthvalue, 7);
+  lv_label_bind_text(depthvalue, &mfd_subject_depth_offset, NULL);
+
+  lv_obj_add_flag(depthvalue, LV_OBJ_FLAG_CHECKABLE);
+  lv_obj_add_state(depthvalue, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_CHECKED));
+  lv_obj_set_style_text_font(depthvalue, &ui_font_lv_conthrax_24, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DISABLED));
+  lv_obj_set_style_text_color(depthvalue, lv_color_hex(0xffcc229c), (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DISABLED));
+  lv_obj_set_style_text_opa(depthvalue, 255, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DISABLED));
+  lv_textarea_set_placeholder_text(depthvalue, "123456");
+  lv_textarea_set_one_line(depthvalue, true);
+  lv_textarea_set_password_mode(depthvalue, false);
+  lv_obj_add_event_cb(depthvalue, ta_event_cb, LV_EVENT_ALL, kbd);
+  lv_log("about to set depth offset t %.1f\n", mfd_ship_config_get_depth_offset());
+  sprintf(tmpVal, "%.1f", mfd_ship_config_get_depth_offset());
+  lv_textarea_add_text(depthvalue, tmpVal);
+  lv_keyboard_set_textarea(kbd, depthvalue);
+
   // SaveBtn
   lv_obj_t *savebtn = lv_button_create(panel);
   lv_obj_set_pos(savebtn, 675, 50);
@@ -258,7 +303,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_style_align(btnlbl, LV_ALIGN_CENTER, (lv_style_selector_t)(LV_PART_MAIN | LV_STATE_DEFAULT));
   lv_label_set_text(btnlbl, "Save");
   
-  lv_obj_add_event_cb(savebtn, save_btn_event_cb, LV_EVENT_CLICKED, logvalue);
+  lv_obj_add_event_cb(savebtn, save_btn_event_cb, LV_EVENT_CLICKED, text_area_array);
 
   lv_obj_t *version = lv_label_create(panel);
   lv_obj_set_style_text_font(version, &ui_font_lv_conthrax_16, 0);
