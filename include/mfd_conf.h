@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "1"
-#define VERSION_MINOR "0.1"
+#define VERSION_MINOR "0.2"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -60,6 +60,7 @@ extern lv_obj_t *AWAGauge, *AWAGaugeTile;
 extern lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTminitile, *SOGminitile,
     *TRPminitile, *MTWminitile;
 extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
+extern float depth_offset; // = 0.0; // Will be set to real value when EEPROM is read
 
 // static Preferences mfdsettings;
 extern lv_subject_t mfd_subject_baudrate;
@@ -67,6 +68,7 @@ extern lv_subject_t mfd_subject_wifi;
 extern lv_subject_t mfd_subject_ssid;
 extern lv_subject_t mfd_subject_pwd;
 extern lv_subject_t mfd_subject_log;
+extern lv_subject_t mfd_subject_depth_offset;
 // extern lv_subject_t *mfd_groupsettings_array_subject[];
 extern bool mfd_demo_mode; // set to true to enable demo mode, which simulates data for the display
 
@@ -80,5 +82,7 @@ extern float increase_boat_log(float value);
 extern float get_boat_log();
 extern void set_demo_mode(bool value);
 extern bool get_demo_mode();
+extern void set_depth_offset(float value);
+extern float get_depth_offset();
 
 #endif // MFD_CONF_H

@@ -111,6 +111,15 @@ float increase_boat_log(float value)
   lv_subject_set_float(&mfd_subject_log, boat_log);
   return boat_log;
 }
+void set_depth_offset(float value)
+{
+  depth_offset = value;
+  lv_subject_set_float(&mfd_subject_depth_offset, value);
+}
+float get_depth_offset()
+{
+  return depth_offset;
+}
 
 void init_data_store()
 {
@@ -152,7 +161,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
     sprintf(NMEA_DATA_STORE[tag], "%1.3s", fmt_data);
     break;
   case DPT:
-    boat_dpt = atof(fmt_data) * -1.0;
+    //boat_dpt = atof(fmt_data) * -1.0;
     sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
   case LOG:
@@ -239,7 +248,7 @@ void mfd_update_tile_data()
         lv_label_set_text(tile_hash[AWS2], NMEA_DATA_STORE[i]);
         break;
       case DPT:
-        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt);
+        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt*-1.0);
         break;
       default:
         break;

@@ -156,6 +156,7 @@ int boat_cog = 0;
 float boat_dpt = 0.0;
 float boat_vmg = 0.0;
 float boat_log = 0.1; // = 0.1;  // Will be set to real value when EEPROM is read
+float depth_offset = 0.0; // = 0.0; // Will be set to real value when EEPROM is read
 
 float boat_trp = 0.0;      // = 0.0;
 bool trip_started = false; // to ensure trip starts at 0
@@ -192,6 +193,7 @@ lv_subject_t mfd_subject_wifi;
 lv_subject_t mfd_subject_ssid;
 lv_subject_t mfd_subject_pwd;
 lv_subject_t mfd_subject_log;
+lv_subject_t mfd_subject_depth_offset;
 // extern lv_subject_t *mfd_groupsettings_array_subject[];
 bool mfd_demo_mode = false; // set to true to enable demo mode, which simulates data for the display
 
@@ -283,6 +285,8 @@ void setup()
   lv_log("mfd_subject_pwd = %s\n", lv_subject_get_string(&mfd_subject_pwd));
   lv_subject_init_float(&mfd_subject_log, mfd_ship_config_get_log());
   lv_log("mfd_subject_log = %.1f\n", lv_subject_get_float(&mfd_subject_log));
+  lv_subject_init_float(&mfd_subject_depth_offset, mfd_ship_config_get_depth_offset());
+  lv_log("mfd_subject_depth_offset = %.1f\n", lv_subject_get_float(&mfd_subject_depth_offset));
 
   lv_disp_load_scr(screen_main);
   lv_log("--->>EEPROM read with:\n");
@@ -291,9 +295,12 @@ void setup()
   lv_log("SSID :%s\n", mfd_ship_config_get_ssid());
   lv_log("pwd :%s\n", mfd_ship_config_get_pwd());
   lv_log("log: %.1f\n", mfd_ship_config_get_log());
+  lv_log("depth offset: %.1f\n", mfd_ship_config_get_depth_offset());
 
   set_boat_log(lv_subject_get_float(&mfd_subject_log)); // set boat_log to value from NVR
+  set_depth_offset(lv_subject_get_float(&mfd_subject_depth_offset)); // set depth_offset to value from NVR
   lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
+  lv_log(" depth_offset initialize with value from mfd_depth_offset %.1f\n", get_depth_offset());
 
   // for testing purposes only
   //  mfd_pers_t testconfig;
