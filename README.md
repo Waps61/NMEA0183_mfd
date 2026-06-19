@@ -1,4 +1,11 @@
 # NMEA0183-MFD: A marine multifucntion display
+#### V1.1 released 19-06-2026
+After using the device for a couple of months on board,it did not fail me once. Some improvements or enhancements were noted. Like\
+* The latitude and longitude was not implemented, but it became clear that this is a must. So this is implemented now as minitiles on the TRP panel
+* For my use a depth sensor offset was not taken into account. But for a more generic use this has now been implemented in the Settings panel
+* When booting the device brightness was set to 25%. For outdoors use this was not sufficient, so this has been increasded to 75%
+* TWA and TWs were not calculated, in the assumption that these values would come from my sensors, which they didn't. So formulas are now imnplemted to calculate the values.Calculations are based on document from Joseph George Caldwwell,"Calculating True Wind Speed and Direction from Apparent Wind Speed and Direction see: [here](https://www.starpath.com/freeware/truewind.pdf)
+* Water temperature seemed to be missing. Now implemented as a minitile on TRIP panel
 #### V1.0 released 17-03-2026
 Package available. See [changelog.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/changelog.md)
 
