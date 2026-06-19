@@ -118,6 +118,7 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
   lv_scale_set_major_tick_every(scale, 5);
   lv_scale_set_angle_range(scale, 270);
   lv_scale_set_rotation(scale, 135);
+  
   lv_scale_set_label_show(scale, true);
 
   lv_obj_set_style_length(scale, 6, LV_PART_ITEMS);
@@ -145,7 +146,7 @@ lv_obj_t *mfd_tile_gauge_create(lv_obj_t *tile, int range, int sector_start, int
   lv_obj_set_style_line_rounded(needle_line, false, LV_PART_MAIN);
   lv_obj_set_style_pad_right(needle_line, 50, LV_PART_MAIN);
   lv_obj_set_style_pad_radial(scale, 15, LV_PART_INDICATOR);
-      lv_scale_set_draw_ticks_on_top(scale, true);
+  lv_scale_set_draw_ticks_on_top(scale, true);
   lv_log("neeedle line created created...\n");
 
   lv_scale_set_line_needle_value(scale, needle_line, 124, 0);

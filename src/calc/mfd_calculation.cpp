@@ -157,6 +157,7 @@ void processNMEAData(const char *buff)
     double tmpVal = 0.0;
     double tmpVar = 0.0;
     float distance = 0.0;
+    float Y, a, b, bb = 0.0; // temp variables to calculate TWA and TWS
     char tmp[15];
 
     char *ptr;
@@ -206,6 +207,7 @@ void processNMEAData(const char *buff)
             if (field == 1)
             {
               boat_awa = atof(cvalue);
+              
               boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
               sprintf(tmp, "%3.1f", boat_vmg);
               set_data_store(AWA, cvalue);
@@ -226,7 +228,34 @@ void processNMEAData(const char *buff)
             }
             if (field == 3)
             {
+              /**
+               * TWA and TWs calculation based on document from Joseph George Caldwwell,
+               * "Calculating True Wind Speed and Direction from Apparent Wind Speed and Direction"
+               * see: https://www.starpath.com/freeware/truewind.pdf
+               **/
+              
+              Y = 90.0 - boat_awa;
+              a= atof(cvalue)* cos(Y*PI/180);
+              bb = atof(cvalue)* sin(Y*PI/180);
+              b = bb - boat_sog;
+              if(a!=0.0)
+              {
+                 boat_tws = sqrt(a*a + b*b);
+                 boat_twa = 90- (atan(b/a)*180/PI);
+              }
+              else
+              { 
+                if(boat_awa > 179.0)
+                 boat_tws = boat_sog+ atof(cvalue);
+                 else boat_tws = boat_sog- atof(cvalue);
+                 boat_twa = boat_awa;
+              }
+              
               set_data_store(AWS, cvalue);
+              sprintf(tmp, "%3.1f", boat_tws);
+              set_data_store(TWS, tmp);
+              sprintf(tmp, "%3.0f", boat_twa);
+              set_data_store(TWA, tmp);
             }
           }
           // Prepare for SOG and COG values from RMC tags
@@ -240,6 +269,7 @@ void processNMEAData(const char *buff)
             if (field == 4)
             {
               strcat(lat_new, cvalue);
+              set_data_store(LAT, lat_new);
             }
             if (field == 5)
             {
@@ -249,6 +279,7 @@ void processNMEAData(const char *buff)
             if (field == 6)
             {
               strcat(lon_new, cvalue);
+              set_data_store(LON, lon_new);
               // when the lat lon is received for the 1st time set old values to this
               // position to make sure trip start at 0
               if (!trip_started)
@@ -303,7 +334,7 @@ void processNMEAData(const char *buff)
             }
           }
           // Prepare for DPT values, can be comming DBK,DBT or DPT tags
-          if (strstr(bfr, "DBK") != NULL)
+          if (strstr(bfr, "DBK") != NULL )
           {
             if (field == 2)
             {
