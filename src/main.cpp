@@ -140,6 +140,7 @@ SOFTWARE.
 #include <comms/mfd_communication.h>
 #include <mfd_conf.h>
 #include <persist/flash_erase.h>
+#include <stdlib.h>
 
 #endif // TEST
 /**
@@ -220,6 +221,9 @@ bool nmeaDataReady = false;                  //*** flag variable for the NMEA re
 bool recvInProgress = false;                 //*** flag variable to indicate if the receiving process is in progress, initial state is false
 bool newData = false;                        // *** flag variable to indicate if new data is available, initial state is false
 char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
+bool mob_active = false;                     //*** flag variable to indicate if the MOB is active
+
+mob_obj_t mob_data;
 
 #ifndef TEST
 mfd_pers_t ship_config;

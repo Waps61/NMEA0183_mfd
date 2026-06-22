@@ -9,6 +9,9 @@
   The main screen initialises and controls the menubar and the 5 panels
   Trip, Wind and Course panels are used to display max 6 tiles per panel
   Brightness and Settings apnel have their own helper functions defined
+  
+  As per V1.1.x a new panel is added for the MOB functionality. 
+  The MOB panel is used to display the MOB data and to set the MOB alarm.
 */
 /*********************
  *      INCLUDES
@@ -34,6 +37,7 @@
 #include <NMEA0183_data.h>
 #include <ui/mfd_bright_panel.h>
 #include <ui/mfd_config_panel.h>
+#include <ui/mfd_mob_panel.h>
 #include <esp_heap_caps.h>
 #include <ui/mfd_tile_gauge.h>
 
@@ -54,19 +58,21 @@ static lv_obj_t *mfd_wind_panel = NULL;       // a static panel to display wind 
 static lv_obj_t *mfd_course_panel = NULL;     // a static panel to display course data
 static lv_obj_t *mfd_brightness_panel = NULL; // a static panel for brigtness settings
 static lv_obj_t *mfd_config_panel = NULL;     // a static panel for the config setting
-static lv_obj_t *mfd_panel_array[5] = {0};
+static lv_obj_t *mfd_mob_panel = NULL;        // a static panel for the MOB settings
+static lv_obj_t *mfd_panel_array[6] = {0};
 static int TRIP_PNL = 0; // Thes indexes are uses to improve readability of the code, since the panel are stored in an array
 static int WIND_PNL = 1; // and are actually used as the key in a hash style of use
 static int COURSE_PNL = 2;
 static int BRIGHT_PNL = 3;
 static int CONFIG_PNL = 4;
+static int MOB_PNL = 5;
 /**
  * Below hash is used since I needed a reference to the panel which is referred to as a void pointer in the event handler.
  * So I can not use the integer itself but have to use a pinter to the integer as reference in the event handler.
  * It is not the most efficient but this it is what could think of to solve the problem. The hash is used in the
  * menu_btn_event_cb to show and hide the panels.
  */
-static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL};
+static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL, &MOB_PNL};
 
 static char tile_data_buffer[15];
 
@@ -273,11 +279,20 @@ void menu_btn_event_cb(lv_event_t *event)
   {
     int *ipnl = (int *)lv_event_get_user_data(event);
     lv_log("index from button pressed = %d\n", *ipnl);
-    for (int i = TRIP_PNL; i <= CONFIG_PNL; i++)
+    for (int i = TRIP_PNL; i <= MOB_PNL; i++)
     {
       if (i == *ipnl)
       {
         lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
+        // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
+        if (i == MOB_PNL && !mob_active) {
+          mob_active = true;
+          mob_data.lat = 0.0;
+          mob_data.lon = 0.0;
+          mob_data.sog = 0.0;
+          mob_data.cog = 0.0;
+          mob_data.time = millis();
+        } 
         mfd_show_panel(mfd_panel_array[i]);
       }
       else
@@ -337,7 +352,7 @@ lv_obj_t *screen_main_create(void)
   lv_obj_set_style_radius(menu_bar, 5, 0);
   lv_obj_set_style_margin_all(menu_bar, 2, 0);
 
-  // Create the panels TRIP, WIND, COURSE, BRIGHTNESS and SETTINGS
+  // Create the panels TRIP, WIND, COURSE, BRIGHTNESS, SETTINGS and MOB
   lv_obj_t *mfd_trip_panel = mfd_panel_create(screen_active, "TRIP");
   mfd_panel_array[TRIP_PNL] = mfd_trip_panel;
   mfd_show_panel(mfd_trip_panel);
@@ -358,6 +373,10 @@ lv_obj_t *screen_main_create(void)
   mfd_panel_array[CONFIG_PNL] = mfd_settings_panel;
   mfd_hide_panel(mfd_settings_panel);
 
+  lv_obj_t *mfd_mob_panel = mfd_mob_panel_create(screen_active, " MOB");
+  mfd_panel_array[MOB_PNL] = mfd_mob_panel;
+  mfd_hide_panel(mfd_mob_panel);
+
   // Add the buttons and their link to their panel to the menubar
   // The void *userdata reference  is the reference to the panel to show
   lv_obj_t *trip_btn = mfd_button_create(menu_bar, "TRIP");
@@ -375,10 +394,14 @@ lv_obj_t *screen_main_create(void)
   lv_obj_t *setting_btn = mfd_button_create(menu_bar, "SETTING");
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
-  lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
+  lv_obj_t *mob_btn = mfd_button_create(menu_bar, "MOB");
+  //lv_obj_set_style_bg_color(mob_btn, lv_color_hex(SUN_BACKGROUND), 0);
+  lv_obj_add_event_cb(mob_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[MOB_PNL]);
+
+  //lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
 
   // Create the about screen as a child of the main screen
-  lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
+  //lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
 
   // Add the tiles and their tile_data objects to the trip panel
   CTSbox = mfd_panel_add_tile(mfd_trip_panel, "CTS", "o", CTSbox);

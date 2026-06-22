@@ -274,6 +274,20 @@ lv_obj_t *mfd_set_btn_style(lv_obj_t *btn)
   return btn;
 }
 
+/**
+ * Set the style of a button and add the checkable flag. The button will change its background color when pressed or focused
+ */
+lv_obj_t *mfd_set_mob_btn_style(lv_obj_t *btn)
+{
+
+  lv_obj_add_style(btn, &mfd_style_btn, LV_STATE_DEFAULT);
+  lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+  lv_obj_set_style_bg_color(btn, lv_color_hex(0x008591), LV_STATE_FOCUSED);
+  lv_obj_set_style_bg_color(btn, lv_color_hex(DAY_TEXT_ON_PRIMARY), LV_STATE_DEFAULT | LV_STATE_PRESSED);
+  lv_obj_set_scrollbar_mode(btn, LV_SCROLLBAR_MODE_OFF);
+  return btn;
+}
+
 lv_obj_t *mfd_set_menu_bar_style(lv_obj_t *mbar)
 {
 

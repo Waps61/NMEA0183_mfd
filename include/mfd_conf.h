@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "1"
-#define VERSION_MINOR "1"
+#define VERSION_MINOR "1.1"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -59,7 +59,7 @@ extern lv_obj_t *AWAGauge, *AWAGaugeTile;
 // and some tiles are mini tiles
 extern lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTminitile, *SOGminitile,
     *TRPminitile, *MTWminitile;
-extern float boat_log; // = 0.1;  // Will be set to real value when EEPROM is read
+extern float boat_log;     // = 0.1;  // Will be set to real value when EEPROM is read
 extern float depth_offset; // = 0.0; // Will be set to real value when EEPROM is read
 
 // static Preferences mfdsettings;
@@ -71,6 +71,18 @@ extern lv_subject_t mfd_subject_log;
 extern lv_subject_t mfd_subject_depth_offset;
 // extern lv_subject_t *mfd_groupsettings_array_subject[];
 extern bool mfd_demo_mode; // set to true to enable demo mode, which simulates data for the display
+extern bool mob_active;    //*** flag variable to indicate if the MOB is active
+
+struct _mob_obj_t
+{
+    float lat;
+    float lon;
+    float sog;
+    float cog;
+    float time; // time of the MOB event, used to calculate the duration of the MOB event
+};
+typedef struct _mob_obj_t mob_obj_t;
+extern mob_obj_t mob_data;
 
 extern char mfd_ssid_curval[26];
 extern char mfd_ssid_oldval[26];

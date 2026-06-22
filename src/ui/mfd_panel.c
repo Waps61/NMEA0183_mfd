@@ -139,7 +139,7 @@ lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_x(panel, 150);
   lv_obj_set_y(panel, 0);
 
-  mfd_panel_t *paneldata;
+  mfd_panel_t *paneldata; 
   paneldata = (mfd_panel_t*)malloc(sizeof(mfd_panel_t));
   paneldata->draw_pos_x = TILE_START_POS_X;
   paneldata->draw_pos_y = TILE_START_POS_Y;

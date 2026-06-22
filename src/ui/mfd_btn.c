@@ -12,6 +12,8 @@
 #include <lvgl.h>
 #include <ui/mfd_themes.h>
 #include <ui/mfd_btn.h>
+#include <string.h>
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -37,7 +39,11 @@ lv_obj_t *mfd_button_create(lv_obj_t *parent, const char *text)
 {
 
   lv_obj_t *btn = lv_button_create(parent);
-  mfd_set_btn_style(btn);
+  if( strcmp(text, "MOB") != 0 ){
+    mfd_set_btn_style(btn);
+  } else {
+    mfd_set_mob_btn_style(btn);
+  }
 
   lv_obj_t *label = lv_label_create(btn);
   lv_label_set_text(label, text);
