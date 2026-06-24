@@ -53,12 +53,12 @@ void mfd_set_style_changed(int styleID)
 }
 
 /**
- * Update the style of an object to the new style. 
+ * Update the style of an object to the new style.
  * This function is called recursively for all child objects of the parent object, to update their styles as well.
- * The function checks if the new style has a background color, text color, border color or shadow color property, 
- * and if so, it updates the corresponding style of the child object. The background color of the parent object is 
+ * The function checks if the new style has a background color, text color, border color or shadow color property,
+ * and if so, it updates the corresponding style of the child object. The background color of the parent object is
  * also updated to the new background color of the style.
-*/
+ */
 void mfd_update_style(lv_obj_t *parent, lv_style_t *newstyle)
 {
 
@@ -67,31 +67,35 @@ void mfd_update_style(lv_obj_t *parent, lv_style_t *newstyle)
   lv_style_value_t sval, bg_main;
   for (i = 0; i < count; i++)
   {
-    //lv_log("child nr %d \n", i);
+    // lv_log("child nr %d \n", i);
     lv_obj_t *child = lv_obj_get_child(parent, i);
-    mfd_update_style(child, newstyle);
-    if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_BG_COLOR, &sval))
+    if (child != NULL)
     {
-      lv_obj_set_style_bg_color(child, sval.color, 0);
-      bg_main = sval;
+
+      mfd_update_style(child, newstyle);
+      if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_BG_COLOR, &sval))
+      {
+        lv_obj_set_style_bg_color(child, sval.color, 0);
+        bg_main = sval;
+      }
+      // else
+      // lv_log("no bg_color found.\n");
+      if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_TEXT_COLOR, &sval))
+        lv_obj_set_style_text_color(child, sval.color, 0);
+      // else
+      // lv_log("no text_color found.\n");
+      if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_BORDER_COLOR, &sval))
+        lv_obj_set_style_border_color(child, sval.color, 0);
+      // else
+      // lv_log("no border_color found.\n");
+      if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_SHADOW_COLOR, &sval))
+        lv_obj_set_style_shadow_color(child, sval.color, 0);
+      // if(LV_RESULT_OK == lv_style_get_prop(newstyle,LV_STYLE_LINE_COLOR,&sval));
+      //   lv_obj_set_style_line_color(child, sval.color, 0);
     }
-    // else
-    // lv_log("no bg_color found.\n");
-    if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_TEXT_COLOR, &sval))
-      lv_obj_set_style_text_color(child, sval.color, 0);
-    // else
-    // lv_log("no text_color found.\n");
-    if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_BORDER_COLOR, &sval))
-      lv_obj_set_style_border_color(child, sval.color, 0);
-    // else
-    // lv_log("no border_color found.\n");
-    if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_SHADOW_COLOR, &sval))
-      lv_obj_set_style_shadow_color(child, sval.color, 0);
-    // if(LV_RESULT_OK == lv_style_get_prop(newstyle,LV_STYLE_LINE_COLOR,&sval));
-    //   lv_obj_set_style_line_color(child, sval.color, 0);
   }
-  if( lv_color_eq(bg_main.color, lv_color_hex(DAY_BACKGROUND)))
-    bg_main.color = lv_palette_lighten(LV_PALETTE_GREY,3);
+  if (lv_color_eq(bg_main.color, lv_color_hex(DAY_BACKGROUND)))
+    bg_main.color = lv_palette_lighten(LV_PALETTE_GREY, 3);
   lv_obj_set_style_bg_color(parent, bg_main.color, 0);
 }
 
@@ -200,7 +204,7 @@ void mfd_init_styles()
 }
 
 /**
- * Set the style of an object to the default style. 
+ * Set the style of an object to the default style.
  */
 lv_obj_t *mfd_set_style(lv_obj_t *obj)
 {
@@ -211,7 +215,7 @@ lv_obj_t *mfd_set_style(lv_obj_t *obj)
 }
 
 /**
- * Set the style of an object to the day style. 
+ * Set the style of an object to the day style.
  */
 lv_obj_t *mfd_set_style_day(lv_obj_t *obj)
 {
@@ -221,7 +225,7 @@ lv_obj_t *mfd_set_style_day(lv_obj_t *obj)
 }
 
 /**
- * Set the style of an object to the night style. 
+ * Set the style of an object to the night style.
  */
 lv_obj_t *mfd_set_style_night(lv_obj_t *obj)
 {
@@ -231,7 +235,7 @@ lv_obj_t *mfd_set_style_night(lv_obj_t *obj)
 }
 
 /**
- * Set the style of an object to the sun style. 
+ * Set the style of an object to the sun style.
  */
 lv_obj_t *mfd_set_style_sun(lv_obj_t *obj)
 {
@@ -241,7 +245,7 @@ lv_obj_t *mfd_set_style_sun(lv_obj_t *obj)
 }
 
 /**
- * Set the style of an object to the dawn style. 
+ * Set the style of an object to the dawn style.
  */
 lv_obj_t *mfd_set_obj_style_dawn(lv_obj_t *obj)
 {
@@ -250,7 +254,7 @@ lv_obj_t *mfd_set_obj_style_dawn(lv_obj_t *obj)
 }
 
 /**
- * Set the style of a tile. 
+ * Set the style of a tile.
  */
 lv_obj_t *mfd_set_tile_style(lv_obj_t *tile)
 {
@@ -304,7 +308,7 @@ void mfd_recolor(lv_obj_t *parent)
   if (UNCHANGED_STYLE != mfd_get_style_changed())
   {
 
-    // lv_log(" recoloring tree...\n)");
+    lv_log(" recoloring tree...\n)");
 
     if (DAY_STYLE == mfd_get_style_changed())
       mfd_update_style(parent, &mfd_style_day);

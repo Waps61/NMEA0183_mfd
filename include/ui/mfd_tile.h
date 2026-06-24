@@ -15,12 +15,11 @@ extern "C"
    *********************/
 
 #include <lvgl.h>
+#include <mfd_conf.h>
 
   /*********************
    *      DEFINES
    *********************/
-#define TILE_WIDTH 260
-#define TILE_HEIGHT 260
   /**********************
    *      TYPEDEFS
    **********************/

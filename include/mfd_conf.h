@@ -7,11 +7,13 @@
 
 // Version
 #define VERSION_MAJOR "1"
-#define VERSION_MINOR "1.1"
+#define VERSION_MINOR "1.1.1"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
 #define MFD_SCREEN_HEIGHT 600
+#define TILE_WIDTH 260
+#define TILE_HEIGHT 260
 #define BOX_BUFFER_SIZE 15
 #define MFD_USE_DATABOX 1
 
@@ -62,6 +64,9 @@ extern lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTmini
 extern float boat_log;     // = 0.1;  // Will be set to real value when EEPROM is read
 extern float depth_offset; // = 0.0; // Will be set to real value when EEPROM is read
 
+// and we have MOB tile objects updateds when MOB is active
+extern lv_obj_t *MOB_cts_box, *MOB_dst_box, *MOB_pos_box;
+
 // static Preferences mfdsettings;
 extern lv_subject_t mfd_subject_baudrate;
 extern lv_subject_t mfd_subject_wifi;
@@ -75,11 +80,11 @@ extern bool mob_active;    //*** flag variable to indicate if the MOB is active
 
 struct _mob_obj_t
 {
-    float lat;
-    float lon;
-    float sog;
+    char lat[20];  // char arry to store the latitude in degrees and minutes format, e.g. "48° 51.0' N"
+    char lon[20];  // char arry to store the longitude in degrees and minutes format, e.g. "005° 12.4' E"
     float cog;
     float time; // time of the MOB event, used to calculate the duration of the MOB event
+    bool data_set; // flag to indicate if the MOB data is set, used to prevent updating the MOB panel with invalid data
 };
 typedef struct _mob_obj_t mob_obj_t;
 extern mob_obj_t mob_data;

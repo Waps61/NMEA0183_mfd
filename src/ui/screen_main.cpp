@@ -9,8 +9,8 @@
   The main screen initialises and controls the menubar and the 5 panels
   Trip, Wind and Course panels are used to display max 6 tiles per panel
   Brightness and Settings apnel have their own helper functions defined
-  
-  As per V1.1.x a new panel is added for the MOB functionality. 
+
+  As per V1.1.x a new panel is added for the MOB functionality.
   The MOB panel is used to display the MOB data and to set the MOB alarm.
 */
 /*********************
@@ -167,7 +167,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
     sprintf(NMEA_DATA_STORE[tag], "%1.3s", fmt_data);
     break;
   case DPT:
-    //boat_dpt = atof(fmt_data) * -1.0;
+    // boat_dpt = atof(fmt_data) * -1.0;
     sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
   case LOG:
@@ -193,14 +193,14 @@ void set_data_store(enum sequence_id tag, const char data[15])
     strncpy(lat_minutes, data + 2, strlen(data) - 4);
     strncpy(lat_dir, data + strlen(data) - 1, 1);
     sprintf(NMEA_DATA_STORE[tag], "%2s°%2.7s' %s", lat_degrees, lat_minutes, lat_dir);
-    
+
     break;
   case LON:
     strncpy(lon_degrees, data, 3);
     strncpy(lon_minutes, data + 3, strlen(data) - 5);
     strncpy(lon_dir, data + strlen(data) - 1, 1);
     sprintf(NMEA_DATA_STORE[tag], "%3s°%2.7s' %s", lon_degrees, lon_minutes, lon_dir);
-    
+
     break;
   default:
     if (strlen(fmt_data) < 3)
@@ -254,8 +254,20 @@ void mfd_update_tile_data()
         lv_label_set_text(tile_hash[AWS2], NMEA_DATA_STORE[i]);
         break;
       case DPT:
-        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt*-1.0);
+        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt * -1.0);
         break;
+      //case LAT:
+        // then a LON is also available, so update the MOB panel with the new position data if the MOB is 
+        //active and the MOB data is not yet set.
+        // if ( !mob_data.data_set)
+        // {
+          //char tmp_lbl[50] = {0};
+          //sprintf(tmp_lbl, " %s\n%s", NMEA_DATA_STORE[i], NMEA_DATA_STORE[LON]);
+          //lv_label_set_text(MOB_pos_box, NMEA_DATA_STORE[i]);
+          //mob_data.data_set = true;
+        // }
+        //break;
+      
       default:
         break;
       }
@@ -285,14 +297,15 @@ void menu_btn_event_cb(lv_event_t *event)
       {
         lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
         // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
-        if (i == MOB_PNL && !mob_active) {
-          mob_active = true;
-          mob_data.lat = 0.0;
-          mob_data.lon = 0.0;
-          mob_data.sog = 0.0;
+        if (i == MOB_PNL )
+        {
+          //mob_active = true;
+          sprintf(mob_data.lat, "%s", lv_label_get_text(tile_hash[LAT]));
+          sprintf(mob_data.lon, "%s", lv_label_get_text(tile_hash[LON]));
           mob_data.cog = 0.0;
           mob_data.time = millis();
-        } 
+          lv_log("MOB activated, lat: %s, lon: %s, cog: %.2f, time: %.2f\n", mob_data.lat, mob_data.lon, mob_data.cog, mob_data.time);
+        }
         mfd_show_panel(mfd_panel_array[i]);
       }
       else
@@ -395,13 +408,13 @@ lv_obj_t *screen_main_create(void)
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
   lv_obj_t *mob_btn = mfd_button_create(menu_bar, "MOB");
-  //lv_obj_set_style_bg_color(mob_btn, lv_color_hex(SUN_BACKGROUND), 0);
+  // lv_obj_set_style_bg_color(mob_btn, lv_color_hex(SUN_BACKGROUND), 0);
   lv_obj_add_event_cb(mob_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[MOB_PNL]);
 
-  //lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
+  // lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
 
   // Create the about screen as a child of the main screen
-  //lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
+  // lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
 
   // Add the tiles and their tile_data objects to the trip panel
   CTSbox = mfd_panel_add_tile(mfd_trip_panel, "CTS", "o", CTSbox);
@@ -409,13 +422,13 @@ lv_obj_t *screen_main_create(void)
   LATminitile = mfd_tile_add_mini_tile(CTSbox, LATminitile);
   tile_hash[LAT] = mfd_mini_tile_add_data(LATminitile);
   mfd_mini_tile_set_label(LATminitile, "LAT");
-  
+
   COGbox = mfd_panel_add_tile(mfd_trip_panel, "COG", "o", COGbox);
   tile_hash[COG] = mfd_tile_add_tile_data(COGbox, tile_hash[COG]);
   LONminitile = mfd_tile_add_mini_tile(COGbox, LONminitile);
   tile_hash[LON] = mfd_mini_tile_add_data(LONminitile);
   mfd_mini_tile_set_label(LONminitile, "LON");
-  
+
   SOGbox = mfd_panel_add_tile(mfd_trip_panel, "SOG", "KTS", SOGbox);
   tile_hash[SOG] = mfd_tile_add_tile_data(SOGbox, tile_hash[SOG]);
   SOGminitile = mfd_tile_add_mini_tile(SOGbox, SOGminitile);

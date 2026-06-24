@@ -17,6 +17,7 @@ extern "C"
 #include <lvgl.h>
 #include <ui/mfd_themes.h>
 #include <font/mfd_fonts.h>
+#include <mfd_conf.h>
 
   /*********************
    *      DEFINES

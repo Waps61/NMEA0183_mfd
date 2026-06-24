@@ -189,6 +189,9 @@ lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
 lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTminitile, *SOGminitile,
     *TRPminitile, *MTWminitile = NULL;
 
+// and we have MOB tile objects updateds when MOB is active
+lv_obj_t *MOB_cts_box, *MOB_dst_box, *MOB_pos_box = NULL;
+
 // static Preferences mfdsettings;
 lv_subject_t mfd_subject_baudrate;
 lv_subject_t mfd_subject_wifi;
@@ -223,7 +226,13 @@ bool newData = false;                        // *** flag variable to indicate if
 char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
 bool mob_active = false;                     //*** flag variable to indicate if the MOB is active
 
-mob_obj_t mob_data;
+mob_obj_t mob_data =
+    {
+        .lat = "--º --.---'",
+        .lon = "---º --.---'",
+        .cog = 0.0,
+        .time = 0.0,
+        .data_set = false};
 
 #ifndef TEST
 mfd_pers_t ship_config;
