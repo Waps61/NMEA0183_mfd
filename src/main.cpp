@@ -226,13 +226,7 @@ bool newData = false;                        // *** flag variable to indicate if
 char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
 bool mob_active = false;                     //*** flag variable to indicate if the MOB is active
 
-mob_obj_t mob_data =
-    {
-        .lat = "--º --.---'",
-        .lon = "---º --.---'",
-        .cog = 0.0,
-        .time = 0.0,
-        .data_set = false};
+mob_obj_t *mob_data = NULL;
 
 #ifndef TEST
 mfd_pers_t ship_config;
@@ -247,6 +241,17 @@ bool get_demo_mode()
 {
   return mfd_demo_mode;
 }
+
+void set_MOB_active(bool value)
+{
+  mob_active = value;
+}
+
+bool get_MOB_active()
+{
+  return mob_active;
+}
+
 
 /**
  * Set the backlight of the JC1060P470 display with integrated ESP32-P4-C6
@@ -315,6 +320,13 @@ void setup()
   set_depth_offset(lv_subject_get_float(&mfd_subject_depth_offset)); // set depth_offset to value from NVR
   lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
   lv_log(" depth_offset initialize with value from mfd_depth_offset %.1f\n", get_depth_offset());
+
+  mob_data = (mob_obj_t *)malloc(sizeof(mob_obj_t));
+  mob_data->mob_set = false;
+  mob_data->cog = 0.0;
+  mob_data->time = 0.0;
+  sprintf(mob_data->lat, "--º --.---'");
+  sprintf(mob_data->lon, "---º --.---'");  
 
   // for testing purposes only
   //  mfd_pers_t testconfig;

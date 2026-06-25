@@ -256,22 +256,20 @@ void mfd_update_tile_data()
       case DPT:
         lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt * -1.0);
         break;
-      //case LAT:
-        // then a LON is also available, so update the MOB panel with the new position data if the MOB is 
-        //active and the MOB data is not yet set.
-        // if ( !mob_data.data_set)
-        // {
-          //char tmp_lbl[50] = {0};
-          //sprintf(tmp_lbl, " %s\n%s", NMEA_DATA_STORE[i], NMEA_DATA_STORE[LON]);
-          //lv_label_set_text(MOB_pos_box, NMEA_DATA_STORE[i]);
-          //mob_data.data_set = true;
-        // }
-        //break;
       
       default:
         break;
       }
     }
+    // if (mob_data->mob_set)
+    // {
+    //   char tmp_lbl[50] = {0};
+    //   strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
+    //   // sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
+    //   lv_label_set_text(MOB_pos_box, tmp_lbl);
+    //   lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+    // }
+      
   }
 }
 
@@ -299,12 +297,14 @@ void menu_btn_event_cb(lv_event_t *event)
         // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
         if (i == MOB_PNL )
         {
-          //mob_active = true;
-          sprintf(mob_data.lat, "%s", lv_label_get_text(tile_hash[LAT]));
-          sprintf(mob_data.lon, "%s", lv_label_get_text(tile_hash[LON]));
-          mob_data.cog = 0.0;
-          mob_data.time = millis();
-          lv_log("MOB activated, lat: %s, lon: %s, cog: %.2f, time: %.2f\n", mob_data.lat, mob_data.lon, mob_data.cog, mob_data.time);
+          mob_active = true;
+          sprintf(mob_data->lat, "%s", lv_label_get_text(tile_hash[LAT]));
+          sprintf(mob_data->lon, "%s", lv_label_get_text(tile_hash[LON]));
+          mob_data->cog = 0.0;
+          mob_data->time = millis();
+          mob_data->mob_set = true;
+          //set_MOB_active(true);
+          lv_log("MOB activated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
         }
         mfd_show_panel(mfd_panel_array[i]);
       }
@@ -519,6 +519,16 @@ lv_obj_t *screen_main_create(void)
 
   CMGbox = mfd_panel_add_tile(mfd_course_panel, "CMG", "0", CMGbox);
   tile_hash[CMG] = mfd_tile_add_tile_data(CMGbox, tile_hash[CMG]);
+
+  MOB_cts_box = mfd_mob_panel_add_tile(mfd_mob_panel, "CTS", "o", MOB_cts_box);
+  tile_hash[MOB_CTS] = mfd_tile_add_tile_data(MOB_cts_box, tile_hash[MOB_CTS]);
+
+  MOB_dst_box = mfd_mob_panel_add_tile(mfd_mob_panel, "DST", "nm", MOB_dst_box);
+  tile_hash[MOB_DST] = mfd_tile_add_tile_data(MOB_dst_box, tile_hash[MOB_DST]);
+  
+
+  MOB_pos_box = mfd_mob_panel_add_tile(mfd_mob_panel, "MOB POS", "", MOB_pos_box);
+  tile_hash[MOB_POS] = mfd_tile_add_tile_data(MOB_pos_box, tile_hash[MOB_POS]);
 
   LV_TRACE_OBJ_CREATE("finished");
 

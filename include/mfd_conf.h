@@ -84,10 +84,10 @@ struct _mob_obj_t
     char lon[20];  // char arry to store the longitude in degrees and minutes format, e.g. "005° 12.4' E"
     float cog;
     float time; // time of the MOB event, used to calculate the duration of the MOB event
-    bool data_set; // flag to indicate if the MOB data is set, used to prevent updating the MOB panel with invalid data
+    bool mob_set; // flag to indicate if the MOB data is set, used to prevent updating the MOB panel with invalid data
 };
 typedef struct _mob_obj_t mob_obj_t;
-extern mob_obj_t mob_data;
+extern mob_obj_t *mob_data;
 
 extern char mfd_ssid_curval[26];
 extern char mfd_ssid_oldval[26];
@@ -101,5 +101,7 @@ extern void set_demo_mode(bool value);
 extern bool get_demo_mode();
 extern void set_depth_offset(float value);
 extern float get_depth_offset();
+extern void set_MOB_active(bool value);
+extern bool get_MOB_active();
 
 #endif // MFD_CONF_H

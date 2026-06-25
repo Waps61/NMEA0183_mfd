@@ -129,7 +129,7 @@ extern char lon_new[FIELD_BUFFER]; // = {0};
 extern char lat_old[FIELD_BUFFER]; // = {0};
 extern char lon_old[FIELD_BUFFER]; // = {0};
 
-#define NR_OF_NMEA_TAGS 24 // make sure this equal to nr of NMEA_TAG
+#define NR_OF_NMEA_TAGS 27 // make sure this equal to nr of NMEA_TAG
 // Used as a reference to the required NMEA tag
 // oldVal is used for specific purposes while processing nmea data
 // if tags are used more then once add them at the last tag that
@@ -158,7 +158,10 @@ static enum sequence_id {
   CTS2,   // 20 Course To Steer 2, calculated from COG and TWA
   COG2,   // 21 Course Over Ground 2
   SOG2,   // 22 Speed Over Ground 2
-  AWS2    // 23 Apparent Wind Speed 2
+  AWS2,   // 23 Apparent Wind Speed 2
+  MOB_CTS,// 24 CTS to MOB
+  MOB_DST,// 25 DTS to MOB
+  MOB_POS // 26 POS of MOB
 } NMEA_TAG;
 
 /**
