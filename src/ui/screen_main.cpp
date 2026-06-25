@@ -256,20 +256,21 @@ void mfd_update_tile_data()
       case DPT:
         lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt * -1.0);
         break;
-      
+
       default:
         break;
       }
     }
-    // if (mob_data->mob_set)
-    // {
-    //   char tmp_lbl[50] = {0};
-    //   strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
-    //   // sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
-    //   lv_label_set_text(MOB_pos_box, tmp_lbl);
-    //   lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
-    // }
-      
+    if (mob_active && !mob_data->mob_set)
+    {
+      mob_data->mob_set = true;
+      char tmp_lbl[50] = {0};
+      strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
+      sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
+      lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
+      lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
+      // lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+    }
   }
 }
 
@@ -295,16 +296,14 @@ void menu_btn_event_cb(lv_event_t *event)
       {
         lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
         // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
-        if (i == MOB_PNL )
+        if (i == MOB_PNL)
         {
           mob_active = true;
           sprintf(mob_data->lat, "%s", lv_label_get_text(tile_hash[LAT]));
           sprintf(mob_data->lon, "%s", lv_label_get_text(tile_hash[LON]));
           mob_data->cog = 0.0;
           mob_data->time = millis();
-          mob_data->mob_set = true;
-          //set_MOB_active(true);
-          lv_log("MOB activated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+          mob_data->mob_set = false;
         }
         mfd_show_panel(mfd_panel_array[i]);
       }
@@ -525,7 +524,6 @@ lv_obj_t *screen_main_create(void)
 
   MOB_dst_box = mfd_mob_panel_add_tile(mfd_mob_panel, "DST", "nm", MOB_dst_box);
   tile_hash[MOB_DST] = mfd_tile_add_tile_data(MOB_dst_box, tile_hash[MOB_DST]);
-  
 
   MOB_pos_box = mfd_mob_panel_add_tile(mfd_mob_panel, "MOB POS", "", MOB_pos_box);
   tile_hash[MOB_POS] = mfd_tile_add_tile_data(MOB_pos_box, tile_hash[MOB_POS]);

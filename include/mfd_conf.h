@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "1"
-#define VERSION_MINOR "1.1.1"
+#define VERSION_MINOR "1.2"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -80,10 +80,10 @@ extern bool mob_active;    //*** flag variable to indicate if the MOB is active
 
 struct _mob_obj_t
 {
-    char lat[20];  // char arry to store the latitude in degrees and minutes format, e.g. "48° 51.0' N"
-    char lon[20];  // char arry to store the longitude in degrees and minutes format, e.g. "005° 12.4' E"
+    char lat[20]; // char arry to store the latitude in degrees and minutes format, e.g. "48° 51.0' N"
+    char lon[20]; // char arry to store the longitude in degrees and minutes format, e.g. "005° 12.4' E"
     float cog;
-    float time; // time of the MOB event, used to calculate the duration of the MOB event
+    float time;   // time of the MOB event, used to calculate the duration of the MOB event
     bool mob_set; // flag to indicate if the MOB data is set, used to prevent updating the MOB panel with invalid data
 };
 typedef struct _mob_obj_t mob_obj_t;

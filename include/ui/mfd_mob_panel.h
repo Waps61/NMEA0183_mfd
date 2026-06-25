@@ -11,6 +11,7 @@
 #include <mfd_conf.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ui/mfd_themes.h>
 #include <font/mfd_fonts.h>
 #include <ui/mfd_btn.h>

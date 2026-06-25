@@ -43,6 +43,7 @@ extern "C"
     int tile_width;
     int tile_height;
     int tile_count;
+    int font_size;
   };
   typedef struct _mfd_panel_t mfd_panel_t;
 

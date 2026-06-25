@@ -26,7 +26,7 @@ void end_btn_event_cb(lv_event_t *event)
     mob_data->mob_set = false;
     sprintf(mob_data->lat, "--º --.---'");
     sprintf(mob_data->lon, "---º --.---'");
-    lv_log("MOB deactivated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_ative=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time, mob_data->mob_set);
+    
   }
 }
 
@@ -93,19 +93,15 @@ lv_obj_t *mfd_mob_panel_add_tile(lv_obj_t *panel, char const *title, char const 
 
 lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
 {
-static bool inited = false;
+  static bool inited = false;
   static lv_panel_styles_t styles;
   if (!inited)
   {
     inited = true;
 
     lv_style_init(&styles.style_main);
-   
 
     lv_style_init(&styles.style_scrollbar);
-   
-
-    
   }
 
   lv_obj_t *panel = lv_obj_create(parent);
@@ -116,17 +112,21 @@ static bool inited = false;
   lv_obj_set_height(panel, lv_pct(98));
   lv_obj_set_x(panel, 150);
   lv_obj_set_y(panel, 0);
-  
+
   mfd_panel_t *mobpaneldata;
   mobpaneldata = (mfd_panel_t *)malloc(sizeof(mfd_panel_t));
   mobpaneldata->draw_pos_x = 5;
   mobpaneldata->draw_pos_y = 0;
-  mobpaneldata->max_nr_of_tiles = 3; 
+  mobpaneldata->max_nr_of_tiles = 3;
   mobpaneldata->tile_count = 0;
   mobpaneldata->tile_spacing_x = 395;
   mobpaneldata->tile_spacing_y = 300;
   mobpaneldata->tile_width = 220;
   mobpaneldata->tile_height = 125;
+  if (strcmp(title, "MOB POS") == 0)
+    mobpaneldata->font_size = 24;
+  else
+    mobpaneldata->font_size = 48;
   lv_obj_set_user_data(panel, mobpaneldata);
 
   if (title != NULL)

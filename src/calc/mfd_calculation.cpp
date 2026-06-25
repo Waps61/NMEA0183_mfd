@@ -140,7 +140,18 @@ bool isNumeric(char *value)
   return result;
 }
 
+int get_course_to_mob( const char * mob_lat, const char * mob_lon)
+{
+  int course = 0;
+  return course;
+}
 
+float get_distance_to_mob()
+{
+  float distance = 0.0;
+
+  return distance;
+}
 
 /**
  *  function to processes the receivedChars buffer and filters sentence MWV,RM and VWR,

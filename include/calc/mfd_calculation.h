@@ -12,6 +12,8 @@
 
 
 extern bool isNumeric(char *value);
-extern void processNMEAData(  const char *buff );
+extern int get_course_to_mob(const char *mob_lat, const char *mob_lon);
+extern float get_distance_to_mob();
+extern void processNMEAData(const char *buff);
 
 #endif // MFD_CALCULATION_H
