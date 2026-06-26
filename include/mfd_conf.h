@@ -7,7 +7,7 @@
 
 // Version
 #define VERSION_MAJOR "1"
-#define VERSION_MINOR "1.2"
+#define VERSION_MINOR "1.3"
 #define MFD_VERSION "Version: " VERSION_MAJOR "." VERSION_MINOR
 // Configuration constants for MFD (Multi-Function Display)
 #define MFD_SCREEN_WIDTH 1024
@@ -88,6 +88,13 @@ struct _mob_obj_t
 };
 typedef struct _mob_obj_t mob_obj_t;
 extern mob_obj_t *mob_data;
+
+/* Result of a MOB calculation */
+typedef struct
+{
+    int courseToSteerDeg; /* 0 - 359, rounded to nearest integer degree */
+    float distanceNM;     /* nautical miles                              */
+} MobResult;
 
 extern char mfd_ssid_curval[26];
 extern char mfd_ssid_oldval[26];

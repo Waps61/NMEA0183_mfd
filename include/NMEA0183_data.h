@@ -13,7 +13,8 @@
 #define MTF 3.28084   // meters to feet
 #define NTK 1.852     // nautical mile to km
 #define KTN 0.5399569 // km to nautical mile
-// #define PI 3.14159265359 // The definition of Pi
+//#define PI 3.14159265359 // The definition of Pi
+#define EARTH_RADIUS_NM 3440.065 // Earth radius in nautical miles (mean radius) 
 
 //*** The NMEA defines in totl 82 characters including the starting
 //*** characters $ or ! and the checksum character *, the checksum

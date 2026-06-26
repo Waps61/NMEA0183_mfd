@@ -26,7 +26,6 @@ void end_btn_event_cb(lv_event_t *event)
     mob_data->mob_set = false;
     sprintf(mob_data->lat, "--º --.---'");
     sprintf(mob_data->lon, "---º --.---'");
-    
   }
 }
 
@@ -40,12 +39,49 @@ void draw_radar_ring(int radius, lv_obj_t *parent)
   lv_obj_set_style_border_color(circle, lv_color_hex(MOB_BTN_COLOR), 0);
   lv_obj_set_style_bg_opa(circle, LV_OPA_TRANSP, 0);
   lv_obj_center(circle);
+
+  // draw horizontal and vertical lines to indicate the direction of the MOB position. The lines are drawn from the center of the panel to the edge of the panel.
+  lv_obj_t *hline = lv_obj_create(parent);
+  lv_obj_set_size(hline, RADAR_WIDTH, 2);
+  lv_obj_set_style_border_width(hline, 2, 0);
+  lv_obj_set_style_border_color(hline, lv_color_hex(MOB_BTN_COLOR), 0);
+  lv_obj_set_style_bg_opa(hline, LV_OPA_TRANSP, 0);
+  lv_obj_center(hline);
+
+  lv_obj_t *vline = lv_obj_create(parent);
+  lv_obj_set_size(vline, 2, RADAR_WIDTH);
+  lv_obj_set_style_border_width(vline, 2, 0);
+  lv_obj_set_style_border_color(vline, lv_color_hex(MOB_BTN_COLOR), 0);
+  lv_obj_set_style_bg_opa(vline, LV_OPA_TRANSP, 0);
+  lv_obj_center(vline);
+
+  lv_obj_t *radar_scale = lv_label_create(parent);
+  lv_label_set_text_fmt(radar_scale,"scale = %.1f nm",RADAR_SCALE);
+  lv_obj_set_style_text_font(radar_scale, &ui_font_lv_conthrax_16, 0);
+  lv_obj_set_style_align(radar_scale, LV_ALIGN_RIGHT_MID, 0);
 }
 
-void rotate_mob_ship(float cog, lv_obj_t *ship)
+void rotate_mob_ship(int cog, lv_obj_t *ship)
 {
   // rotate the ship object to the course over ground (COG) value
   lv_image_set_rotation((lv_obj_t *)ship, cog * 10);
+}
+
+void update_radar_position(MobResult act_mob)
+{
+  float radar_scale = RADAR_WIDTH / (RADAR_SCALE * 2);
+  float r = act_mob.distanceNM * radar_scale;
+  if (r>radar_scale)
+    r = radar_scale;
+  float radar_x = r * cos((90 - act_mob.courseToSteerDeg) * M_PI / 180);
+  float radar_y = r * sin((90 - act_mob.courseToSteerDeg) * M_PI / 180);
+  // if( act_mob.courseToSteerDeg > 180)
+  //   radar_x *= -1; // 180-360 degrees is on the negative side of the x-axis
+
+  lv_image_set_rotation(mob_ship, act_mob.courseToSteerDeg * 10);
+  // Correct for the alignment direction in the y-direction, where
+  // y-direction the opposite in the XY-axis
+  lv_obj_align(mob_person, LV_ALIGN_CENTER, (int)radar_x, (int)-radar_y);
 }
 
 /** Updates the position of the MOB person on the panel
@@ -115,12 +151,12 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
 
   mfd_panel_t *mobpaneldata;
   mobpaneldata = (mfd_panel_t *)malloc(sizeof(mfd_panel_t));
-  mobpaneldata->draw_pos_x = 5;
+  mobpaneldata->draw_pos_x = 2;
   mobpaneldata->draw_pos_y = 0;
   mobpaneldata->max_nr_of_tiles = 3;
   mobpaneldata->tile_count = 0;
   mobpaneldata->tile_spacing_x = 395;
-  mobpaneldata->tile_spacing_y = 300;
+  mobpaneldata->tile_spacing_y = 305;
   mobpaneldata->tile_width = 220;
   mobpaneldata->tile_height = 125;
   if (strcmp(title, "MOB POS") == 0)
@@ -138,27 +174,10 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   }
 
   // draw 4 radar rings on the MOB panel to indicate the distance from the MOB position. The rings are drawn at 50, 100, 150 and 200 meters from the MOB position.
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 6; i++)
   {
-    draw_radar_ring(50 + i * 95, panel);
+    draw_radar_ring(i * 50, panel);
   }
-
-  // draw horizontal and vertical lines to indicate the direction of the MOB position. The lines are drawn from the center of the panel to the edge of the panel.
-  lv_obj_t *hline = lv_line_create(panel);
-  static lv_point_precise_t hline_points[] = {{5, 0}, {485, 0}};
-  lv_line_set_points(hline, hline_points, 2);
-  lv_obj_set_style_line_color(hline, lv_color_hex(MOB_BTN_COLOR), 0);
-  lv_obj_set_style_line_width(hline, 2, 0);
-  lv_obj_set_style_line_rounded(hline, true, 0);
-  lv_obj_center(hline);
-
-  lv_obj_t *vline = lv_line_create(panel);
-  static lv_point_precise_t vline_points[] = {{0, 0}, {0, 480}};
-  lv_line_set_points(vline, vline_points, 2);
-  lv_obj_set_style_line_color(vline, lv_color_hex(MOB_BTN_COLOR), 0);
-  lv_obj_set_style_line_width(vline, 2, 0);
-  lv_obj_set_style_line_rounded(vline, true, 0);
-  lv_obj_center(vline);
 
   // Add ther end button. When pressed the MOB status is set to false
   lv_obj_t *end_mob_btn = lv_button_create(panel);
@@ -175,6 +194,7 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   LV_IMAGE_DECLARE(location_arrow_solid);
   mob_ship = lv_image_create(panel);
   lv_image_set_src(mob_ship, &location_arrow_solid);
+  lv_image_set_scale(mob_ship, 512);
   lv_obj_align(mob_ship, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_style_bg_color(mob_ship, lv_color_hex(DAY_BACKGROUND), 0);
   // lv_image_set_rotation((lv_obj_t *)mob_ship, 2350);
@@ -183,7 +203,7 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   LV_IMAGE_DECLARE(person_drowning_solid);
   mob_person = lv_image_create(panel);
   lv_image_set_src(mob_person, &person_drowning_solid);
-  lv_obj_align(mob_person, LV_ALIGN_CENTER, -100, 100);
+  // lv_obj_align(mob_person, LV_ALIGN_CENTER, -100, 100);
   lv_obj_set_style_bg_color(mob_person, lv_color_hex(DAY_BACKGROUND), 0);
 
   return panel;

@@ -261,14 +261,29 @@ void mfd_update_tile_data()
         break;
       }
     }
-    if (mob_active && !mob_data->mob_set)
+    if (mob_active)
     {
-      mob_data->mob_set = true;
+      MobResult mob_direction;
       char tmp_lbl[50] = {0};
-      strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
-      sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
-      lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
-      lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
+      if (!mob_data->mob_set)
+      {
+
+        mob_data->mob_set = true;
+        strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
+        sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
+        lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
+        lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
+      }
+      mob_direction = CalculateMOB(mob_data->lat, mob_data->lon, NMEA_DATA_STORE[LAT], NMEA_DATA_STORE[LON]);
+
+      
+      sprintf(tmp_lbl, "%d", mob_direction.courseToSteerDeg);
+      lv_label_set_text(tile_hash[MOB_CTS], tmp_lbl);
+      sprintf(tmp_lbl, "%.1f", mob_direction.distanceNM);
+      lv_label_set_text(tile_hash[MOB_DST], tmp_lbl);
+
+      update_radar_position(mob_direction);
+
       // lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
     }
   }

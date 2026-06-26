@@ -21,10 +21,116 @@
    Global variables go here
 */
 
-
-
 // Variable used to pass nmea tag values like SOG etc. back and forth between objects, max 15 char's long
 char cvalue[FIELD_BUFFER] = {0};
+
+/* -------------------------------------------------------------------------
+ * Parses strings like "53°41,2344' N" or "006°22,1234' W"
+ * Returns signed decimal degrees (negative for S / W).
+ * ------------------------------------------------------------------------- */
+static double ParseDegMinTick(const char *str)
+{
+  char buf[64];
+  int i = 0, n;
+  char degBuf[16] = {0};
+  int dl = 0;
+  char minBuf[16] = {0};
+  int ml = 0;
+  char hemi = 0;
+  double deg, minutes, decimal;
+
+  strncpy(buf, str, sizeof(buf) - 1);
+  buf[sizeof(buf) - 1] = '\0';
+  n = (int)strlen(buf);
+
+  /* 1) read the degree digits */
+  while (i < n && isdigit((unsigned char)buf[i]))
+  {
+    if (dl < (int)sizeof(degBuf) - 1)
+      degBuf[dl++] = buf[i];
+    i++;
+  }
+
+  /* 2) skip everything until the next digit (the degree symbol, etc.) */
+  while (i < n && !isdigit((unsigned char)buf[i]))
+    i++;
+
+  /* 3) read the minutes (digits, plus ',' or '.' as decimal separator) */
+  while (i < n && (isdigit((unsigned char)buf[i]) || buf[i] == ',' || buf[i] == '.'))
+  {
+    char c = buf[i];
+    if (c == ',')
+      c = '.';
+    if (ml < (int)sizeof(minBuf) - 1)
+      minBuf[ml++] = c;
+    i++;
+  }
+
+  /* 4) scan ahead for the hemisphere letter */
+  while (i < n)
+  {
+    char c = (char)toupper((unsigned char)buf[i]);
+    if (c == 'N' || c == 'S' || c == 'E' || c == 'W')
+    {
+      hemi = c;
+      break;
+    }
+    i++;
+  }
+
+  deg = atof(degBuf);
+  minutes = atof(minBuf);
+  decimal = deg + minutes / 60.0;
+  if (hemi == 'S' || hemi == 'W')
+    decimal = -decimal;
+  return decimal;
+}
+
+/* -------------------------------------------------------------------------
+ * Parses strings like "5341.5631,N" or "00622.1234,E" (DDMM.MMMM / DDDMM.MMMM)
+ * Returns signed decimal degrees (negative for S / W).
+ * ------------------------------------------------------------------------- */
+// static double ParseDDMM(const char *str)
+// {
+//   char buf[64];
+//   char *comma;
+//   char *dot;
+//   char hemi = 0;
+//   int dotPos, minStart;
+//   char degPart[16] = {0};
+//   char minPart[16] = {0};
+//   double deg, minutes, decimal;
+
+//   strncpy(buf, str, sizeof(buf) - 1);
+//   buf[sizeof(buf) - 1] = '\0';
+
+//   comma = strchr(buf, ',');
+//   if (comma)
+//   {
+//     hemi = (char)toupper((unsigned char)*(comma + 1));
+//     *comma = '\0'; /* cut the string so only the numeric part remains */
+//   }
+
+//   dot = strchr(buf, '.');
+//   if (!dot)
+//     return 0.0; /* malformed input */
+
+//   dotPos = (int)(dot - buf);
+//   minStart = dotPos - 2;
+//   if (minStart < 0)
+//     minStart = 0;
+
+//   strncpy(degPart, buf, (size_t)minStart);
+//   degPart[minStart] = '\0';
+//   strcpy(minPart, buf + minStart);
+
+//   deg = degPart[0] ? atof(degPart) : 0.0;
+//   minutes = atof(minPart);
+//   decimal = deg + minutes / 60.0;
+//   if (hemi == 'S' || hemi == 'W')
+//     decimal = -decimal;
+//   return decimal;
+// }
 
 /**
  * Parse coordinate string in format "5221.5621,N" or "00540.8482,E"
@@ -140,17 +246,43 @@ bool isNumeric(char *value)
   return result;
 }
 
-int get_course_to_mob( const char * mob_lat, const char * mob_lon)
+/* -------------------------------------------------------------------------
+ * Main MOB function.
+ *
+ *   Lat / Lon   : MOB waypoint, format "53°41,2344' N" style
+ *
+ * Returns course to steer (deg, rounded, 0-359) and distance (NM).
+ * ------------------------------------------------------------------------- */
+MobResult CalculateMOB(const char *mobLat, const char *mobLon,
+                       const char *boatLat, const char *boatLon)
 {
-  int course = 0;
-  return course;
-}
+  MobResult result;
 
-float get_distance_to_mob()
-{
-  float distance = 0.0;
+  double lat1 = ParseDegMinTick(mobLat); /* MOB latitude  */
+  double lon1 = ParseDegMinTick(mobLon); /* MOB longitude */
+  double lat2 = ParseDegMinTick(boatLat); /* boat latitude  */
+  double lon2 = ParseDegMinTick(boatLon); /* boat longitude */
 
-  return distance;
+  double phi1 = lat2 * M_PI / 180.0; /* boat (from) */
+  double phi2 = lat1 * M_PI / 180.0; /* MOB (to)    */
+  double dphi = (lat1 - lat2) * M_PI / 180.0;
+  double dlambda = (lon1 - lon2) * M_PI / 180.0;
+
+  /* Haversine great-circle distance */
+  double a = sin(dphi / 2.0) * sin(dphi / 2.0) +
+             cos(phi1) * cos(phi2) * sin(dlambda / 2.0) * sin(dlambda / 2.0);
+  double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+  double distance = EARTH_RADIUS_NM * c;
+
+  /* Initial bearing (course to steer) from boat to MOB */
+  double y = sin(dlambda) * cos(phi2);
+  double x = cos(phi1) * sin(phi2) - sin(phi1) * cos(phi2) * cos(dlambda);
+  double theta = atan2(y, x);
+  double bearingDeg = fmod((theta * 180.0 / M_PI) + 360.0, 360.0);
+
+  result.courseToSteerDeg = ((int)floor(bearingDeg + 0.5)) % 360;
+  result.distanceNM = (float)distance;
+  return result;
 }
 
 /**
@@ -218,7 +350,7 @@ void processNMEAData(const char *buff)
             if (field == 1)
             {
               boat_awa = atof(cvalue);
-              
+
               boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
               sprintf(tmp, "%3.1f", boat_vmg);
               set_data_store(AWA, cvalue);
@@ -244,24 +376,25 @@ void processNMEAData(const char *buff)
                * "Calculating True Wind Speed and Direction from Apparent Wind Speed and Direction"
                * see: https://www.starpath.com/freeware/truewind.pdf
                **/
-              
+
               Y = 90.0 - boat_awa;
-              a= atof(cvalue)* cos(Y*PI/180);
-              bb = atof(cvalue)* sin(Y*PI/180);
+              a = atof(cvalue) * cos(Y * PI / 180);
+              bb = atof(cvalue) * sin(Y * PI / 180);
               b = bb - boat_sog;
-              if(a!=0.0)
+              if (a != 0.0)
               {
-                 boat_tws = sqrt(a*a + b*b);
-                 boat_twa = 90- (atan(b/a)*180/PI);
+                boat_tws = sqrt(a * a + b * b);
+                boat_twa = 90 - (atan(b / a) * 180 / PI);
               }
               else
-              { 
-                if(boat_awa > 179.0)
-                 boat_tws = boat_sog+ atof(cvalue);
-                 else boat_tws = boat_sog- atof(cvalue);
-                 boat_twa = boat_awa;
+              {
+                if (boat_awa > 179.0)
+                  boat_tws = boat_sog + atof(cvalue);
+                else
+                  boat_tws = boat_sog - atof(cvalue);
+                boat_twa = boat_awa;
               }
-              
+
               set_data_store(AWS, cvalue);
               sprintf(tmp, "%3.1f", boat_tws);
               set_data_store(TWS, tmp);
@@ -302,29 +435,28 @@ void processNMEAData(const char *buff)
                 strcpy(lon_old, lon_new);
               }
               distance = calculate_distance(lat_old, lon_old, lat_new, lon_new);
-              
+
               // distance between the new and previous position based omn a max speed of 20 knots
-              // greater than 20/3600 = 0,00556  nautical miles per second is not possible, so if the 
-              // distance is greater than this value then we assume that the position is not reliable and we do 
+              // greater than 20/3600 = 0,00556  nautical miles per second is not possible, so if the
+              // distance is greater than this value then we assume that the position is not reliable and we do
               // not update the log and trip values. To be on the safe side lets assume that it will not take
-              // more then 30 seconds to receive a position update, so we will use a distance of 
+              // more then 30 seconds to receive a position update, so we will use a distance of
               // 0.00556 * 30 = 0.1668 nautical miles as the threshold for unreliable position updates
-              if( distance > 0.1668)
+              if (distance > 0.1668)
               {
-                
+
                 distance = 0.0;
               }
-              
             }
             if (field == 7)
             {
               boat_sog = atof(cvalue);
               boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
               sprintf(tmp, "%3.1f", boat_vmg);
-              // use a SOG threshold of 0.3 knots to prevent log and trip updates when the boat is not moving, because at 
-              // low speeds the position updates are not reliable and can cause log and trip values to increase when 
+              // use a SOG threshold of 0.3 knots to prevent log and trip updates when the boat is not moving, because at
+              // low speeds the position updates are not reliable and can cause log and trip values to increase when
               // the boat is actually stationary
-              if( boat_sog > 0.3) 
+              if (boat_sog > 0.3)
               {
                 boat_trp += distance;
                 increase_boat_log(distance);
@@ -345,39 +477,39 @@ void processNMEAData(const char *buff)
             }
           }
           // Prepare for DPT values, can be comming DBK,DBT or DPT tags
-          if (strstr(bfr, "DBK") != NULL )
+          if (strstr(bfr, "DBK") != NULL)
           {
             if (field == 2)
             {
-              boat_dpt = atof(cvalue)+ get_depth_offset();
+              boat_dpt = atof(cvalue) + get_depth_offset();
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
             }
             if (field == 3 && cvalue[0] == 'f')
             {
-              //boat_dpt = atof(cvalue);
-              boat_dpt = boat_dpt *FTM + get_depth_offset();
+              // boat_dpt = atof(cvalue);
+              boat_dpt = boat_dpt * FTM + get_depth_offset();
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
-              }
+            }
           }
           else if (strstr(bfr, "DBT") != NULL)
           {
             if (field == 3)
             {
-              boat_dpt = atof(cvalue)+ get_depth_offset();
+              boat_dpt = atof(cvalue) + get_depth_offset();
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
-              }
+            }
           }
           else if (strstr(bfr, "DPT") != NULL)
           {
             if (field == 1)
             {
-              boat_dpt = atof(cvalue)+ get_depth_offset();
+              boat_dpt = atof(cvalue) + get_depth_offset();
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
-              }
+            }
           }
 
           // Prepare for Water Temperature values, comming from MTW tags
