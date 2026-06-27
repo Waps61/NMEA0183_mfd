@@ -9,9 +9,10 @@
 #include <ctype.h>
 #include <math.h>
 
-
-
 extern bool isNumeric(char *value);
-extern void processNMEAData(  const char *buff );
+MobResult CalculateMOB(const char *mobLat, const char *mobLon,
+                       const char *boatLat, const char *boatLon);
+
+extern void processNMEAData(const char *buff);
 
 #endif // MFD_CALCULATION_H

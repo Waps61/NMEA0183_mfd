@@ -140,6 +140,7 @@ SOFTWARE.
 #include <comms/mfd_communication.h>
 #include <mfd_conf.h>
 #include <persist/flash_erase.h>
+#include <stdlib.h>
 
 #endif // TEST
 /**
@@ -188,6 +189,9 @@ lv_obj_t *AWAGauge, *AWAGaugeTile = NULL;
 lv_obj_t *LATminitile, *LONminitile, *DIRminitile, *LOGminitile, *DPTminitile, *SOGminitile,
     *TRPminitile, *MTWminitile = NULL;
 
+// and we have MOB tile objects updateds when MOB is active
+lv_obj_t *MOB_cts_box, *MOB_dst_box, *MOB_pos_box = NULL;
+
 // static Preferences mfdsettings;
 lv_subject_t mfd_subject_baudrate;
 lv_subject_t mfd_subject_wifi;
@@ -220,6 +224,9 @@ bool nmeaDataReady = false;                  //*** flag variable for the NMEA re
 bool recvInProgress = false;                 //*** flag variable to indicate if the receiving process is in progress, initial state is false
 bool newData = false;                        // *** flag variable to indicate if new data is available, initial state is false
 char nmeaBuffer[NMEA_BUFFER_SIZE + 1] = {0}; //*** buffer variable to store the incoming NMEA data, initial state is an array of 0 with size NMEA_BUFFER_SIZE + 1
+bool mob_active = false;                     //*** flag variable to indicate if the MOB is active
+
+mob_obj_t *mob_data = NULL;
 
 #ifndef TEST
 mfd_pers_t ship_config;
@@ -234,6 +241,17 @@ bool get_demo_mode()
 {
   return mfd_demo_mode;
 }
+
+void set_MOB_active(bool value)
+{
+  mob_active = value;
+}
+
+bool get_MOB_active()
+{
+  return mob_active;
+}
+
 
 /**
  * Set the backlight of the JC1060P470 display with integrated ESP32-P4-C6
@@ -302,6 +320,13 @@ void setup()
   set_depth_offset(lv_subject_get_float(&mfd_subject_depth_offset)); // set depth_offset to value from NVR
   lv_log(" boat_log initialize with value from mfd_log %.1f\n", get_boat_log());
   lv_log(" depth_offset initialize with value from mfd_depth_offset %.1f\n", get_depth_offset());
+
+  mob_data = (mob_obj_t *)malloc(sizeof(mob_obj_t));
+  mob_data->mob_set = false;
+  mob_data->cog = 0.0;
+  mob_data->time = 0.0;
+  sprintf(mob_data->lat, "--º --.---'");
+  sprintf(mob_data->lon, "---º --.---'");  
 
   // for testing purposes only
   //  mfd_pers_t testconfig;

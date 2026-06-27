@@ -54,11 +54,11 @@ lv_obj_t *mfd_panel_add_gauge(lv_obj_t *panel, char const *nmea_tag, lv_obj_t *g
     lv_obj_set_style_x(gauge_tile, pdata->draw_pos_x, 0);
     lv_obj_set_style_y(gauge_tile, pdata->draw_pos_y, 0);
     pdata->tile_count++;
-    pdata->draw_pos_x += TILE_WIDTH + pdata->tile_spacing_x;
-    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - TILE_WIDTH))
+    pdata->draw_pos_x += pdata->tile_width + pdata->tile_spacing_x;
+    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - pdata->tile_width))
     {
       pdata->draw_pos_x = 10;
-      pdata->draw_pos_y += TILE_HEIGHT + pdata->tile_spacing_y;
+      pdata->draw_pos_y += pdata->tile_height + pdata->tile_spacing_y;
     }
     mfd_gauge_set_label(gauge_tile, nmea_tag);
     //lv_obj_align(gauge_tile, LV_ALIGN_BOTTOM_MID,0,-10);
@@ -71,7 +71,6 @@ lv_obj_t *mfd_panel_add_gauge(lv_obj_t *panel, char const *nmea_tag, lv_obj_t *g
 lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *tag_unit, lv_obj_t *tile)
 {
   mfd_panel_t *pdata = (mfd_panel_t *)lv_obj_get_user_data(panel);
-  
   if (pdata->tile_count < pdata->max_nr_of_tiles)
   {
     tile = mfd_tile_create(panel);
@@ -81,11 +80,11 @@ lv_obj_t *mfd_panel_add_tile(lv_obj_t *panel, char const *nmea_tag, char const *
     lv_obj_set_style_x(tile, pdata->draw_pos_x, 0);
     lv_obj_set_style_y(tile, pdata->draw_pos_y, 0);
     pdata->tile_count++;
-    pdata->draw_pos_x += TILE_WIDTH + pdata->tile_spacing_x;
-    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH-TILE_WIDTH))
+    pdata->draw_pos_x += pdata->tile_width + pdata->tile_spacing_x;
+    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - pdata->tile_width))
     {
       pdata->draw_pos_x = 10;
-      pdata->draw_pos_y += TILE_HEIGHT + pdata->tile_spacing_y;
+      pdata->draw_pos_y += pdata->tile_height + pdata->tile_spacing_y;
     }
     mfd_tile_set_label(tile, nmea_tag);
     mfd_tile_set_unit(tile, tag_unit);
@@ -104,11 +103,11 @@ void mfd_panel_add_spacer(lv_obj_t *panel)
   if (pdata->tile_count < pdata->max_nr_of_tiles)
   {
     pdata->tile_count++;
-    pdata->draw_pos_x += TILE_WIDTH + pdata->tile_spacing_x;
-    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - TILE_WIDTH))
+    pdata->draw_pos_x += pdata->tile_width + pdata->tile_spacing_x;
+    if (pdata->draw_pos_x > (MFD_SCREEN_WIDTH - pdata->tile_width))
     {
       pdata->draw_pos_x = 10;
-      pdata->draw_pos_y += TILE_HEIGHT + pdata->tile_spacing_y;
+      pdata->draw_pos_y += pdata->tile_height + pdata->tile_spacing_y;
     }
   }
   }
@@ -139,7 +138,7 @@ lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_x(panel, 150);
   lv_obj_set_y(panel, 0);
 
-  mfd_panel_t *paneldata;
+  mfd_panel_t *paneldata; 
   paneldata = (mfd_panel_t*)malloc(sizeof(mfd_panel_t));
   paneldata->draw_pos_x = TILE_START_POS_X;
   paneldata->draw_pos_y = TILE_START_POS_Y;
@@ -147,6 +146,9 @@ lv_obj_t *mfd_panel_create(lv_obj_t *parent, const char *title)
   paneldata->tile_count = 0;
   paneldata->tile_spacing_x = TILE_SPACING_X;
   paneldata->tile_spacing_y = TILE_SPACING_Y;
+  paneldata->tile_width = TILE_WIDTH;
+  paneldata->tile_height = TILE_HEIGHT;
+  paneldata->font_size = 96;
   lv_obj_set_user_data(panel, paneldata);
 
   if (title != NULL)

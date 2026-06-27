@@ -9,6 +9,9 @@
   The main screen initialises and controls the menubar and the 5 panels
   Trip, Wind and Course panels are used to display max 6 tiles per panel
   Brightness and Settings apnel have their own helper functions defined
+
+  As per V1.1.x a new panel is added for the MOB functionality.
+  The MOB panel is used to display the MOB data and to set the MOB alarm.
 */
 /*********************
  *      INCLUDES
@@ -34,6 +37,7 @@
 #include <NMEA0183_data.h>
 #include <ui/mfd_bright_panel.h>
 #include <ui/mfd_config_panel.h>
+#include <ui/mfd_mob_panel.h>
 #include <esp_heap_caps.h>
 #include <ui/mfd_tile_gauge.h>
 
@@ -54,19 +58,21 @@ static lv_obj_t *mfd_wind_panel = NULL;       // a static panel to display wind 
 static lv_obj_t *mfd_course_panel = NULL;     // a static panel to display course data
 static lv_obj_t *mfd_brightness_panel = NULL; // a static panel for brigtness settings
 static lv_obj_t *mfd_config_panel = NULL;     // a static panel for the config setting
-static lv_obj_t *mfd_panel_array[5] = {0};
+static lv_obj_t *mfd_mob_panel = NULL;        // a static panel for the MOB settings
+static lv_obj_t *mfd_panel_array[6] = {0};
 static int TRIP_PNL = 0; // Thes indexes are uses to improve readability of the code, since the panel are stored in an array
 static int WIND_PNL = 1; // and are actually used as the key in a hash style of use
 static int COURSE_PNL = 2;
 static int BRIGHT_PNL = 3;
 static int CONFIG_PNL = 4;
+static int MOB_PNL = 5;
 /**
  * Below hash is used since I needed a reference to the panel which is referred to as a void pointer in the event handler.
  * So I can not use the integer itself but have to use a pinter to the integer as reference in the event handler.
  * It is not the most efficient but this it is what could think of to solve the problem. The hash is used in the
  * menu_btn_event_cb to show and hide the panels.
  */
-static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL};
+static int *panel_hash[] = {&TRIP_PNL, &WIND_PNL, &COURSE_PNL, &BRIGHT_PNL, &CONFIG_PNL, &MOB_PNL};
 
 static char tile_data_buffer[15];
 
@@ -161,7 +167,7 @@ void set_data_store(enum sequence_id tag, const char data[15])
     sprintf(NMEA_DATA_STORE[tag], "%1.3s", fmt_data);
     break;
   case DPT:
-    //boat_dpt = atof(fmt_data) * -1.0;
+    // boat_dpt = atof(fmt_data) * -1.0;
     sprintf(NMEA_DATA_STORE[tag], "%2.4s", fmt_data);
     break;
   case LOG:
@@ -187,14 +193,14 @@ void set_data_store(enum sequence_id tag, const char data[15])
     strncpy(lat_minutes, data + 2, strlen(data) - 4);
     strncpy(lat_dir, data + strlen(data) - 1, 1);
     sprintf(NMEA_DATA_STORE[tag], "%2s°%2.7s' %s", lat_degrees, lat_minutes, lat_dir);
-    
+
     break;
   case LON:
     strncpy(lon_degrees, data, 3);
     strncpy(lon_minutes, data + 3, strlen(data) - 5);
     strncpy(lon_dir, data + strlen(data) - 1, 1);
     sprintf(NMEA_DATA_STORE[tag], "%3s°%2.7s' %s", lon_degrees, lon_minutes, lon_dir);
-    
+
     break;
   default:
     if (strlen(fmt_data) < 3)
@@ -248,11 +254,40 @@ void mfd_update_tile_data()
         lv_label_set_text(tile_hash[AWS2], NMEA_DATA_STORE[i]);
         break;
       case DPT:
-        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt*-1.0);
+        lv_chart_set_next_value(dptplot, ser_dpt, boat_dpt * -1.0);
         break;
+
       default:
         break;
       }
+    }
+    if (mob_active)
+    {
+      MobResult mob_direction;
+      char tmp_lbl[50] = {0};
+      // Check if MOB is not yet displayed on MOB panel
+      if (!mob_data->mob_set)
+      {
+
+        mob_data->mob_set = true;
+        strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
+        sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
+        lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
+        lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
+      }
+      // Calculate CTS and DST from ship to MOB
+      mob_direction = CalculateMOB(mob_data->lat, mob_data->lon, NMEA_DATA_STORE[LAT], NMEA_DATA_STORE[LON]);
+
+      
+      sprintf(tmp_lbl, "%d", mob_direction.courseToSteerDeg);
+      lv_label_set_text(tile_hash[MOB_CTS], tmp_lbl);
+      sprintf(tmp_lbl, "%.1f", mob_direction.distanceNM);
+      lv_label_set_text(tile_hash[MOB_DST], tmp_lbl);
+
+      // Show CST and DST to MOB and ships COG North up
+      update_radar_position(mob_direction,boat_cog);
+
+      lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
     }
   }
 }
@@ -273,11 +308,24 @@ void menu_btn_event_cb(lv_event_t *event)
   {
     int *ipnl = (int *)lv_event_get_user_data(event);
     lv_log("index from button pressed = %d\n", *ipnl);
-    for (int i = TRIP_PNL; i <= CONFIG_PNL; i++)
+    for (int i = TRIP_PNL; i <= MOB_PNL; i++)
     {
       if (i == *ipnl)
       {
         lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
+        // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
+        if (i == MOB_PNL)
+        {
+          if(!mob_active)
+          {
+          mob_active = true; //MOB btn is activated
+          sprintf(mob_data->lat, "%s", lv_label_get_text(tile_hash[LAT]));
+          sprintf(mob_data->lon, "%s", lv_label_get_text(tile_hash[LON]));
+          mob_data->cog = 0.0;
+          mob_data->time = millis();
+          mob_data->mob_set = false; //MOB position not yet displayed on screen
+          }
+        }
         mfd_show_panel(mfd_panel_array[i]);
       }
       else
@@ -337,7 +385,7 @@ lv_obj_t *screen_main_create(void)
   lv_obj_set_style_radius(menu_bar, 5, 0);
   lv_obj_set_style_margin_all(menu_bar, 2, 0);
 
-  // Create the panels TRIP, WIND, COURSE, BRIGHTNESS and SETTINGS
+  // Create the panels TRIP, WIND, COURSE, BRIGHTNESS, SETTINGS and MOB
   lv_obj_t *mfd_trip_panel = mfd_panel_create(screen_active, "TRIP");
   mfd_panel_array[TRIP_PNL] = mfd_trip_panel;
   mfd_show_panel(mfd_trip_panel);
@@ -358,6 +406,10 @@ lv_obj_t *screen_main_create(void)
   mfd_panel_array[CONFIG_PNL] = mfd_settings_panel;
   mfd_hide_panel(mfd_settings_panel);
 
+  lv_obj_t *mfd_mob_panel = mfd_mob_panel_create(screen_active, " MOB");
+  mfd_panel_array[MOB_PNL] = mfd_mob_panel;
+  mfd_hide_panel(mfd_mob_panel);
+
   // Add the buttons and their link to their panel to the menubar
   // The void *userdata reference  is the reference to the panel to show
   lv_obj_t *trip_btn = mfd_button_create(menu_bar, "TRIP");
@@ -375,10 +427,14 @@ lv_obj_t *screen_main_create(void)
   lv_obj_t *setting_btn = mfd_button_create(menu_bar, "SETTING");
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
-  lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
+  lv_obj_t *mob_btn = mfd_button_create(menu_bar, "MOB");
+  // lv_obj_set_style_bg_color(mob_btn, lv_color_hex(SUN_BACKGROUND), 0);
+  lv_obj_add_event_cb(mob_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[MOB_PNL]);
+
+  // lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");
 
   // Create the about screen as a child of the main screen
-  lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
+  // lv_obj_add_screen_create_event(lv_button_0, LV_EVENT_CLICKED, screen_about_create, LV_SCREEN_LOAD_ANIM_MOVE_TOP, 500, 0);
 
   // Add the tiles and their tile_data objects to the trip panel
   CTSbox = mfd_panel_add_tile(mfd_trip_panel, "CTS", "o", CTSbox);
@@ -386,13 +442,13 @@ lv_obj_t *screen_main_create(void)
   LATminitile = mfd_tile_add_mini_tile(CTSbox, LATminitile);
   tile_hash[LAT] = mfd_mini_tile_add_data(LATminitile);
   mfd_mini_tile_set_label(LATminitile, "LAT");
-  
+
   COGbox = mfd_panel_add_tile(mfd_trip_panel, "COG", "o", COGbox);
   tile_hash[COG] = mfd_tile_add_tile_data(COGbox, tile_hash[COG]);
   LONminitile = mfd_tile_add_mini_tile(COGbox, LONminitile);
   tile_hash[LON] = mfd_mini_tile_add_data(LONminitile);
   mfd_mini_tile_set_label(LONminitile, "LON");
-  
+
   SOGbox = mfd_panel_add_tile(mfd_trip_panel, "SOG", "KTS", SOGbox);
   tile_hash[SOG] = mfd_tile_add_tile_data(SOGbox, tile_hash[SOG]);
   SOGminitile = mfd_tile_add_mini_tile(SOGbox, SOGminitile);
@@ -483,6 +539,15 @@ lv_obj_t *screen_main_create(void)
 
   CMGbox = mfd_panel_add_tile(mfd_course_panel, "CMG", "0", CMGbox);
   tile_hash[CMG] = mfd_tile_add_tile_data(CMGbox, tile_hash[CMG]);
+
+  MOB_cts_box = mfd_mob_panel_add_tile(mfd_mob_panel, "CTS", "o", MOB_cts_box);
+  tile_hash[MOB_CTS] = mfd_tile_add_tile_data(MOB_cts_box, tile_hash[MOB_CTS]);
+
+  MOB_dst_box = mfd_mob_panel_add_tile(mfd_mob_panel, "DST", "nm", MOB_dst_box);
+  tile_hash[MOB_DST] = mfd_tile_add_tile_data(MOB_dst_box, tile_hash[MOB_DST]);
+
+  MOB_pos_box = mfd_mob_panel_add_tile(mfd_mob_panel, "MOB POS", "", MOB_pos_box);
+  tile_hash[MOB_POS] = mfd_tile_add_tile_data(MOB_pos_box, tile_hash[MOB_POS]);
 
   LV_TRACE_OBJ_CREATE("finished");
 

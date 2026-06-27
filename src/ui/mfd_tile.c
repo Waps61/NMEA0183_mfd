@@ -21,6 +21,7 @@
 #include <ui/mfd_mini_tile.h>
 #include <NMEA0183_data.h>
 #include <font/mfd_fonts.h>
+#include <ui/mfd_panel_gen.h>
 
 /*********************
  *      DEFINES
@@ -37,7 +38,6 @@ lv_obj_t *mini_tile_container;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 
 void mfd_tile_set_label(lv_obj_t *tile, const char *title)
 {
@@ -90,10 +90,21 @@ lv_obj_t *mfd_tile_create(lv_obj_t *parent)
 {
 
   lv_obj_t *tile = lv_obj_create(parent);
+
+  mfd_panel_t *pdata = (mfd_panel_t *)lv_obj_get_user_data(parent);
+
   lv_obj_set_name(tile, "mfd_tile");
   mfd_set_tile_style(tile);
-  lv_obj_set_width(tile, TILE_WIDTH);
-  lv_obj_set_height(tile, TILE_HEIGHT);
-
+  if (pdata != NULL)
+  {
+    lv_obj_set_user_data(tile, pdata);
+    lv_obj_set_width(tile, pdata->tile_width);
+    lv_obj_set_height(tile, pdata->tile_height);
+  }
+  else
+  {
+    lv_obj_set_width(tile, TILE_WIDTH);
+    lv_obj_set_height(tile, TILE_HEIGHT);
+  }
   return tile;
 }

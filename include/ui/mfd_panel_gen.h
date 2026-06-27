@@ -40,7 +40,10 @@ extern "C"
     int tile_spacing_y;
     int draw_pos_x;
     int draw_pos_y;
+    int tile_width;
+    int tile_height;
     int tile_count;
+    int font_size;
   };
   typedef struct _mfd_panel_t mfd_panel_t;
 
@@ -48,7 +51,7 @@ extern "C"
   // static int max_col = 3;
   // static int max_tiles = 6;
   // static int tile_index = 0;
- /**********************
+  /**********************
    * GLOBAL PROTOTYPES
    **********************/
   void mfd_hide_panel(lv_obj_t *panel);

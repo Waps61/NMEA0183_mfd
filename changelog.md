@@ -1,5 +1,7 @@
 # CHANGE LOG
-## V1.1
+## V1.1.1
+Working on a MOB function as a new panel
+### V1.1
 Released version V1.1
 Added:
 * Depth sensor off-set implemented to make it more generic.

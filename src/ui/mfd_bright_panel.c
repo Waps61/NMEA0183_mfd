@@ -179,6 +179,9 @@ lv_obj_t *mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   paneldata->tile_count = 0;
   paneldata->tile_spacing_x = TILE_SPACING_X;
   paneldata->tile_spacing_y = TILE_SPACING_Y;
+  paneldata->tile_width = TILE_WIDTH;
+  paneldata->tile_height = TILE_HEIGHT;
+  paneldata->font_size = 96;
   lv_obj_set_user_data(panel, paneldata);
 
   if (title != NULL)
