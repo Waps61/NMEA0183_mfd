@@ -194,15 +194,18 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   LV_IMAGE_DECLARE(location_arrow_solid);
   mob_ship = lv_image_create(panel);
   lv_image_set_src(mob_ship, &location_arrow_solid);
+  
   lv_image_set_scale(mob_ship, 512);
   lv_obj_align(mob_ship, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_style_bg_color(mob_ship, lv_color_hex(DAY_BACKGROUND), 0);
+  //lv_obj_set_style_bg_image_recolor(mob_ship, lv_color_hex( MOB_BTN_COLOR), 0);
   // lv_image_set_rotation((lv_obj_t *)mob_ship, 2350);
   rotate_mob_ship(235.0, mob_ship);
 
   LV_IMAGE_DECLARE(person_drowning_solid);
   mob_person = lv_image_create(panel);
   lv_image_set_src(mob_person, &person_drowning_solid);
+  lv_image_set_scale(mob_person, 512);
   // lv_obj_align(mob_person, LV_ALIGN_CENTER, -100, 100);
   lv_obj_set_style_bg_color(mob_person, lv_color_hex(DAY_BACKGROUND), 0);
 
