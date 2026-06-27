@@ -1,4 +1,9 @@
 # NMEA0183-MFD: A marine multifunction display
+#### V1.2 relased 2706-2026
+One feature request was still on the hot list. Previous version ommitted MOB functionality.
+This has been implemented in V1.2 as an MOB panel. When activated, the current boat position is stored as the MOB position and is shown on a radar plot. With North up your boat is in the middle and the MOB position and distance is plotted on the radar plot. Your boat point is the actual COG so it gives you an idea where to go.
+### the MOB panel
+![screenshot of the MOB panel](/screenshots/mob_screen.jpeg)
 #### V1.1 released 19-06-2026
 After using the device for a couple of months on board,it did not fail me once. Some improvements or enhancements were noted. Like\
 * The latitude and longitude was not implemented, but it became clear that this is a must. So this is implemented now as minitiles on the TRP panel
