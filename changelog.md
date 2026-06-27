@@ -1,5 +1,8 @@
 # CHANGE LOG
-## V1.1.1
+### V1.2
+Released version 1.2
+Added an MOB panel with a radar plot, north up, with the MOB plotted in relation to your boat. For more info see See [README.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/README.md)
+### V1.1.1 to V1.1.5
 Working on a MOB function as a new panel
 ### V1.1
 Released version V1.1
