@@ -26,19 +26,31 @@ void end_btn_event_cb(lv_event_t *event)
     mob_data->mob_set = false;
     sprintf(mob_data->lat, "--º --.---'");
     sprintf(mob_data->lon, "---º --.---'");
+    MobResult mob_stopped;
+    mob_stopped.courseToSteerDeg = 0;
+    mob_stopped.distanceNM = 0;
+    update_radar_position(mob_stopped, 0);
   }
 }
 
-/** Draws a radar ring on the MOB panel  */
-void draw_radar_ring(int radius, lv_obj_t *parent)
+/** Draws a radar plot on the MOB panel  */
+void draw_radar(int radius, int nr_of_rings, lv_obj_t *parent)
 {
-  lv_obj_t *circle = lv_obj_create(parent);
-  lv_obj_set_size(circle, radius * 2, radius * 2);
-  lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, 0);
-  lv_obj_set_style_border_width(circle, 2, 0);
-  lv_obj_set_style_border_color(circle, lv_color_hex(MOB_BTN_COLOR), 0);
-  lv_obj_set_style_bg_opa(circle, LV_OPA_TRANSP, 0);
-  lv_obj_center(circle);
+  char lbltxt[10] = {0};
+  for (int i = 1; i <= nr_of_rings; i++)
+  {
+    lv_obj_t *circle = lv_obj_create(parent);
+    lv_obj_set_size(circle, i * radius * 2, i * radius * 2);
+    lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_border_width(circle, 2, 0);
+    lv_obj_set_style_border_color(circle, lv_color_hex(MOB_BTN_COLOR), 0);
+    lv_obj_set_style_bg_opa(circle, LV_OPA_TRANSP, 0);
+    lv_obj_center(circle);
+    lv_obj_t *ring_lbl = lv_label_create(parent);
+    lv_label_set_text_fmt(ring_lbl, "%.1f", (float)((i * 2) / 10.0));
+    lv_obj_center(ring_lbl);
+    lv_obj_set_pos(ring_lbl, i * radius, 0);
+  }
 
   // draw horizontal and vertical lines to indicate the direction of the MOB position. The lines are drawn from the center of the panel to the edge of the panel.
   lv_obj_t *hline = lv_obj_create(parent);
@@ -56,51 +68,56 @@ void draw_radar_ring(int radius, lv_obj_t *parent)
   lv_obj_center(vline);
 
   lv_obj_t *radar_scale = lv_label_create(parent);
-  lv_label_set_text_fmt(radar_scale,"scale = %.1f nm",RADAR_SCALE);
+  lv_label_set_text(radar_scale, "nm");
   lv_obj_set_style_text_font(radar_scale, &ui_font_lv_conthrax_16, 0);
-  lv_obj_set_style_align(radar_scale, LV_ALIGN_RIGHT_MID, 0);
-}
+  lv_obj_center(radar_scale);
+  lv_obj_set_pos(radar_scale, (nr_of_rings + 1) * radius, 0);
 
-void rotate_mob_ship(int cog, lv_obj_t *ship)
-{
-  // rotate the ship object to the course over ground (COG) value
-  lv_image_set_rotation((lv_obj_t *)ship, cog * 10);
-}
+  lv_obj_t *north_lbl = lv_label_create(parent);
+  lv_label_set_text(north_lbl, "N");
+  lv_obj_set_style_text_font(north_lbl, &ui_font_lv_conthrax_20, 0);
+  lv_obj_set_style_text_color(north_lbl, lv_color_hex(MOB_BTN_COLOR), 0);
+  lv_obj_center(north_lbl);
+  lv_obj_set_pos(north_lbl, 0, -nr_of_rings * radius);
 
-void update_radar_position(MobResult act_mob)
-{
-  float radar_scale = RADAR_WIDTH / (RADAR_SCALE * 2);
-  float r = act_mob.distanceNM * radar_scale;
-  if (r>radar_scale)
-    r = radar_scale;
-  float radar_x = r * cos((90 - act_mob.courseToSteerDeg) * M_PI / 180);
-  float radar_y = r * sin((90 - act_mob.courseToSteerDeg) * M_PI / 180);
-  // if( act_mob.courseToSteerDeg > 180)
-  //   radar_x *= -1; // 180-360 degrees is on the negative side of the x-axis
+  lv_obj_t *south_lbl = lv_label_create(parent);
+  lv_label_set_text(south_lbl, "S");
+  lv_obj_set_style_text_font(south_lbl, &ui_font_lv_conthrax_20, 0);
+  lv_obj_set_style_text_color(south_lbl, lv_color_hex(MOB_BTN_COLOR), 0);
+  lv_obj_center(south_lbl);
+  lv_obj_set_pos(south_lbl, 0, nr_of_rings * radius);
 
-  lv_image_set_rotation(mob_ship, act_mob.courseToSteerDeg * 10);
-  // Correct for the alignment direction in the y-direction, where
-  // y-direction the opposite in the XY-axis
-  lv_obj_align(mob_person, LV_ALIGN_CENTER, (int)radar_x, (int)-radar_y);
+  lv_obj_t *west_lbl = lv_label_create(parent);
+  lv_label_set_text(west_lbl, "W");
+  lv_obj_set_style_text_font(west_lbl, &ui_font_lv_conthrax_20, 0);
+  lv_obj_set_style_text_color(west_lbl, lv_color_hex(MOB_BTN_COLOR), 0);
+  lv_obj_center(west_lbl);
+  lv_obj_set_pos(west_lbl, -nr_of_rings * radius, 0);
 }
 
 /** Updates the position of the MOB person on the panel
  * relatively to the ship position. The MOB  is represented by a small icon that
  * is moved on the panel based on the latitude and longitude values of the MOB relatively to the  ship.
  * The MOB person is moved on the panel based on the following formula:
- * The ship is represented by a larger icon that is fixed in the center of the panel
+ * The ship is represented by an  icon that is fixed in the center of the panel and it's bow
+ * pointing to it's current COG.
+ * The radar is pointing North.
  */
-void update_mob_position(float lat, float lon, lv_obj_t *person)
+void update_radar_position(MobResult act_mob, int ship_cog)
 {
-  // update the position of the ship object on the MOB panel based on the latitude and longitude values
-  // The MOB panel is 865x480 pixels. The center of the panel is 432.5, 240. The latitude and longitude values are in degrees.
-  // The latitude and longitude values are converted to pixels based on the following formula:
-  // x = (lon + 180) * (865 / 360)
-  // y = (90 - lat) * (480 / 180)
-  int x = (lon + 180) * (865 / 360);
-  int y = (90 - lat) * (480 / 180);
-  lv_obj_set_x(person, x);
-  lv_obj_set_y(person, y);
+  float radar_scale = RADAR_WIDTH / (RADAR_SCALE * 2);
+  float r = act_mob.distanceNM * radar_scale;
+  if (r > radar_scale)
+    r = radar_scale;
+  float radar_x = r * cos((90 - act_mob.courseToSteerDeg) * M_PI / 180);
+  float radar_y = r * sin((90 - act_mob.courseToSteerDeg) * M_PI / 180);
+  // if( act_mob.courseToSteerDeg > 180)
+  //   radar_x *= -1; // 180-360 degrees is on the negative side of the x-axis
+
+  lv_image_set_rotation(mob_ship, ship_cog * 10); // act_mob.courseToSteerDeg * 10);
+  // Correct for the alignment direction in the y-direction, where
+  // y-direction the opposite in the XY-axis
+  lv_obj_align(mob_person, LV_ALIGN_CENTER, (int)radar_x, (int)-radar_y);
 }
 
 lv_obj_t *mfd_mob_panel_add_tile(lv_obj_t *panel, char const *title, char const *unit, lv_obj_t *tile)
@@ -173,11 +190,7 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
     lv_obj_set_align(label, LV_ALIGN_TOP_MID);
   }
 
-  // draw 4 radar rings on the MOB panel to indicate the distance from the MOB position. The rings are drawn at 50, 100, 150 and 200 meters from the MOB position.
-  for (int i = 0; i < 6; i++)
-  {
-    draw_radar_ring(i * 50, panel);
-  }
+  draw_radar(50, 5, panel);
 
   // Add ther end button. When pressed the MOB status is set to false
   lv_obj_t *end_mob_btn = lv_button_create(panel);
@@ -190,23 +203,20 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_y(end_mob_btn, 475);
   lv_obj_add_event_cb(end_mob_btn, end_btn_event_cb, LV_EVENT_ALL, NULL);
 
-  // put a demo images on screen
+  // draw the ship image on screen
   LV_IMAGE_DECLARE(location_arrow_solid);
   mob_ship = lv_image_create(panel);
   lv_image_set_src(mob_ship, &location_arrow_solid);
-  
+
   lv_image_set_scale(mob_ship, 512);
   lv_obj_align(mob_ship, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_style_bg_color(mob_ship, lv_color_hex(DAY_BACKGROUND), 0);
-  //lv_obj_set_style_bg_image_recolor(mob_ship, lv_color_hex( MOB_BTN_COLOR), 0);
-  // lv_image_set_rotation((lv_obj_t *)mob_ship, 2350);
-  rotate_mob_ship(235.0, mob_ship);
 
+  // draw the MOB image on screen
   LV_IMAGE_DECLARE(person_drowning_solid);
   mob_person = lv_image_create(panel);
   lv_image_set_src(mob_person, &person_drowning_solid);
   lv_image_set_scale(mob_person, 512);
-  // lv_obj_align(mob_person, LV_ALIGN_CENTER, -100, 100);
   lv_obj_set_style_bg_color(mob_person, lv_color_hex(DAY_BACKGROUND), 0);
 
   return panel;

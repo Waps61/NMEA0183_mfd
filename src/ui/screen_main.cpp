@@ -265,6 +265,7 @@ void mfd_update_tile_data()
     {
       MobResult mob_direction;
       char tmp_lbl[50] = {0};
+      // Check if MOB is not yet displayed on MOB panel
       if (!mob_data->mob_set)
       {
 
@@ -274,6 +275,7 @@ void mfd_update_tile_data()
         lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
         lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
       }
+      // Calculate CTS and DST from ship to MOB
       mob_direction = CalculateMOB(mob_data->lat, mob_data->lon, NMEA_DATA_STORE[LAT], NMEA_DATA_STORE[LON]);
 
       
@@ -282,9 +284,10 @@ void mfd_update_tile_data()
       sprintf(tmp_lbl, "%.1f", mob_direction.distanceNM);
       lv_label_set_text(tile_hash[MOB_DST], tmp_lbl);
 
-      update_radar_position(mob_direction);
+      // Show CST and DST to MOB and ships COG North up
+      update_radar_position(mob_direction,boat_cog);
 
-      // lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+      lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
     }
   }
 }
@@ -313,12 +316,15 @@ void menu_btn_event_cb(lv_event_t *event)
         // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
         if (i == MOB_PNL)
         {
-          mob_active = true;
+          if(!mob_active)
+          {
+          mob_active = true; //MOB btn is activated
           sprintf(mob_data->lat, "%s", lv_label_get_text(tile_hash[LAT]));
           sprintf(mob_data->lon, "%s", lv_label_get_text(tile_hash[LON]));
           mob_data->cog = 0.0;
           mob_data->time = millis();
-          mob_data->mob_set = false;
+          mob_data->mob_set = false; //MOB position not yet displayed on screen
+          }
         }
         mfd_show_panel(mfd_panel_array[i]);
       }

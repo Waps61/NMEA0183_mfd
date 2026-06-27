@@ -29,7 +29,7 @@ extern "C"
 
   lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title);
   lv_obj_t *mfd_mob_panel_add_tile(lv_obj_t *panel, char const *title, char const *unit, lv_obj_t *tile);
-  void update_radar_position(MobResult act_mob);
+  void update_radar_position(MobResult act_mob, int ship_cog);
 
 #ifdef __cplusplus
 } /*extern "C"*/
