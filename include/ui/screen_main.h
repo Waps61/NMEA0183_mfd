@@ -29,7 +29,8 @@ extern "C"
     WIND,
     COURSE,
     BRIGHT,
-    SETTING
+    SETTING,
+    MOB
   };
   /**********************
    * GLOBAL PROTOTYPES
