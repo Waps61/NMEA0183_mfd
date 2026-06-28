@@ -201,6 +201,11 @@ lv_obj_t *mfd_mob_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_height(end_mob_btn, 75);
   lv_obj_set_x(end_mob_btn, 650);
   lv_obj_set_y(end_mob_btn, 475);
+  lv_obj_set_style_border_width(end_mob_btn, 1,0);
+  lv_obj_set_style_shadow_width(end_mob_btn, 5, 0);
+  lv_obj_set_style_shadow_offset_x(end_mob_btn, 4, 0);
+  lv_obj_set_style_shadow_offset_y(end_mob_btn, 6, 0);
+  lv_obj_set_style_bg_color(end_mob_btn, lv_color_hex(MOB_BTN_COLOR), 0);
   lv_obj_add_event_cb(end_mob_btn, end_btn_event_cb, LV_EVENT_ALL, NULL);
 
   // draw the ship image on screen
