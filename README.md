@@ -1,5 +1,7 @@
 # NMEA0183-MFD: A marine multifunction display
-#### V1.2 relased 2706-2026
+#### V1.3 released 29-06-2026
+Solved the bug with the background color of buttons. The flag LV_OBJ_FLAG_CHECKABLE was causing the issue.
+#### V1.2 relased 27-06-2026
 One feature request was still on the hot list. Previous version ommitted MOB functionality.
 This has been implemented in V1.2 as an MOB panel. When activated, the current boat position is stored as the MOB position and is shown on a radar plot. With North up your boat is in the middle and the MOB position and distance is plotted on the radar plot. Your boat point is the actual COG so it gives you an idea where to go.
 ### the MOB panel
