@@ -1,4 +1,6 @@
 # CHANGE LOG
+### V1.3
+Released versio 1.3. Fixed the bachround issue with buttons, i.e. noticable when dawn or night mode was selected. The LV_OBJ_FLAG_CHECKABLE was causing this behaviour.
 ### V1.2
 Released version 1.2
 Added an MOB panel with a radar plot, north up, with the MOB plotted in relation to your boat. For more info see See [README.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/README.md)
