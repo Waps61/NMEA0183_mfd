@@ -23,15 +23,7 @@ extern "C"
   /**********************
    *      TYPEDEFS
    **********************/
-  enum mfd_panel_id
-  {
-    TRIP,
-    WIND,
-    COURSE,
-    BRIGHT,
-    SETTING,
-    MOB
-  };
+ 
   /**********************
    * GLOBAL PROTOTYPES
    **********************/

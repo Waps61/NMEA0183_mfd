@@ -82,16 +82,13 @@ void mfd_update_style(lv_obj_t *parent, lv_style_t *newstyle)
       // lv_log("no bg_color found.\n");
       if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_TEXT_COLOR, &sval))
         lv_obj_set_style_text_color(child, sval.color, 0);
-      // else
-      // lv_log("no text_color found.\n");
+      
       if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_BORDER_COLOR, &sval))
         lv_obj_set_style_border_color(child, sval.color, 0);
-      // else
-      // lv_log("no border_color found.\n");
+      
       if (LV_RESULT_OK == lv_style_get_prop(newstyle, LV_STYLE_SHADOW_COLOR, &sval))
         lv_obj_set_style_shadow_color(child, sval.color, 0);
-      // if(LV_RESULT_OK == lv_style_get_prop(newstyle,LV_STYLE_LINE_COLOR,&sval));
-      //   lv_obj_set_style_line_color(child, sval.color, 0);
+      
     }
   }
   if (lv_color_eq(bg_main.color, lv_color_hex(DAY_BACKGROUND)))
@@ -187,7 +184,7 @@ void mfd_init_styles()
 
   lv_style_set_bg_color(&mfd_style_menubar, lv_color_hex(DAY_BACKGROUND));
   lv_style_set_bg_opa(&mfd_style_menubar, LV_OPA_50);
-  lv_style_set_text_color(&mfd_style_menubar, lv_color_hex(DAY_TEXT_ON_BACKGROUND));
+  //lv_style_set_text_color(&mfd_style_menubar, lv_color_hex(DAY_TEXT_ON_BACKGROUND));
   lv_style_set_text_opa(&mfd_style_menubar, LV_OPA_50);
   lv_style_set_text_font(&mfd_style_menubar, &ui_font_lv_conthrax_16);
   lv_style_set_border_color(&mfd_style_menubar, lv_color_hex(DAY_TEXT_ON_PRIMARY));
@@ -272,9 +269,7 @@ lv_obj_t *mfd_set_btn_style(lv_obj_t *btn)
 {
 
   lv_obj_add_style(btn, &mfd_style_btn, 0);//LV_STATE_DEFAULT);
-  lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
   lv_obj_set_style_bg_color(btn, lv_color_hex(0x008591), LV_STATE_FOCUSED);
-  //lv_obj_set_style_bg_color(btn, lv_color_hex(DAY_TEXT_ON_PRIMARY), /*LV_STATE_DEFAULT |*/ LV_STATE_PRESSED);
   lv_obj_set_scrollbar_mode(btn, LV_SCROLLBAR_MODE_OFF);
   return btn;
 }
@@ -286,9 +281,7 @@ lv_obj_t *mfd_set_mob_btn_style(lv_obj_t *btn)
 {
 
   lv_obj_add_style(btn, &mfd_style_btn, LV_STATE_DEFAULT);
-  lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
   lv_obj_set_style_bg_color(btn, lv_color_hex(MOB_BTN_COLOR), LV_STATE_FOCUSED);
-  lv_obj_set_style_bg_color(btn, lv_color_hex(DAY_TEXT_ON_PRIMARY), LV_STATE_DEFAULT | LV_STATE_PRESSED);
   lv_obj_set_scrollbar_mode(btn, LV_SCROLLBAR_MODE_OFF);
   return btn;
 }
@@ -309,7 +302,7 @@ void mfd_recolor(lv_obj_t *parent)
   if (UNCHANGED_STYLE != mfd_get_style_changed())
   {
 
-    lv_log(" recoloring tree...\n)");
+    //lv_log(" recoloring tree...\n)");
 
     if (DAY_STYLE == mfd_get_style_changed())
       mfd_update_style(parent, &mfd_style_day);

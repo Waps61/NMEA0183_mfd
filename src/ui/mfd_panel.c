@@ -61,7 +61,7 @@ lv_obj_t *mfd_panel_add_gauge(lv_obj_t *panel, char const *nmea_tag, lv_obj_t *g
       pdata->draw_pos_y += pdata->tile_height + pdata->tile_spacing_y;
     }
     mfd_gauge_set_label(gauge_tile, nmea_tag);
-    //lv_obj_align(gauge_tile, LV_ALIGN_BOTTOM_MID,0,-10);
+    
     
   }
   return gauge_tile;

@@ -259,7 +259,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_textarea_set_one_line(logvalue, true);
   lv_textarea_set_password_mode(logvalue, false);
   lv_obj_add_event_cb(logvalue, ta_event_cb, LV_EVENT_ALL, kbd);
-  lv_log("about to set log t %.1f\n", mfd_ship_config_get_log());
+  //lv_log("about to set log t %.1f\n", mfd_ship_config_get_log());
   sprintf(tmpVal, "%.1f", mfd_ship_config_get_log());
   lv_textarea_add_text(logvalue, tmpVal);
   lv_keyboard_set_textarea(kbd, logvalue);
@@ -284,7 +284,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_textarea_set_one_line(depthvalue, true);
   lv_textarea_set_password_mode(depthvalue, false);
   lv_obj_add_event_cb(depthvalue, ta_event_cb, LV_EVENT_ALL, kbd);
-  lv_log("about to set depth offset t %.1f\n", mfd_ship_config_get_depth_offset());
+  //lv_log("about to set depth offset t %.1f\n", mfd_ship_config_get_depth_offset());
   sprintf(tmpVal, "%.1f", mfd_ship_config_get_depth_offset());
   lv_textarea_add_text(depthvalue, tmpVal);
   lv_keyboard_set_textarea(kbd, depthvalue);

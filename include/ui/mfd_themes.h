@@ -68,7 +68,7 @@ extern "C"
 #define DAWN_TEXT_ON_BACKGROUND 0xea01ff // #ea01ff
 #define DAWN_LINE_COLOR 0x553ca0         // #553ca0
 
-#define MOB_BTN_COLOR 0xFF0000 // #FF0000
+#define MOB_BTN_COLOR 0xFF0000         // #FF0000
 #define MOB_BTN_COLOR_PRESSED 0xFF0000 // #ff6200
 
   /**********************
@@ -81,13 +81,6 @@ extern "C"
    * THEME_MODE_DAWN for operation during the twilight zone befor nigth
    * THEME_MODE_NIGHT for night opreation, moderate brightness and Red foreground and black background
    */
-  typedef enum
-  {
-    THEME_MODE_DAY,
-    THEME_MODE_SUN,
-    THEME_MODE_DAWN,
-    THEME_MODE_NIGHT
-  } lv_theme_mode_t;
 
   /***********************
    *  STATIC VARIABLES

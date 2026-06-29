@@ -287,18 +287,13 @@ void mfd_update_tile_data()
       // Show CST and DST to MOB and ships COG North up
       update_radar_position(mob_direction,boat_cog);
 
-      lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+      //lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
     }
   }
 }
 
 /**
- * Menu button handler from the main menu to select
- * 1 of the 5 panels.
- * Cuurently trip panel is always visible but overlayed with the follwoing panels
- * So need to press a button once to show and twcie to hide
- *
- *
+ * Menu button handler from the main menu to select 1 of the 6 panels.
  */
 void menu_btn_event_cb(lv_event_t *event)
 {
@@ -307,12 +302,12 @@ void menu_btn_event_cb(lv_event_t *event)
   if (code == LV_EVENT_CLICKED)
   {
     int *ipnl = (int *)lv_event_get_user_data(event);
-    lv_log("index from button pressed = %d\n", *ipnl);
+    //lv_log("index from button pressed = %d\n", *ipnl);
     for (int i = TRIP_PNL; i <= MOB_PNL; i++)
     {
       if (i == *ipnl)
       {
-        lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
+        //lv_log("panel to show is %s\n", lv_obj_get_name(mfd_panel_array[i]));
         // check if MOB btn is pressed, if so set the mob_active flag to true, so that the MOB panel can be shown and the MOB alarm can be set.
         if (i == MOB_PNL)
         {
@@ -428,7 +423,6 @@ lv_obj_t *screen_main_create(void)
   lv_obj_add_event_cb(setting_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[CONFIG_PNL]);
 
   lv_obj_t *mob_btn = mfd_button_create(menu_bar, "MOB");
-  // lv_obj_set_style_bg_color(mob_btn, lv_color_hex(SUN_BACKGROUND), 0);
   lv_obj_add_event_cb(mob_btn, menu_btn_event_cb, LV_EVENT_ALL, panel_hash[MOB_PNL]);
 
   // lv_obj_t *lv_button_0 = mfd_button_create(menu_bar, "Sjean");

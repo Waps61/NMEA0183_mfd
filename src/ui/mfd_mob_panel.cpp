@@ -111,8 +111,7 @@ void update_radar_position(MobResult act_mob, int ship_cog)
     r = radar_scale;
   float radar_x = r * cos((90 - act_mob.courseToSteerDeg) * M_PI / 180);
   float radar_y = r * sin((90 - act_mob.courseToSteerDeg) * M_PI / 180);
-  // if( act_mob.courseToSteerDeg > 180)
-  //   radar_x *= -1; // 180-360 degrees is on the negative side of the x-axis
+  
 
   lv_image_set_rotation(mob_ship, ship_cog * 10); // act_mob.courseToSteerDeg * 10);
   // Correct for the alignment direction in the y-direction, where

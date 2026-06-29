@@ -86,51 +86,6 @@ static double ParseDegMinTick(const char *str)
   return decimal;
 }
 
-/* -------------------------------------------------------------------------
- * Parses strings like "5341.5631,N" or "00622.1234,E" (DDMM.MMMM / DDDMM.MMMM)
- * Returns signed decimal degrees (negative for S / W).
- * ------------------------------------------------------------------------- */
-// static double ParseDDMM(const char *str)
-// {
-//   char buf[64];
-//   char *comma;
-//   char *dot;
-//   char hemi = 0;
-//   int dotPos, minStart;
-//   char degPart[16] = {0};
-//   char minPart[16] = {0};
-//   double deg, minutes, decimal;
-
-//   strncpy(buf, str, sizeof(buf) - 1);
-//   buf[sizeof(buf) - 1] = '\0';
-
-//   comma = strchr(buf, ',');
-//   if (comma)
-//   {
-//     hemi = (char)toupper((unsigned char)*(comma + 1));
-//     *comma = '\0'; /* cut the string so only the numeric part remains */
-//   }
-
-//   dot = strchr(buf, '.');
-//   if (!dot)
-//     return 0.0; /* malformed input */
-
-//   dotPos = (int)(dot - buf);
-//   minStart = dotPos - 2;
-//   if (minStart < 0)
-//     minStart = 0;
-
-//   strncpy(degPart, buf, (size_t)minStart);
-//   degPart[minStart] = '\0';
-//   strcpy(minPart, buf + minStart);
-
-//   deg = degPart[0] ? atof(degPart) : 0.0;
-//   minutes = atof(minPart);
-//   decimal = deg + minutes / 60.0;
-//   if (hemi == 'S' || hemi == 'W')
-//     decimal = -decimal;
-//   return decimal;
-// }
 
 /**
  * Parse coordinate string in format "5221.5621,N" or "00540.8482,E"
@@ -487,7 +442,7 @@ void processNMEAData(const char *buff)
             }
             if (field == 3 && cvalue[0] == 'f')
             {
-              // boat_dpt = atof(cvalue);
+              
               boat_dpt = boat_dpt * FTM + get_depth_offset();
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
