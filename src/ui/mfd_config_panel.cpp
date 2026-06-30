@@ -271,7 +271,7 @@ lv_obj_t *mfd_config_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_set_name(depthvalue, "mfd_depth_value");
   lv_obj_set_pos(depthvalue, 275, 253);
   lv_obj_set_size(depthvalue, 150, 70);
-  lv_textarea_set_accepted_chars(depthvalue, "1234567890.");
+  lv_textarea_set_accepted_chars(depthvalue, "1234567890.-");
   lv_textarea_set_max_length(depthvalue, 7);
   lv_label_bind_text(depthvalue, &mfd_subject_depth_offset, NULL);
 

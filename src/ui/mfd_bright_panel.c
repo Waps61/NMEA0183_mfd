@@ -209,16 +209,17 @@ lv_obj_t *mfd_brightness_panel_create(lv_obj_t *parent, const char *title)
   lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -60);
   lv_obj_set_style_border_width(slider, 1, 0);
   lv_obj_add_style(slider, &mfd_style, 0);
+  lv_obj_set_style_bg_color(slider, lv_color_hex(NIGHT_TEXT_ON_BACKGROUND), LV_PART_KNOB);
 
   lv_obj_t *dimdown = lv_label_create(panel);
-  lv_label_set_text(dimdown, "-");
+  lv_label_set_text(dimdown, LV_SYMBOL_MINUS);
   lv_obj_set_style_text_font(dimdown, &ui_font_lv_conthrax_24, 0);
-  lv_obj_align(dimdown, LV_ALIGN_BOTTOM_LEFT, 225, -60);
+  lv_obj_align(dimdown, LV_ALIGN_BOTTOM_LEFT, 225, -50);
 
   lv_obj_t *dimup = lv_label_create(panel);
-  lv_label_set_text(dimup, "+");
+  lv_label_set_text(dimup, LV_SYMBOL_PLUS);
   lv_obj_set_style_text_font(dimup, &ui_font_lv_conthrax_24, 0);
-  lv_obj_align(dimup, LV_ALIGN_BOTTOM_RIGHT, -225, -60);
+  lv_obj_align(dimup, LV_ALIGN_BOTTOM_RIGHT, -225, -50);
 
   // Create a label below the slider
   lv_obj_t *label = lv_label_create(panel);

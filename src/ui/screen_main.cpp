@@ -271,7 +271,7 @@ void mfd_update_tile_data()
 
         mob_data->mob_set = true;
         strncpy(tmp_lbl, mob_data->lat, strlen(mob_data->lat));
-        sprintf(tmp_lbl, " %s\n%s", mob_data->lat, mob_data->lon);
+        sprintf(tmp_lbl, "%17s\n%14s", mob_data->lat, mob_data->lon);
         lv_label_set_text(tile_hash[MOB_POS], tmp_lbl);
         lv_obj_set_style_text_font(tile_hash[MOB_POS], &ui_font_lv_conthrax_20, 0);
       }
@@ -281,13 +281,19 @@ void mfd_update_tile_data()
       
       sprintf(tmp_lbl, "%d", mob_direction.courseToSteerDeg);
       lv_label_set_text(tile_hash[MOB_CTS], tmp_lbl);
-      sprintf(tmp_lbl, "%.1f", mob_direction.distanceNM);
+      sprintf(tmp_lbl, "%.2f", mob_direction.distanceNM);
       lv_label_set_text(tile_hash[MOB_DST], tmp_lbl);
 
       // Show CST and DST to MOB and ships COG North up
       update_radar_position(mob_direction,boat_cog);
 
       //lv_log("MOB data updated, lat: %s, lon: %s, cog: %.2f, time: %.2f mob_active=%d\n", mob_data->lat, mob_data->lon, mob_data->cog, mob_data->time,mob_data->mob_set);
+    } else if(mob_data->mob_set)
+    {
+      mob_data->mob_set = false;
+      lv_label_set_text_fmt(tile_hash[MOB_POS], "%14s\n%14s", mob_data->lat, mob_data->lon);
+      lv_label_set_text(tile_hash[MOB_CTS], "---");
+      lv_label_set_text(tile_hash[MOB_DST], "---");
     }
   }
 }
