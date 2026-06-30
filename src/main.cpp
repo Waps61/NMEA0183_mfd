@@ -325,8 +325,8 @@ void setup()
   mob_data->mob_set = false;
   mob_data->cog = 0.0;
   mob_data->time = 0.0;
-  sprintf(mob_data->lat, "--º --.---'");
-  sprintf(mob_data->lon, "---º --.---'");  
+  sprintf(mob_data->lat, "--°--.----'");
+  sprintf(mob_data->lon, "---°--.----'");
 
   // for testing purposes only
   //  mfd_pers_t testconfig;

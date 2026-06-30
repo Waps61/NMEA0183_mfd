@@ -23,9 +23,9 @@ void end_btn_event_cb(lv_event_t *event)
     mob_active = false;
     mob_data->cog = 0.0;
     mob_data->time = 0.0;
-    mob_data->mob_set = false;
-    sprintf(mob_data->lat, "--º --.---'");
-    sprintf(mob_data->lon, "---º --.---'");
+    mob_data->mob_set = true;
+    sprintf(mob_data->lat, "--°--.----'");
+    sprintf(mob_data->lon, "---°--.----'");
     MobResult mob_stopped;
     mob_stopped.courseToSteerDeg = 0;
     mob_stopped.distanceNM = 0;
