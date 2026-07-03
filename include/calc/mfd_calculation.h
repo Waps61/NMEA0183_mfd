@@ -9,7 +9,6 @@
 #include <ctype.h>
 #include <math.h>
 
-extern bool isNumeric(char *value);
 MobResult CalculateMOB(const char *mobLat, const char *mobLon,
                        const char *boatLat, const char *boatLon);
 
