@@ -1,16 +1,24 @@
-
 /**
- * @file mfd_persistent.c
+ * @file mfd_persistent.cpp
+ *
+ * Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
+ * Contact:  waps61 @gmail.com
+ *
+ * Persistent storage implementation. Fixes vs v1.3 
+ *   - `nvr_millis` and `mfd_preferences` now have exactly one definition
+ *     (here), instead of one private copy per translation unit that
+ *     included the header.
+ *   - Arduino `String` objects are now passed through `.c_str()` before
+ *     reaching a `%s` format specifier (they previously weren't, which is
+ *     undefined behavior -- a plausible contributor to the memory
+ *     assertions chased down in the v1.0 changelog).
  */
-/*
-  Project:  NMEA0183 Multi Function Display, Copyright 2026, Roy Wassili
-  Contact:  waps61 @gmail.com
-  Persistent implementation. It is used to store some variables for configuration
-  setting of the program
-*/
 #include <Arduino.h>
 #include <lvgl.h>
 #include <persist/mfd_persistent.h>
+
+unsigned long nvr_millis = 0;
+static Preferences mfd_preferences;
 
 void mfd_ship_config_set_baudrate(int value)
 {
@@ -29,17 +37,17 @@ bool mfd_ship_config_get_wifi()
 {
   return ship_config.wifi_on;
 }
-void mfd_ship_config_set_ssid(String value)
+void mfd_ship_config_set_ssid(const String &value)
 {
-  ship_config.SSID = String(value);
+  ship_config.SSID = value;
 }
 String mfd_ship_config_get_ssid()
 {
   return ship_config.SSID;
 }
-void mfd_ship_config_set_pwd(String value)
+void mfd_ship_config_set_pwd(const String &value)
 {
-  ship_config.pwd = String(value);
+  ship_config.pwd = value;
 }
 String mfd_ship_config_get_pwd()
 {
@@ -62,19 +70,15 @@ float mfd_ship_config_get_depth_offset()
   return ship_config.depth_offset;
 }
 
-bool mfd_persistent_open()
+static bool mfd_persistent_open()
 {
-  bool success = false;
-  Serial.begin(115200);
-  success = mfd_preferences.begin("NMEA_mfd", false);
+  bool success = mfd_preferences.begin("NMEA_mfd", false);
   lv_log("persistent opened = %d\n", success);
-  // mfd_preferences.clear();
   return success;
 }
 
-void mfd_persistent_close()
+static void mfd_persistent_close()
 {
-
   mfd_preferences.end();
 }
 
@@ -93,22 +97,43 @@ mfd_pers_t mfd_read_persistent_data()
     mfd_persistent_close();
   }
   else
+  {
     lv_log("reading failed\n");
+    /* Fall back to safe defaults so callers always get a usable struct,
+     * even if NVS couldn't be opened (e.g. first boot / corrupted partition). */
+    persistent_data.baudrate = 9600;
+    persistent_data.wifi_on = true;
+    persistent_data.SSID = "---";
+    persistent_data.pwd = "***";
+    persistent_data.ship_log = -0.1f;
+    persistent_data.depth_offset = 0.0f;
+  }
   return persistent_data;
 }
 
 bool mfd_write_persistent_data(mfd_pers_t *perst_data)
 {
-  bool success = false;
-  success = mfd_persistent_open();
+  bool success = mfd_persistent_open();
   if (success)
   {
-    lv_log("writing baudrate %d to EEPROM was =%d\n", perst_data->baudrate, (success &= (mfd_preferences.putInt("baudrate", perst_data->baudrate) != 0)));
-    lv_log("writing wifi %d to EEPROM was =%d\n", (int)perst_data->wifi_on, (success &= (mfd_preferences.putBool("wifi_on", perst_data->wifi_on) != 0)));
-    lv_log("writing SSID %s to EEPROM was =%d\n", perst_data->SSID, (success &= (mfd_preferences.putString("SSID", perst_data->SSID) != 0)));
-    lv_log("writing pwd %s to EEPROM was =%d\n", perst_data->pwd, (success &= (mfd_preferences.putString("pwd", perst_data->pwd) != 0)));
-    lv_log("writing log %0.1f to EEPROM was =%d\n", perst_data->ship_log, (success &= (mfd_preferences.putFloat("ship_log", perst_data->ship_log) != 0)));
-    lv_log("writing depth offset %0.1f to EEPROM was =%d\n", perst_data->depth_offset, (success &= (mfd_preferences.putFloat("depth_offset", perst_data->depth_offset) != 0)));
+    success &= (mfd_preferences.putInt("baudrate", perst_data->baudrate) != 0);
+    lv_log("writing baudrate %d to EEPROM was =%d\n", perst_data->baudrate, success);
+
+    success &= (mfd_preferences.putBool("wifi_on", perst_data->wifi_on) != 0);
+    lv_log("writing wifi %d to EEPROM was =%d\n", (int)perst_data->wifi_on, success);
+
+    success &= (mfd_preferences.putString("SSID", perst_data->SSID) != 0);
+    lv_log("writing SSID %s to EEPROM was =%d\n", perst_data->SSID.c_str(), success);
+
+    success &= (mfd_preferences.putString("pwd", perst_data->pwd) != 0);
+    lv_log("writing pwd to EEPROM was =%d\n", success); /* never log the password itself */
+
+    success &= (mfd_preferences.putFloat("ship_log", perst_data->ship_log) != 0);
+    lv_log("writing log %0.1f to EEPROM was =%d\n", perst_data->ship_log, success);
+
+    success &= (mfd_preferences.putFloat("depth_offset", perst_data->depth_offset) != 0);
+    lv_log("writing depth offset %0.1f to EEPROM was =%d\n", perst_data->depth_offset, success);
+
     mfd_persistent_close();
   }
 
@@ -123,28 +148,28 @@ bool mfd_update_persistent_key(mfd_pers_key key_id, mfd_pers_t *perst_data)
     switch (key_id)
     {
     case MFD_BAUDRATE:
-      success = mfd_preferences.putInt("baudrate", perst_data->baudrate);
-      lv_log("baudrate update writen with value %d\n", perst_data->baudrate);
+      success = mfd_preferences.putInt("baudrate", perst_data->baudrate) != 0;
+      lv_log("baudrate update written with value %d (ok=%d)\n", perst_data->baudrate, success);
       break;
     case MFD_WIFI_ON:
-      success = mfd_preferences.putBool("wifi_on", perst_data->wifi_on);
-      lv_log("wifi switch update writen with value %d\n", perst_data->wifi_on);
+      success = mfd_preferences.putBool("wifi_on", perst_data->wifi_on) != 0;
+      lv_log("wifi switch update written with value %d (ok=%d)\n", perst_data->wifi_on, success);
       break;
     case MFD_SSID:
-      success = mfd_preferences.putString("SSID", perst_data->SSID);
-      lv_log("ssid update writen with value *****\n");
+      success = mfd_preferences.putString("SSID", perst_data->SSID) != 0;
+      lv_log("ssid update written (ok=%d)\n", success);
       break;
     case MFD_PWD:
-      success = mfd_preferences.putString("pwd", perst_data->pwd);
-      lv_log("pwd update writen with value ###n", perst_data->pwd);
+      success = mfd_preferences.putString("pwd", perst_data->pwd) != 0;
+      lv_log("pwd update written (ok=%d)\n", success); /* never log the password itself */
       break;
     case MFD_SHIPLOG:
-      success = mfd_preferences.putFloat("ship_log", perst_data->ship_log);
-      lv_log("ship log update writen with value %.1f\n", perst_data->ship_log);
+      success = mfd_preferences.putFloat("ship_log", perst_data->ship_log) != 0;
+      lv_log("ship log update written with value %.1f (ok=%d)\n", perst_data->ship_log, success);
       break;
     case MFD_DEPTH_OFFSET:
-      success = mfd_preferences.putFloat("depth_offset", perst_data->depth_offset);
-      lv_log("depth offset update writen with value %.1f\n", perst_data->depth_offset);
+      success = mfd_preferences.putFloat("depth_offset", perst_data->depth_offset) != 0;
+      lv_log("depth offset update written with value %.1f (ok=%d)\n", perst_data->depth_offset, success);
       break;
     default:
       break;
