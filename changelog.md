@@ -1,6 +1,19 @@
 # CHANGE LOG
+### V1.3.2
+Fixed some bugs where:
+* VMG was miscalculated for SOG >0.3 kts
+* Removed some dead code from functiontion that where never used
+* Hardened the code in the persistence module dealing woth strings
+* depth_offset was appplied twice when converting from feet to meters
+* - `nvr_millis` and `mfd_preferences` were declared `static` at this\
+header's file scope, which means every .cpp that includes this \
+header got its OWN private copy of both. They are now `extern` \
+here and defined exactly once in mfd_persistent.cpp.
+### V1.3.1
+Fixed missing font icons where icons where not compiled into the font files.
+Precision of the DST tag in the MOB panel increased to 2 digits.
 ### V1.3
-Released versio 1.3. Fixed the bachround issue with buttons, i.e. noticable when dawn or night mode was selected. The LV_OBJ_FLAG_CHECKABLE was causing this behaviour.
+Released versio 1.3. Fixed the backround issue with buttons, i.e. noticable when dawn or night mode was selected. The LV_OBJ_FLAG_CHECKABLE was causing this behaviour.
 ### V1.2
 Released version 1.2
 Added an MOB panel with a radar plot, north up, with the MOB plotted in relation to your boat. For more info see See [README.md](https://github.com/Waps61/NMEA0183_mfd/edit/main/README.md)

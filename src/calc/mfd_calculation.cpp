@@ -186,20 +186,7 @@ float calculate_distance(const char *lat1_str, const char *lon1_str,
 
   return distance;
 }
-/***
- * function check if a string is a number
- */
-bool isNumeric(char *value)
-{
-  bool result = true;
-  int i = 0;
-  while (value[i] != '\0' && result && i < FIELD_BUFFER)
-  {
-    result = (isdigit(value[i]) || value[i] == '.' || value[i] == '-');
-    i++;
-  }
-  return result;
-}
+
 
 /* -------------------------------------------------------------------------
  * Main MOB function.
@@ -408,6 +395,8 @@ void processNMEAData(const char *buff)
               boat_sog = atof(cvalue);
               boat_vmg = (float)(boat_sog * cos(boat_awa * PI / 180));
               sprintf(tmp, "%3.1f", boat_vmg);
+              set_data_store(SOG, cvalue);
+              set_data_store(VMG, tmp);
               // use a SOG threshold of 0.3 knots to prevent log and trip updates when the boat is not moving, because at
               // low speeds the position updates are not reliable and can cause log and trip values to increase when
               // the boat is actually stationary
@@ -421,8 +410,7 @@ void processNMEAData(const char *buff)
                 sprintf(tmp, "%f", get_boat_log());
                 set_data_store(LOG, tmp);
               }
-              set_data_store(SOG, cvalue);
-              set_data_store(VMG, tmp);
+              
             }
             if (field == 8)
             {
@@ -443,7 +431,7 @@ void processNMEAData(const char *buff)
             if (field == 3 && cvalue[0] == 'f')
             {
               
-              boat_dpt = boat_dpt * FTM + get_depth_offset();
+              boat_dpt = boat_dpt * FTM;
               sprintf(tmp, "%1.1f", boat_dpt);
               set_data_store(DPT, tmp);
             }
@@ -518,7 +506,7 @@ void processNMEAData(const char *buff)
             }
             if (field == 3)
             {
-              if (cvalue[0] = 'E')
+              if (cvalue[0] == 'E')
               {
                 // For Easterly deviation add to magnetic sensor reading
                 // For Magnetic Heading
@@ -538,7 +526,7 @@ void processNMEAData(const char *buff)
             }
             if (field == 5)
             {
-              if (cvalue[0] = 'E')
+              if (cvalue[0] == 'E')
               {
                 // For Easterly variation add to magnetic heading
                 // For True Heading

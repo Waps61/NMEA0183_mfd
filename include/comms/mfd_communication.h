@@ -34,7 +34,6 @@ extern void mfd_setup_communication();
 
 extern int NMEA_startTalking(const char *nmeaBuff);
 extern void NMEA_startListening();
-extern void decodeNMEAInput(char cIn);
 extern void NMEA_runSoftGenerator();
 
 #endif // MFD_COMMUNICATION_H
